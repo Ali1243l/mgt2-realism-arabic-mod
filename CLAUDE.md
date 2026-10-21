@@ -6,6 +6,7 @@ These rules keep their work from colliding.
 ## 1. Start of every session or task
 1. `git status` and `git log -n 3 --oneline`: see what changed recently.
 2. Read `TASKS.md` (who is doing what) and `IMPORTANT_PROJECT_STATUS.md` (how the mod works, decisions, gotchas).
+   The design plan is `docs/GDD.md` (35 points, Arabic); `TASKS.md` tracks each point.
 3. State the plan before touching code: the task, the files you will create or modify, and the current branch.
 
 ## 2. Visibility
