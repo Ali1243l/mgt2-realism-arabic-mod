@@ -1,0 +1,7 @@
+#!/bin/sh
+# team rule (CLAUDE.md): work happens on feature/* or fix/* branches, main only changes through pull requests
+branch=$(git branch --show-current)
+if [ "$branch" = "main" ]; then
+  echo "Blocked: no commits on main. Create a branch: git checkout -b feature/<name>" >&2
+  exit 1
+fi

@@ -1,0 +1,46 @@
+line	ar	note
+9	مع ازدياد مستوى الخبرة تنخفض تكاليف التطوير.<br>بالإضافة إلى ذلك تزداد نقاط أسلوب اللعب والرسومات والتقنية والصوت.	broken sentence
+23	استوديو الرسومات	unify
+24	استوديو الصوت	unify
+66	<b>تصميم الغرفة</b><br>يمكنك الضغط على <color=blue>مفتاح Shift الأيسر</color><br>لإزالة الغرفة.	line order + English leftover
+67	<b>إزالة الغرفة</b><br>يمكنك أيضاً الضغط على <color=blue>مفتاح Shift الأيسر</color><br>لإزالة الغرفة.	line order + English leftover
+68	<b>وضع الباب</b><br>يجب أن يكون الباب متصلاً بالممر.<br>يمكنك إزالة الباب باستخدام <color=blue>مفتاح Delete</color>.	English leftover
+69	<b>وضع النوافذ</b><br>اضغط باستمرار على <color=blue>مفتاح Shift الأيسر</color><br>لإزالة النوافذ.	line order + English leftover
+147	الموظفون المعيّنون لهذه الغرفة.<br>اضغط <color=blue>CTRL + زر الماوس الأيسر</color> لتحديد جميع الموظفين.	half English
+327	الرجاء تحديد نوع اللعبة. بالنسبة لألعاب MMO و F2P فإن ميزة "اللعب الجماعي عبر الإنترنت" مطلوبة.	reversed Latin
+335	الحد الأقصى للميزات	English leftover
+503	قام المطوّر <color=blue><NAME1></color> بترخيص محرّكك من أجل <color=blue><NAME2></color>. تم إرسال الفاتورة إليك للتو.	placeholder order
+530	اكتملت الحملة التسويقية لـ <NAME1>	placeholder order
+669	رسائل المعجبين لـ <b><NAME></b>	placeholder order
+680	قائمة تنزيلات ألعاب F2P	reversed Latin
+681	قائمة اشتراكات ألعاب MMO	reversed Latin
+831	<NUM> نقاط مهارة متبقية	missing placeholder
+839	<size=20>Mad Games Tycoon 2</size><br><br>شكراً لشرائك <color=blue>Mad Games Tycoon 2</color>. يرجى العلم أن نسخة الوصول المبكر ما زالت تفتقر إلى كثير من الميزات، وأن اللعبة غير متوازنة في بعض الأماكن، وقد تظهر بعض الأخطاء. كما أن جميع الترجمات ما زالت تحتوي على أخطاء كثيرة.<br><br>استمتع!	stray hamza
+843	تم إلغاء تحديث لـ <NAME><br>لأن اللعبة سُحبت من السوق.	placeholder order
+883	<b>تم فتح ألعاب MMO وغرفة الخوادم</b><br><br>يمكنك الآن تطوير ألعاب MMO وبناء غرفة الخوادم اللازمة.	reversed Latin
+910	وصلتنا لعبة حصرية جديدة لـ <NAME>. لنرَ إن كانت تستحق الشراء.<br>	placeholder order
+916	اكتمل تحسين أسلوب اللعب لـ <NAME1>	placeholder order
+919	اكتمل تحسين الرسومات لـ <NAME1>	placeholder order
+922	اكتمل تحسين الصوت لـ <NAME1>	placeholder order
+924	اكتمل تسجيل التقاط الحركة لـ <NAME1>	placeholder order
+926	قائمة الإيقاف المؤقت المنسدلة	English leftover
+956	لأي لعبة تريد تطوير إضافة (AddOn) مدفوعة؟	reversed Latin
+982	اكتملت الإضافة	missing space
+1062	▪ <b>ألعاب آلات الأركيد</b> لا يمكن تطويرها إلا لـ "Arcade System Boards".	English
+1063	▪ <b>ألعاب الهاتف المحمول</b> لا يمكن نشرها إلا على الهواتف الذكية.	English
+1080	تلقّى المبرمجون لديك أحدث حزمة SDK وقاموا بتحديثها فوراً، وبذلك تم إصلاح بعض المشاكل التقنية.	reversed Latin
+1122	يجب أن يحتوي إصدار المقتنين على محتوى أكثر من الإصدار الأصغر.	reversed word order
+1138	اكتمل الإنتاج لـ <NAME1>	placeholder order
+1171	أظهرت أبحاثنا أن <color=blue><NUM1></color> مشترياً مهتمون بـ <color=blue>الإصدار الفاخر</color> و <color=blue><NUM2></color> بـ <color=blue>إصدار المقتنين</color>.	reversed word order
+1193	لا يمكن تخفيض التمويل لـ <color=orange>ألعاب العقود</color>.	placeholder order
+1206	وضع اللعب الجماعي ما زال في مرحلة مبكرة. بعض الوظائف المهمة مفقودة وقد ينقطع الاتصال.	reversed word order
+1299	فتح / إغلاق جميع تبويبات الألعاب	English leftover
+1315	<b>لعبة حصرية</b><br>بفضل هذه اللعبة تم بيع ما يقدَّر بـ <color=blue><NUM> <NAME></color>.	placeholder order
+1322	الدعم المالي	stored unshaped
+1323	المساعدة في الأبحاث	stored unshaped
+1324	توفير المحرّك	stored unshaped
+1325	التنازل عن الترخيص	stored unshaped
+1376	لا يمكنك تفعيل الشراء داخل اللعبة لـ <color=orange>ألعاب العقود</color>.	placeholder order
+1426	اكتملت حملة تسويقية خاصة لـ <NAME1>	placeholder order
+1435	نشر نسخة تجريبية	English leftover
+1492	اكتمل تحديث F2P لـ <NAME>.	placeholder order

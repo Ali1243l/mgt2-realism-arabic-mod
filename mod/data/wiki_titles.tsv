@@ -1,0 +1,222 @@
+kind	id	title	file
+pub	0	Acclaim Entertainment	
+pub	1	Accolade (company)	TEXT
+pub	2	Activision	
+pub	3	Atari, Inc.	
+pub	4	Bandai	
+pub	5	Capcom	
+pub	6	Electronic Arts	Electronic-Arts-Logo.svg
+pub	7	Enix	
+pub	8	Gremlin Interactive	
+pub	9	Warner Bros. Games	
+pub	10	Infocom	
+pub	11	Infogrames	Infogrames Entertainment.png
+pub	12	Kemco	
+pub	13	Koei	
+pub	14	Konami	
+pub	15	MicroProse	
+pub	16	Microsoft	
+pub	17	Namco	
+pub	18	Nintendo	Nintendo.svg
+pub	19	Ocean Software	
+pub	20	Origin Systems	
+pub	21	Psygnosis	TEXT
+pub	22	Rare (company)	
+pub	23	Sega	
+pub	24	Sierra Entertainment	
+pub	25	Sony	
+pub	26	Taito	
+pub	27	Ubisoft	Ubisoft logo.svg
+pub	28	3D Realms	
+pub	29	Quantic Dream	
+pub	30	Remedy Entertainment	
+pub	31	Rockstar Games	
+pub	32	Sir-Tech	
+pub	33	Tecnosoft	TEXT
+pub	34	Troika Games	
+pub	35	Westwood Studios	
+pub	36	The Bitmap Brothers	
+pub	37	Black Isle Studios	
+pub	38	Blizzard Entertainment	
+pub	39	Bullfrog Productions	
+pub	40	Bungie	
+pub	41	Obsidian Entertainment	
+pub	42	Epic Games	
+pub	43	id Software	
+pub	44	Lionhead Studios	
+pub	45	Looking Glass Studios	TEXT
+pub	46	Naughty Dog	
+pub	47	Ensemble Studios	
+pub	48	FromSoftware	
+pub	49	Data East	
+pub	50	Epyx	
+pub	51	Interplay Entertainment	
+pub	52	U.S. Gold	
+pub	53	Virgin Interactive	
+pub	54	Codemasters	
+pub	55	Sensible Software	
+pub	56	Elite Systems	
+pub	57	Midway Games	
+pub	58	Sunsoft	Sunsoft logo.svg
+pub	59	Monolith Productions	
+pub	60	System 3 (company)	
+pub	61	Rainbow Arts	
+pub	62	Team17	
+pub	63	CD Projekt	
+pub	64	Strategic Simulations	
+pub	65	THQ	
+pub	66	Hudson Soft	
+pub	67	PlatinumGames	PlatinumGames Logo.png
+pub	68	Broderbund	
+pub	69	Blue Byte	
+pub	70	Treyarch	
+pub	71	Tencent	
+pub	72	King (company)	
+pub	73	GungHo Online Entertainment	
+pub	74	Supercell (video game company)	
+pub	75	Rovio Entertainment	TEXT
+pub	76	Gameforge	
+pub	77	Halfbrick Studios	
+pub	78	Mojang Studios	
+pub	79	Zynga	TEXT
+pub	80	Maxis	
+pub	81	DMA Design	TEXT
+pub	82	BioWare	
+pub	83	Bethesda Softworks	
+pub	84	Tecmo	
+pub	85	Valve Corporation	
+pub	86	LucasArts	
+pub	87	Take-Two Interactive	
+pub	88	Square (video game company)	
+pub	89	Paradox Interactive	
+pub	90	SNK	
+pub	91	Gearbox Software	
+pub	92	Microids	
+pub	93	Crystal Dynamics	
+pub	94	Avalanche Software	
+pub	95	Cinemaware	
+pub	96	Adventure Soft	
+pub	97	Ion Storm	
+pub	98	Thalion Software	
+pub	99	Mindscape (company)	
+plat	1	Amiga 500	
+plat	2	Amiga 1000	
+plat	3	Atari 2600	
+plat	4	Atari 5200	
+plat	5	Atari 7800	
+plat	6	Commodore 64	
+plat	7	Commodore 128	
+plat	8	Dreamcast	
+plat	9	Game Boy	
+plat	10	GameCube	
+plat	11	Game Gear	
+plat	12	Master System	
+plat	13	Sega Genesis	
+plat	14	Nintendo 64	
+plat	15	Nintendo Entertainment System	
+plat	16	Nintendo DS	
+plat	17	IBM Personal Computer	
+plat	18	PlayStation (console)	
+plat	19	PlayStation 2	
+plat	20	PlayStation 3	
+plat	21	PlayStation 4	
+plat	22	PlayStation 5	
+plat	23	PlayStation Portable	
+plat	24	Sega Saturn	
+plat	25	Super Nintendo Entertainment System	
+plat	26	Wii	
+plat	27	Wii U	
+plat	28	Nintendo Switch 2	
+plat	29	Xbox (console)	
+plat	30	Xbox 360	
+plat	31	Xbox Series X and Series S	
+plat	32	Xbox One	
+plat	33	Atari Jaguar	
+plat	34	Atari 2600+	
+plat	35	3DO Interactive Multiplayer	
+plat	36	Vectrex	
+plat	37	ColecoVision	
+plat	38	Intellivision	
+plat	39	SG-1000	
+plat	40	VIC-20	
+plat	41	ZX Spectrum	
+plat	42	Apple Bandai Pippin	
+plat	43	TurboGrafx-16	
+plat	44	Atari Lynx	
+plat	45	Ouya	
+plat	46	PlayStation Vita	
+plat	47	Neo Geo (system)	
+plat	48	Macintosh 128K	
+plat	49	Apple I	
+plat	50	Gizmondo	
+plat	51	Amiga CD32	
+plat	52	Atari ST	
+plat	53	Amstrad CPC	
+plat	54	Acorn Archimedes	
+plat	55	Game Boy Advance	
+plat	56	Nintendo 3DS	
+plat	57	Nvidia Shield Portable	
+plat	58	TurboExpress	
+plat	59	TurboDuo	
+plat	60	PC-FX	
+plat	61	Neo Geo Pocket	
+plat	62	Evercade	
+plat	63	WonderSwan	
+plat	64	N-Gage (device)	
+plat	65	Steam Machine (computer)	
+plat	66	Game Boy Color	
+plat	67	Sega Genesis Mini	
+plat	68	Commodore 64 Games System	
+plat	69	THEC64	
+plat	71	Playdia	
+plat	72	NES Classic Edition	
+plat	73	Microvision	
+plat	74	Watara Supervision	
+plat	75	Arcadia 2001	
+plat	76	Bally Astrocade	
+plat	77	Fairchild Channel F	
+plat	78	Casio PV-1000	
+plat	79	Gamate	
+plat	80	Magnavox Odyssey 2	
+plat	81	Apple II	
+plat	82	Nintendo Switch	
+plat	83	Amstrad GX4000	
+plat	84	Cassette Vision	
+plat	85	Super Cassette Vision	
+plat	86	Entex Adventure Vision	
+plat	87	Neo Geo X	
+plat	88	1292 Advanced Programmable Video System	
+plat	89	Super A'Can	
+plat	90	VTech CreatiVision	
+plat	91	Laser 200	
+plat	92	Zeebo	KEEP
+plat	93	Virtual Boy	
+plat	94	Genesis Nomad	
+plat	97	Commodore PET	
+plat	98	ZX80	
+plat	99	Atari 8-bit computers	
+plat	100	TRS-80	
+plat	101	Philips CD-i	
+plat	102	IPhone (1st generation)	
+plat	103	IPhone 4S	
+plat	104	IPhone 6S	
+plat	105	IPhone 11	
+plat	106	IPhone 15	
+plat	107	Samsung Galaxy (original)	
+plat	108	Samsung Galaxy S4	
+plat	109	Samsung Galaxy S8	
+plat	110	Samsung Galaxy S21	
+plat	111	Samsung Galaxy S25	
+plat	112	Nokia Lumia 920	
+plat	113	Microsoft Lumia 950	
+plat	114	BlackBerry Bold	
+plat	115	BlackBerry Z10	
+plat	116	BlackBerry Priv	
+plat	117	Nokia 5800 XpressMusic	
+plat	118	Nokia N8	
+plat	126	Commodore CDTV	
+plat	127	LaserActive	
+plat	128	Atari VCS (2020 console)	
+plat	129	Steam Deck	
+plat	130	Intellivision Amico	
+plat	132	Game Gear Micro	
