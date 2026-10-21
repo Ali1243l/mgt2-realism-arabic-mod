@@ -38,4 +38,6 @@ Then update `TASKS.md` and the relevant part of `IMPORTANT_PROJECT_STATUS.md`.
   environment variable to the game folder; `mod/build.py` and every plugin `.csproj` read it.
 - Not in git, create locally: `backup/` (run `python -P mod/build.py --backup` on an unmodded game), `decomp/`
   (ilspycmd output of Assembly-CSharp.dll), `downloads/` (image cache, `python -P mod/fetch_images.py`).
+- Turn on the repo's git hooks once per clone: `git config core.hooksPath .githooks` (they block commits and
+  pushes to `main`, since GitHub cannot lock `main` on this free private repo).
 - Run Python with `-P` (needs user site-packages: arabic_reshaper, python-bidi, Pillow).
