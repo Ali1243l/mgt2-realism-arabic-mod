@@ -1,0 +1,2 @@
+# store every file byte-for-byte: the game text files are BOM/CRLF sensitive and Arabic is pre-shaped
+* -text

@@ -1,0 +1,8 @@
+file	op	line	note
+Quotes	delete	59	extra quote not in EN ("Thanks Mario...")
+Quotes	delete	63	extra quote not in EN ("only room for one boss...")
+Review	insert	349	TOTAL_40 block: AR 14 lines vs EN 16
+Review	insert	349	TOTAL_40 block: second missing line
+Review	insert	389	GRAPHIC_50 block: AR 17 lines vs EN 18
+Review	delete	477	GRAPHIC_60 block: AR 15 lines vs EN 14
+Review	delete	731	GAMEPLAY_90 block: AR 18 lines vs EN 17

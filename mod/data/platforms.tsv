@@ -1,0 +1,126 @@
+id	name	manufacturer	date	note
+1	Amiga 500	Commodore
+2	Amiga 1000	Commodore
+3	Atari 2600	Atari
+4	Atari 5200	Atari	NOV 1982	was SEP 1982
+5	Atari 7800	Atari
+6	Commodore 64	Commodore
+7	Commodore 128	Commodore
+8	Sega Dreamcast	Sega
+9	Game Boy	Nintendo
+10	Nintendo GameCube	Nintendo
+11	Sega Game Gear	Sega
+12	Sega Master System	Sega
+13	Sega Mega Drive	Sega
+14	Nintendo 64	Nintendo
+15	Nintendo Entertainment System	Nintendo
+16	Nintendo DS	Nintendo
+17	IBM PC	IBM
+18	PlayStation	Sony
+19	PlayStation 2	Sony
+20	PlayStation 3	Sony
+21	PlayStation 4	Sony
+22	PlayStation 5	Sony
+23	PlayStation Portable	Sony
+24	Sega Saturn	Sega
+25	Super Nintendo	Nintendo
+26	Wii	Nintendo
+27	Wii U	Nintendo	NOV 2012	was DEC 2012
+28	Nintendo Switch 2	Nintendo	JUN 2025	was Zwitch Pro DEC 2024
+29	Xbox	Microsoft
+30	Xbox 360	Microsoft
+31	Xbox Series X	Microsoft
+32	Xbox One	Microsoft
+33	Atari Jaguar	Atari
+34	Atari 2600+	Atari	NOV 2023	fictional Puma 2 (2026) -> real retro console
+35	3DO Interactive Multiplayer	The 3DO Company
+36	Vectrex	General Consumer Electronics
+37	ColecoVision	Coleco
+38	Intellivision	Mattel
+39	Sega SG-1000	Sega
+40	Commodore VIC-20	Commodore
+41	ZX Spectrum	Sinclair Research
+42	Apple Pippin	Apple	MAR 1996	was APR 1996
+43	PC Engine	NEC
+44	Atari Lynx	Atari	SEP 1989	was OCT 1989
+45	Ouya	Ouya Inc.
+46	PlayStation Vita	Sony
+47	Neo Geo	SNK
+48	Macintosh	Apple
+49	Apple I	Apple		start platform, date kept
+50	Gizmondo	Tiger Telematics
+51	Amiga CD32	Commodore
+52	Atari ST	Atari
+53	Amstrad CPC	Amstrad	APR 1984	was JUN 1984
+54	Acorn Archimedes	Acorn Computers
+55	Game Boy Advance	Nintendo
+56	Nintendo 3DS	Nintendo
+57	NVIDIA Shield Portable	NVIDIA
+58	PC Engine GT	NEC
+59	PC Engine Duo	NEC
+60	PC-FX	NEC
+61	Neo Geo Pocket	SNK
+62	Evercade VS	Blaze Entertainment	DEC 2021	fictional Asia Box (2024) -> real niche console
+63	WonderSwan	Bandai
+64	N-Gage	Nokia
+65	Steam Machine	Valve
+66	Game Boy Color	Nintendo
+67	Sega Genesis Mini	Sega	SEP 2019	fictional MegaCast (2025) -> real Sega console
+68	Commodore 64 Games System	Commodore
+69	THEC64 Mini	Retro Games Ltd.	MAR 2018	fictional Game System II (2023) -> real C64 revival
+70	Nintendo Switch 3	Nintendo		future, expected name
+71	Playdia	Bandai
+72	NES Classic Edition	Nintendo	NOV 2016	fictional Fusion F1000 -> real 2016 console
+73	Microvision	Milton Bradley
+74	Watara Supervision	Watara
+75	Arcadia 2001	Emerson
+76	Bally Astrocade	Bally
+77	Fairchild Channel F	Fairchild		start platform, date kept
+78	Casio PV-1000	Casio
+79	Gamate	Bit Corporation
+80	Magnavox Odyssey 2	Philips
+81	Apple II	Apple
+82	Nintendo Switch	Nintendo
+83	Amstrad GX4000	Amstrad
+84	Cassette Vision	Epoch
+85	Super Cassette Vision	Epoch
+86	Entex Adventure Vision	Entex
+87	Neo Geo X	SNK
+88	Radofin 1292 APVS	Radofin
+89	Super A'Can	Funtech
+90	VTech CreatiVision	VTech
+91	VTech Laser 2001	VTech
+92	Zeebo	Zeebo Inc.
+93	Virtual Boy	Nintendo
+94	Sega Nomad	Sega
+95	PlayStation 6	Sony		future, expected name
+96	Xbox Next	Microsoft		future, expected name
+97	Commodore PET	Commodore
+98	ZX80	Sinclair Research	FEB 1980	was JAN 1980
+99	Atari 800	Atari
+100	TRS-80	Tandy
+101	Philips CD-i	Philips	DEC 1991	was OCT 1990
+102	iPhone	Apple	JUN 2007	was NOV 2007
+103	iPhone 4S	Apple	OCT 2011
+104	iPhone 6s	Apple	SEP 2015
+105	iPhone 11	Apple	SEP 2019
+106	iPhone 15	Apple	SEP 2023
+107	Android 1.5 Cupcake	Google	APR 2009
+108	Android 4.3 Jelly Bean	Google	JUL 2013
+109	Android 8 Oreo	Google	AUG 2017
+110	Android 12	Google	OCT 2021
+111	Android 16	Google	JUN 2025
+112	Windows Phone 8	Microsoft	OCT 2012
+113	Windows 10 Mobile	Microsoft	NOV 2015
+114	BlackBerry Bold	Research In Motion	AUG 2008
+115	BlackBerry Z10	BlackBerry	JAN 2013
+116	BlackBerry Priv	BlackBerry	NOV 2015
+117	Nokia Symbian^1	Nokia	NOV 2008
+118	Nokia Symbian^3	Nokia	OCT 2010
+126	Commodore CDTV	Commodore
+127	Pioneer LaserActive	Pioneer	AUG 1993	was APR 1993
+128	Atari VCS	Atari
+129	Steam Deck	Valve
+130	Intellivision Amico	Intellivision Entertainment		announced, never released
+131	Nintendo Switch Lite	Nintendo	SEP 2019	fictional 3DEX handheld; Switch 2 already used by id 28
+132	Game Gear Micro	Sega	OCT 2020	fictional Play Gear II -> real Sega handheld

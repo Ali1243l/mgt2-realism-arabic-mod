@@ -1,0 +1,14 @@
+# per machine, rebuilt locally (see CLAUDE.md section 5); also keeps the game's own files out of git
+backup/
+decomp/
+downloads/
+audit_data/
+# build output
+bin/
+obj/
+__pycache__/
+*.pyc
+# other tools
+.continue/
+.vs/
+.vscode/
