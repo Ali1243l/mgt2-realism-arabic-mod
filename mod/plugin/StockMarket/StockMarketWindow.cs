@@ -4,6 +4,7 @@ using System.Linq;
 using HarmonyLib;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace MGT2Mod.StockMarket
 {
@@ -34,11 +35,16 @@ namespace MGT2Mod.StockMarket
         {
             // Find the game's canvas
             var canvas = GameObject.Find("CanvasInGameMenu");
-            if (canvas == null) return;
+            if (canvas == null)
+            {
+                StockMarketPlugin.Log.LogError("Canvas not found!");
+                return;
+            }
 
             // Create main window (similar to game's other windows)
             windowObj = new GameObject("StockMarketWindow");
             windowObj.transform.SetParent(canvas.transform, false);
+            windowObj.layer = canvas.layer; // Same layer as game UI
 
             var rt = windowObj.AddComponent<RectTransform>();
             rt.sizeDelta = new Vector2(900, 600);
@@ -46,6 +52,9 @@ namespace MGT2Mod.StockMarket
 
             var img = windowObj.AddComponent<Image>();
             img.color = new Color(0.1f, 0.1f, 0.1f, 0.95f);
+
+            // Set higher sorting order by moving to end of hierarchy (rendered last = on top)
+            windowObj.transform.SetAsLastSibling();
 
             // Title bar
             var titleObj = new GameObject("Title");
@@ -123,11 +132,14 @@ namespace MGT2Mod.StockMarket
             foreach (var obj in companies)
             {
                 var pub = obj.GetComponent<publisherScript>();
-                if (pub != null && pub.isUnlocked && !pub.IsMyTochterfirma() && pub.myID != ms.myID)
+                // Show all unlocked AI publishers (not player, not already owned subsidiary)
+                if (pub != null && pub.isUnlocked && pub.myID != ms.myID && !pub.IsMyTochterfirma())
                 {
                     validCompanies.Add(pub);
                 }
             }
+
+            StockMarketPlugin.Log.LogInfo($"Found {validCompanies.Count} companies for stock market");
 
             // Sort by market cap (highest first)
             validCompanies = validCompanies.OrderByDescending(p => StockData.CalculateCompanyValue(p, ms)).ToList();
