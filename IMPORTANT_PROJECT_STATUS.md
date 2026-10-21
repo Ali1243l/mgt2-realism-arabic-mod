@@ -10,6 +10,17 @@
 - Secondary copy: `D:\Steam\steamapps\common\Mad Games Tycoon 2`: same build (20855306), identical `Extern`. Mod NOT applied there.
 - Moddable data: `Mad Games Tycoon 2_Data\Extern\` (`Text\AR`, `Text\DATA`, `CompanyLogos` 64x64, `Icons_Platforms` 128x128)
 
+## Repo & team (2026-10-21)
+- Private GitHub repo: https://github.com/Ali1243l/mgt2-realism-arabic-mod (owner Ali1243l; collaborator
+  uksteamaccwillysa0-lab with write access). Two developers, each with Claude Code, working at the same time.
+- Rules in `CLAUDE.md` (auto-loaded): feature/* or fix/* branches only, PRs into main, conventional commits,
+  claim tasks in `TASKS.md` first, run checks before "done". GitHub can't lock main (free private repo), so
+  `.githooks/` blocks commits/pushes to main: enable per clone with `git config core.hooksPath .githooks`.
+- `.gitattributes` = `* -text` (byte-for-byte; game text is BOM/CRLF sensitive). Not in git: backup/, decomp/,
+  downloads/, audit_data/ (game-derived or per machine). Game path per machine: env var `GameDir`.
+- Design plan (GDD, 35 points, user's file): `docs/GDD.md`. Progress per point: `TASKS.md`.
+- Prompt for the second developer's Claude: `docs/FRIEND_PROMPT.md`.
+
 ## How the mod works (don't re-derive)
 - `backup/Extern/` = untouched originals (Text, CompanyLogos, Icons_Platforms). NEVER edit.
 - `mod/build.py` builds everything from `backup/` + tables, runs self-checks, writes into the game.
@@ -76,11 +87,13 @@
   To use: copy its bin dll into BepInEx/plugins, test, delete again. User saves backed up in the session scratchpad before tests.
 
 ## Current Stage
-Point 1 (live games) v2 DONE and installed; waiting for the user's in-game test. Next: GDD point 2 (stock market & takeovers).
+Repo + team workflow live (PR #1 merged into main). Point 1 (Live Ops v2) done and installed; waiting for the
+user's in-game test. Next: GDD point 2 (stock market & takeovers).
 
 ## Next Steps
-1. User tests Live Ops v2 (new game or existing save; only own F2P games get the update campaign; MMO games get stats only).
-2. GDD point 2 (stock market & takeovers): read decomp for existing stock/Aktien code first.
+1. User tests Live Ops v2 in game (own F2P game: update menu campaign; wizard in-app page; sales window).
+2. GDD point 2 (stock market, tiered ownership, hostile takeover): read decomp for existing stock/Aktien code first,
+   claim it in TASKS.md on `feature/stock-market`.
 3. Later: MMO seasons via MMO add-ons; real names for parody licences (licence_EN).
 
 ## Completion Timestamp
