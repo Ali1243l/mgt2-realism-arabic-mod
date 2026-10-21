@@ -88,13 +88,72 @@
 
 ## Current Stage
 Repo + team workflow live (PR #1 merged into main). Point 1 (Live Ops v2) done and installed; waiting for the
-user's in-game test. Next: GDD point 2 (stock market & takeovers).
+user's in-game test. Point 2 (Stock Market) implemented and ready for testing on `feature/stock-market`.
+
+## Stock Market System (Point 2) - COMPLETED
+**Branch:** `feature/stock-market`
+**Plugin:** `mod/plugin/StockMarket/` (7 files, builds to StockMarket.dll)
+
+### What's Implemented:
+1. **Tiered Ownership System:**
+   - 5%: Dividend rights (quarterly payouts)
+   - 25%: Board seat (see competitor's secret projects)
+   - 51%: Controlling interest (influence decisions)
+   - 100%: Full acquisition (becomes subsidiary)
+
+2. **Stock Market Window:**
+   - F8 hotkey to open
+   - Lists all AI companies with logo, name, value
+   - Shows your current stake (% and tier)
+   - Buy/Sell/Info buttons per company
+
+3. **Buy/Sell Dialogs:**
+   - Tiered purchase options (5%, 25%, 51%, 100%)
+   - Real-time price calculation based on firmenwert + revenue
+   - Color-coded UI matching game style
+
+4. **Advanced Mechanics:**
+   - Quarterly dividends (10% of revenue × ownership %)
+   - Hostile takeover defense (Poison Pill: 50% price increase for 1 year)
+   - Board intelligence notifications (see their games in development)
+   - Save/load persistence (JSON file per save slot)
+
+5. **Integration:**
+   - 100% ownership converts to Tochterfirma (subsidiary)
+   - Weekly tick for dividends and mechanics
+   - Compatible with existing buy/sell system
+   - Disabled in multiplayer
+
+### Files Created:
+- `StockMarket.cs` - Core plugin, data structures, save/load
+- `StockMarketWindow.cs` - Main UI (company list, scrollable)
+- `ShareTransactions.cs` - Buy/sell dialogs with tier options
+- `AdvancedMechanics.cs` - Dividends, hostile takeover, board seat
+- `ManagementIntegration.cs` - F8 hotkey and menu button
+- `StockMarket.csproj` - Build config
+- `README.md` - Full documentation
+
+### Testing Needed:
+1. Press F8 to open stock market
+2. Buy shares (5%, 25%, 51%, 100%) - verify tier benefits
+3. Wait 3 months (game time) - check dividend payout
+4. Buy 25%+ of successful company - check for poison pill
+5. Buy 25% - verify board intelligence notifications
+6. Sell shares - verify money received
+7. Save/load - verify ownership persists
+8. Buy 100% - verify company becomes subsidiary
+
+### Known Limitations:
+- UI text: English only (Arabic translation pending)
+- Button position: temporary top-right (needs proper menu integration)
+- Poison pill: fixed 50% multiplier (could be dynamic)
+- Board seat: notification only (no detailed financial stats yet)
 
 ## Next Steps
-1. User tests Live Ops v2 in game (own F2P game: update menu campaign; wizard in-app page; sales window).
-2. GDD point 2 (stock market, tiered ownership, hostile takeover): read decomp for existing stock/Aktien code first,
-   claim it in TASKS.md on `feature/stock-market`.
-3. Later: MMO seasons via MMO add-ons; real names for parody licences (licence_EN).
+1. User tests Stock Market system in-game (F8 to open)
+2. User tests Live Ops v2 if not done yet
+3. Merge feature/stock-market → main after tests pass
+4. GDD point 3 or beyond (MMO seasons, real licence names, etc.)
 
 ## Completion Timestamp
 (open)
