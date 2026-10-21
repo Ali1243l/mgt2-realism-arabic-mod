@@ -6,7 +6,7 @@ The plan is `docs/GDD.md` (35 points). Details of finished work: `IMPORTANT_PROJ
 ## In progress
 | Task | Owner | Branch |
 |------|-------|--------|
-| - | - | - |
+| GDD Point 2: Stock market, shares, hostile takeover | Ali | feature/stock-market |
 
 ## Pending (not GDD)
 | Task | Notes |
