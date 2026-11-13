@@ -135,7 +135,7 @@ namespace MGT2Mod.StockMarket
             var titleImg = titleBar.GetComponent<Image>();
             titleImg.sprite = GetGameSprite("titleLeiste");
             titleImg.type = Image.Type.Sliced;
-            titleImg.color = Color.white;
+            titleImg.color = new Color(0.204f, 0.596f, 0.859f, 1.0f);
 
             CreateNativeText(titleBar.transform, $"{StockMarketLabels.BuySharesTitle} {currentCompany.GetName()}",
                 new Vector2(16f, 0f), new Vector2(-50f, 0f), Vector2.zero, Vector2.one, 16, FontStyle.Bold, Color.white, TextAnchor.MiddleLeft);
@@ -221,16 +221,60 @@ namespace MGT2Mod.StockMarket
         {
             var card = CreateNativeCard(parent, $"Option_{sharePercent}", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, yPos), new Vector2(-16f, 72f));
 
-            // Title & Description
-            CreateNativeText(card.transform, $"<color=#004488>{title}</color>",
-                new Vector2(14f, 40f), new Vector2(-130f, 66f), Vector2.zero, Vector2.zero, 13, FontStyle.Bold, Color.black, TextAnchor.MiddleLeft);
+            // Left Text Area container
+            var textArea = new GameObject("TextArea", typeof(RectTransform));
+            textArea.transform.SetParent(card.transform, false);
+            var tRt = (RectTransform)textArea.transform;
+            tRt.anchorMin = Vector2.zero;
+            tRt.anchorMax = Vector2.one;
+            tRt.offsetMin = new Vector2(14f, 4f);
+            tRt.offsetMax = new Vector2(-120f, -4f);
 
-            CreateNativeText(card.transform, description,
-                new Vector2(14f, 18f), new Vector2(-130f, 40f), Vector2.zero, Vector2.zero, 11, FontStyle.Normal, new Color(0.35f, 0.38f, 0.42f), TextAnchor.MiddleLeft);
+            // Title
+            var titleObj = new GameObject("Title", typeof(RectTransform), typeof(Text));
+            titleObj.transform.SetParent(textArea.transform, false);
+            var titleRt = (RectTransform)titleObj.transform;
+            titleRt.anchorMin = new Vector2(0f, 0.65f);
+            titleRt.anchorMax = new Vector2(1f, 1f);
+            titleRt.offsetMin = titleRt.offsetMax = Vector2.zero;
+            var tTxt = titleObj.GetComponent<Text>();
+            tTxt.font = GetGameFont();
+            tTxt.fontSize = 13;
+            tTxt.fontStyle = FontStyle.Bold;
+            tTxt.color = new Color(0.05f, 0.35f, 0.70f);
+            tTxt.alignment = TextAnchor.MiddleLeft;
+            tTxt.text = title;
 
+            // Description
+            var descObj = new GameObject("Desc", typeof(RectTransform), typeof(Text));
+            descObj.transform.SetParent(textArea.transform, false);
+            var descRt = (RectTransform)descObj.transform;
+            descRt.anchorMin = new Vector2(0f, 0.32f);
+            descRt.anchorMax = new Vector2(1f, 0.65f);
+            descRt.offsetMin = descRt.offsetMax = Vector2.zero;
+            var dTxt = descObj.GetComponent<Text>();
+            dTxt.font = GetGameFont();
+            dTxt.fontSize = 11;
+            dTxt.fontStyle = FontStyle.Normal;
+            dTxt.color = new Color(0.35f, 0.40f, 0.45f);
+            dTxt.alignment = TextAnchor.MiddleLeft;
+            dTxt.text = description;
+
+            // Price
             long cost = (long)(marketCap * sharePercent / 100f);
-            CreateNativeText(card.transform, $"{StockMarketLabels.Cash} <color=#228833>${cost:N0}</color> ({sharePercent:F1}%)",
-                new Vector2(14f, 2f), new Vector2(-130f, 20f), Vector2.zero, Vector2.zero, 11, FontStyle.Bold, new Color(0.2f, 0.2f, 0.2f), TextAnchor.MiddleLeft);
+            var priceObj = new GameObject("Price", typeof(RectTransform), typeof(Text));
+            priceObj.transform.SetParent(textArea.transform, false);
+            var priceRt = (RectTransform)priceObj.transform;
+            priceRt.anchorMin = new Vector2(0f, 0f);
+            priceRt.anchorMax = new Vector2(1f, 0.32f);
+            priceRt.offsetMin = priceRt.offsetMax = Vector2.zero;
+            var pTxt = priceObj.GetComponent<Text>();
+            pTxt.font = GetGameFont();
+            pTxt.fontSize = 12;
+            pTxt.fontStyle = FontStyle.Bold;
+            pTxt.color = new Color(0.12f, 0.55f, 0.22f);
+            pTxt.alignment = TextAnchor.MiddleLeft;
+            pTxt.text = $"{StockMarketLabels.Cash} ${cost:N0} ({sharePercent:F1}%)";
 
             // Buy Button
             var buyBtn = CreateNativeButton(card.transform, "BuyBtn", StockMarketLabels.BuyBtn, new Color(0.18f, 0.65f, 0.35f), 13, () =>
@@ -298,7 +342,7 @@ namespace MGT2Mod.StockMarket
             var titleImg = titleBar.GetComponent<Image>();
             titleImg.sprite = GetGameSprite("titleLeiste");
             titleImg.type = Image.Type.Sliced;
-            titleImg.color = Color.white;
+            titleImg.color = new Color(0.204f, 0.596f, 0.859f, 1.0f);
 
             CreateNativeText(titleBar.transform, $"{StockMarketLabels.SellSharesTitle} {currentCompany.GetName()}",
                 new Vector2(16f, 0f), new Vector2(-50f, 0f), Vector2.zero, Vector2.one, 16, FontStyle.Bold, Color.white, TextAnchor.MiddleLeft);

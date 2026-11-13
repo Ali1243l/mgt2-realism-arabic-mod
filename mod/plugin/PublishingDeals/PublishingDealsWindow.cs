@@ -487,8 +487,8 @@ namespace MGT2Mod.PublishingDeals
             card.transform.SetParent(_pitchesContent, false);
 
             var le = card.GetComponent<LayoutElement>();
-            le.preferredHeight = 76f;
-            le.minHeight = 76f;
+            le.preferredHeight = 80f;
+            le.minHeight = 80f;
 
             var img = card.GetComponent<Image>();
             img.sprite = GetGameSprite("whiteSimple");
@@ -496,23 +496,25 @@ namespace MGT2Mod.PublishingDeals
             img.color = new Color(0.97f, 0.975f, 0.985f, 1f);
 
             string genreName = _ms?.genres_ != null ? _ms.genres_.GetName(pitch.genre) : $"Genre {pitch.genre}";
+            string tierName = pitch.tier == DealTier.MajorBlockbuster ? PublishingDealsLabels.TierAAA :
+                             (pitch.tier == DealTier.MidTierProject ? PublishingDealsLabels.TierMid : PublishingDealsLabels.TierIndie);
 
             // Title & Developer
             CreateText(card.transform, "Title", new Vector2(0.03f, 0.52f), new Vector2(0.40f, 0.94f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 15, true, $"<b>{pitch.gameTitle}</b>");
-            CreateText(card.transform, "Dev", new Vector2(0.03f, 0.08f), new Vector2(0.40f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false, $"{pitch.developerName}  ({genreName} - {pitch.tier})");
+            CreateText(card.transform, "Dev", new Vector2(0.03f, 0.08f), new Vector2(0.40f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false, $"{pitch.developerName}  ({genreName} - {tierName})");
 
             // Budget & Timeline
             CreateText(card.transform, "Budget", new Vector2(0.40f, 0.52f), new Vector2(0.68f, 0.94f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 13, false, $"{PublishingDealsLabels.PitchBudget} <b><color=#1E8C3A>{_ms.GetMoney(pitch.requestedBudget, true)}</color></b>");
-            CreateText(card.transform, "Time", new Vector2(0.40f, 0.08f), new Vector2(0.68f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false, $"{PublishingDealsLabels.DevTime} {pitch.devWeeks} {PublishingDealsLabels.Weeks}  |  Split: {Mathf.RoundToInt(pitch.proposedRoyaltySplit)}% dev");
+            CreateText(card.transform, "Time", new Vector2(0.40f, 0.08f), new Vector2(0.68f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false, $"{PublishingDealsLabels.DevTime} {pitch.devWeeks} {PublishingDealsLabels.Weeks}  |  {PublishingDealsLabels.DeveloperCut} {Mathf.RoundToInt(pitch.proposedRoyaltySplit)}%");
 
-            // Fund & Accept Button
-            var fundBtn = CreateNativeButton(card.transform, "FundBtn", new Vector2(-15f, 0f), new Vector2(170f, 38f), () =>
+            // Start Negotiation Button
+            var fundBtn = CreateNativeButton(card.transform, "FundBtn", new Vector2(-15f, 0f), new Vector2(175f, 40f), () =>
             {
                 ShowDealNegotiationModal(pitch);
             }, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
-            fundBtn.GetComponent<Image>().color = new Color(0.18f, 0.65f, 0.35f, 1f);
+            fundBtn.GetComponent<Image>().color = new Color(0.161f, 0.502f, 0.725f, 1f);
             var fTxt = fundBtn.GetComponentInChildren<Text>();
-            fTxt.text = PublishingDealsLabels.AcceptDeal;
+            fTxt.text = PublishingDealsLabels.StartNegotiation;
             fTxt.fontSize = 12;
 
             return card;
@@ -545,25 +547,25 @@ namespace MGT2Mod.PublishingDeals
             card.transform.SetParent(_activeProjectsContent, false);
 
             var le = card.GetComponent<LayoutElement>();
-            le.preferredHeight = 74f;
-            le.minHeight = 74f;
+            le.preferredHeight = 78f;
+            le.minHeight = 78f;
 
             var img = card.GetComponent<Image>();
             img.sprite = GetGameSprite("whiteSimple");
             img.type = Image.Type.Sliced;
             img.color = new Color(0.97f, 0.975f, 0.985f, 1f);
 
-            string status = !deal.isReleased ? $"Dev: {deal.weeksLeft} wks left" : $"Market Sales: {deal.weeksLeft} wks left";
+            string status = !deal.isReleased ? $"{PublishingDealsLabels.StatusInDev}: {deal.weeksLeft} {PublishingDealsLabels.Weeks}" : $"{PublishingDealsLabels.StatusReleased}: {deal.weeksLeft} {PublishingDealsLabels.Weeks}";
             CreateText(card.transform, "Title", new Vector2(0.03f, 0.52f), new Vector2(0.40f, 0.94f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 15, true, $"<b>{deal.gameTitle}</b>");
             CreateText(card.transform, "Dev", new Vector2(0.03f, 0.08f), new Vector2(0.40f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false, $"{deal.developerName}  ({status})");
 
             CreateText(card.transform, "Financials", new Vector2(0.40f, 0.08f), new Vector2(0.70f, 0.92f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 13, false,
-                $"Funded: ${_ms.GetMoney(deal.fundedBudget, true)}\nProfits: <b><color=#1E8C3A>{_ms.GetMoney(deal.totalRevenueEarned, true)}</color></b>");
+                $"{PublishingDealsLabels.FundedBudget} ${_ms.GetMoney(deal.fundedBudget, true)}\n{PublishingDealsLabels.EarnedProfits} <b><color=#1E8C3A>{_ms.GetMoney(deal.totalRevenueEarned, true)}</color></b>");
 
             // Status Badge
-            string badgeText = !deal.isReleased ? "IN DEVELOPMENT" : $"RELEASED (Score: {deal.reviewScore}%)";
+            string badgeText = !deal.isReleased ? PublishingDealsLabels.StatusInDev : $"{PublishingDealsLabels.StatusReleased} ({PublishingDealsLabels.Score} {deal.reviewScore}%)";
             Color badgeColor = !deal.isReleased ? new Color(0.161f, 0.502f, 0.725f, 1f) : new Color(0.18f, 0.65f, 0.35f, 1f);
-            var badge = CreateNativeButton(card.transform, "StatusBadge", new Vector2(-15f, 0f), new Vector2(170f, 36f), null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
+            var badge = CreateNativeButton(card.transform, "StatusBadge", new Vector2(-15f, 0f), new Vector2(175f, 38f), null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
             badge.GetComponent<Image>().color = badgeColor;
             var bTxt = badge.GetComponentInChildren<Text>();
             bTxt.text = badgeText;
@@ -599,8 +601,8 @@ namespace MGT2Mod.PublishingDeals
             card.transform.SetParent(_biddingWarsContent, false);
 
             var le = card.GetComponent<LayoutElement>();
-            le.preferredHeight = 74f;
-            le.minHeight = 74f;
+            le.preferredHeight = 78f;
+            le.minHeight = 78f;
 
             var img = card.GetComponent<Image>();
             img.sprite = GetGameSprite("whiteSimple");
@@ -608,14 +610,14 @@ namespace MGT2Mod.PublishingDeals
             img.color = new Color(0.97f, 0.975f, 0.985f, 1f);
 
             CreateText(card.transform, "Title", new Vector2(0.03f, 0.52f), new Vector2(0.40f, 0.94f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 15, true, $"<b>{war.gameTitle}</b>");
-            CreateText(card.transform, "Dev", new Vector2(0.03f, 0.08f), new Vector2(0.40f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false, $"{war.developerName}  ({war.weeksLeft} wks left to bid)");
+            CreateText(card.transform, "Dev", new Vector2(0.03f, 0.08f), new Vector2(0.40f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false, $"{war.developerName}  ({war.weeksLeft} {PublishingDealsLabels.WeeksLeft})");
 
-            string leader = war.leadingBidderId == -1 ? "<color=#1E8C3A>You (Leading!)</color>" : war.leadingBidderName;
+            string leader = war.leadingBidderId == -1 ? $"<color=#1E8C3A>{PublishingDealsLabels.YouLeading}</color>" : war.leadingBidderName;
             CreateText(card.transform, "BidInfo", new Vector2(0.40f, 0.08f), new Vector2(0.70f, 0.92f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 13, false,
                 $"{PublishingDealsLabels.CurrentHighestBid} <b>{leader}</b>\nBid: <b><color=#1E8C3A>{_ms.GetMoney(war.currentHighestBid, true)}</color></b>");
 
             long counterBidAmount = war.currentHighestBid + 250000L;
-            var bidBtn = CreateNativeButton(card.transform, "CounterBidBtn", new Vector2(-15f, 0f), new Vector2(170f, 38f), () =>
+            var bidBtn = CreateNativeButton(card.transform, "CounterBidBtn", new Vector2(-15f, 0f), new Vector2(175f, 40f), () =>
             {
                 bool success = PublishingManager.PlaceCounterBid(_ms, war, counterBidAmount, _guiMain);
                 if (success) RefreshActiveTab();
@@ -648,14 +650,15 @@ namespace MGT2Mod.PublishingDeals
             CloseModalDialog();
             PlaySound(5);
 
-            float playerRoyaltyCut = 100f - pitch.proposedRoyaltySplit;
+            float selectedPlayerCut = pitch.currentPubCutOffer;
+            float selectedBudgetMult = 1.0f;
             int exclusivePlatformId = -1;
             bool permanent = false;
 
             _activeModalDialog = new GameObject("NegotiationModal", typeof(RectTransform), typeof(Image));
             _activeModalDialog.transform.SetParent(_windowMainRt, false);
             var mRt = (RectTransform)_activeModalDialog.transform;
-            mRt.sizeDelta = new Vector2(560f, 440f);
+            mRt.sizeDelta = new Vector2(660f, 530f);
             mRt.anchoredPosition = Vector2.zero;
 
             var bg = _activeModalDialog.GetComponent<Image>();
@@ -672,86 +675,308 @@ namespace MGT2Mod.PublishingDeals
             var fImg = fill.GetComponent<Image>();
             fImg.sprite = GetGameSprite("window1_FillVerlauf");
             fImg.type = Image.Type.Sliced;
-            fImg.color = new Color(0.94f, 0.94f, 0.95f, 1f);
+            fImg.color = new Color(0.93f, 0.935f, 0.945f, 1f);
 
-            CreateText(_activeModalDialog.transform, "Title", new Vector2(0.05f, 0.86f), new Vector2(0.95f, 0.96f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 18, true, $"{pitch.gameTitle} - Publishing Deal Terms");
+            // Titelleiste
+            var titleBar = new GameObject("Titelleiste", typeof(RectTransform), typeof(Image));
+            titleBar.transform.SetParent(_activeModalDialog.transform, false);
+            var tbRt = (RectTransform)titleBar.transform;
+            tbRt.anchorMin = new Vector2(0f, 1f);
+            tbRt.anchorMax = new Vector2(1f, 1f);
+            tbRt.pivot = new Vector2(0.5f, 1f);
+            tbRt.anchoredPosition = new Vector2(0f, -6f);
+            tbRt.sizeDelta = new Vector2(-12f, 44f);
 
-            // Royalty Split Selector (Player cut: 30%, 50%, 70%)
-            CreateText(_activeModalDialog.transform, "SplitLabel", new Vector2(0.08f, 0.68f), new Vector2(0.92f, 0.78f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 15, true, $"{PublishingDealsLabels.RoyaltySplit} (Your Share)");
+            var tbImg = titleBar.GetComponent<Image>();
+            tbImg.sprite = GetGameSprite("titleLeiste");
+            tbImg.type = Image.Type.Sliced;
+            tbImg.color = new Color(0.204f, 0.596f, 0.859f, 1.0f);
 
-            float[] splits = { 30f, 50f, 70f };
-            Button[] sBtns = new Button[3];
+            CreateText(titleBar.transform, "Title", new Vector2(0.04f, 0f), new Vector2(0.88f, 1f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 16, true,
+                $"{PublishingDealsLabels.NegotiationTitle} - {pitch.gameTitle}").color = Color.white;
 
-            Action updateSplitBtns = () =>
+            var closeGo = new GameObject("CloseBtn", typeof(RectTransform), typeof(Image), typeof(Button));
+            closeGo.transform.SetParent(titleBar.transform, false);
+            var cRt = (RectTransform)closeGo.transform;
+            cRt.anchorMin = new Vector2(1f, 0.5f);
+            cRt.anchorMax = new Vector2(1f, 0.5f);
+            cRt.pivot = new Vector2(0.5f, 0.5f);
+            cRt.anchoredPosition = new Vector2(-20f, 0f);
+            cRt.sizeDelta = new Vector2(28f, 28f);
+            closeGo.GetComponent<Image>().sprite = GetGameSprite("close");
+            closeGo.GetComponent<Button>().onClick.AddListener(CloseModalDialog);
+
+            // Action to rebuild inner content
+            Action rebuildContent = null;
+            GameObject contentContainer = null;
+
+            rebuildContent = () =>
             {
-                for (int i = 0; i < splits.Length; i++)
+                if (contentContainer != null) Destroy(contentContainer);
+
+                contentContainer = new GameObject("ContentContainer", typeof(RectTransform));
+                contentContainer.transform.SetParent(_activeModalDialog.transform, false);
+                var ccRt = (RectTransform)contentContainer.transform;
+                ccRt.anchorMin = Vector2.zero;
+                ccRt.anchorMax = Vector2.one;
+                ccRt.offsetMin = new Vector2(14f, 14f);
+                ccRt.offsetMax = new Vector2(-14f, -54f);
+
+                // --- 1. Studio Status & Patience Card ---
+                var statusCard = new GameObject("StatusCard", typeof(RectTransform), typeof(Image));
+                statusCard.transform.SetParent(contentContainer.transform, false);
+                var scRt = (RectTransform)statusCard.transform;
+                scRt.anchorMin = new Vector2(0f, 1f);
+                scRt.anchorMax = new Vector2(1f, 1f);
+                scRt.pivot = new Vector2(0.5f, 1f);
+                scRt.anchoredPosition = new Vector2(0f, 0f);
+                scRt.sizeDelta = new Vector2(0f, 62f);
+
+                var scImg = statusCard.GetComponent<Image>();
+                scImg.sprite = GetGameSprite("uiSquareVerlauf") ?? GetGameSprite("whiteSimple");
+                scImg.type = Image.Type.Sliced;
+                scImg.color = new Color(0.88f, 0.90f, 0.93f, 1f);
+
+                string tierName = pitch.tier == DealTier.MajorBlockbuster ? PublishingDealsLabels.TierAAA :
+                                 (pitch.tier == DealTier.MidTierProject ? PublishingDealsLabels.TierMid : PublishingDealsLabels.TierIndie);
+
+                CreateText(statusCard.transform, "StudioInfo", new Vector2(0.03f, 0.52f), new Vector2(0.55f, 0.94f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 14, true,
+                    $"<b>{pitch.developerName}</b> ({tierName})");
+
+                CreateText(statusCard.transform, "OriginalOffer", new Vector2(0.03f, 0.08f), new Vector2(0.55f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false,
+                    $"{PublishingDealsLabels.PitchBudget} ${_ms.GetMoney(pitch.requestedBudget, true)}  |  {PublishingDealsLabels.DeveloperCut} {pitch.proposedRoyaltySplit:F0}%");
+
+                // Patience Indicator
+                string patienceBlocks;
+                string patienceDesc;
+                Color patienceColor;
+
+                if (pitch.negotiationFailed)
                 {
-                    bool isCur = Mathf.Approximately(playerRoyaltyCut, splits[i]);
-                    sBtns[i].GetComponent<Image>().color = isCur ? new Color(0.161f, 0.502f, 0.725f, 1f) : new Color(0.82f, 0.84f, 0.88f, 1f);
-                    sBtns[i].GetComponentInChildren<Text>().color = isCur ? Color.white : new Color(0.2f, 0.2f, 0.2f, 1f);
+                    patienceBlocks = "□□□□□";
+                    patienceDesc = PublishingDealsLabels.StudioWalkoutMsg;
+                    patienceColor = new Color(0.75f, 0.20f, 0.20f, 1f);
+                }
+                else if (pitch.studioPatience >= 4)
+                {
+                    patienceBlocks = "■■■■■";
+                    patienceDesc = PublishingDealsLabels.PatienceCalm;
+                    patienceColor = new Color(0.12f, 0.55f, 0.22f, 1f);
+                }
+                else if (pitch.studioPatience == 3)
+                {
+                    patienceBlocks = "■■■□□";
+                    patienceDesc = PublishingDealsLabels.PatienceTense;
+                    patienceColor = new Color(0.85f, 0.55f, 0.15f, 1f);
+                }
+                else if (pitch.studioPatience == 2)
+                {
+                    patienceBlocks = "■■□□□";
+                    patienceDesc = PublishingDealsLabels.PatienceTense;
+                    patienceColor = new Color(0.85f, 0.40f, 0.15f, 1f);
+                }
+                else
+                {
+                    patienceBlocks = "■□□□□";
+                    patienceDesc = PublishingDealsLabels.PatienceAngered;
+                    patienceColor = new Color(0.85f, 0.20f, 0.20f, 1f);
+                }
+
+                CreateText(statusCard.transform, "PatienceLabel", new Vector2(0.56f, 0.52f), new Vector2(0.97f, 0.94f), Vector2.zero, Vector2.zero, TextAnchor.MiddleRight, 13, true,
+                    $"{PublishingDealsLabels.StudioPatience} <color=#{ColorUtility.ToHtmlStringRGB(patienceColor)}>{patienceBlocks} ({pitch.studioPatience}/{pitch.maxPatience})</color>");
+
+                CreateText(statusCard.transform, "PatienceState", new Vector2(0.56f, 0.08f), new Vector2(0.97f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleRight, 12, false,
+                    $"<color=#{ColorUtility.ToHtmlStringRGB(patienceColor)}>{patienceDesc}</color>");
+
+                // --- 2. Dynamic Dialogue & Counter-Offer Box ---
+                var dialogBox = new GameObject("DialogBox", typeof(RectTransform), typeof(Image));
+                dialogBox.transform.SetParent(contentContainer.transform, false);
+                var dbRt = (RectTransform)dialogBox.transform;
+                dbRt.anchorMin = new Vector2(0f, 1f);
+                dbRt.anchorMax = new Vector2(1f, 1f);
+                dbRt.pivot = new Vector2(0.5f, 1f);
+                dbRt.anchoredPosition = new Vector2(0f, -68f);
+                dbRt.sizeDelta = new Vector2(0f, 66f);
+
+                var dbImg = dialogBox.GetComponent<Image>();
+                dbImg.sprite = GetGameSprite("uiSquareVerlauf") ?? GetGameSprite("whiteSimple");
+                dbImg.type = Image.Type.Sliced;
+                dbImg.color = pitch.negotiationFailed ? new Color(0.98f, 0.88f, 0.88f, 1f) :
+                              (pitch.agreementReached ? new Color(0.88f, 0.96f, 0.88f, 1f) : new Color(0.94f, 0.95f, 0.97f, 1f));
+
+                string dialogText;
+                if (pitch.negotiationFailed)
+                {
+                    dialogText = $"<color=#C0392B><b>{PublishingDealsLabels.StudioWalkoutMsg}</b></color>";
+                }
+                else if (pitch.agreementReached)
+                {
+                    dialogText = $"<color=#1E8C3A><b>{PublishingDealsLabels.StudioAcceptMsg}</b>\n{PublishingDealsLabels.PublisherCut} {pitch.currentPubCutOffer:F0}%  |  {PublishingDealsLabels.DeveloperCut} {pitch.currentDevCutOffer:F0}%</color>";
+                }
+                else if (pitch.hasCounterOffer)
+                {
+                    dialogText = $"{pitch.lastCounterReason}\n<b>{PublishingDealsLabels.DeveloperCut} {pitch.currentDevCutOffer:F0}%  |  <color=#D9822B>{PublishingDealsLabels.PublisherCut} {pitch.currentPubCutOffer:F0}%</color></b>";
+                }
+                else
+                {
+                    dialogText = $"{PublishingDealsLabels.StudioWelcoming}\n<b>{PublishingDealsLabels.DeveloperCut} {pitch.proposedRoyaltySplit:F0}%  |  {PublishingDealsLabels.PublisherCut} {100f - pitch.proposedRoyaltySplit:F0}%</b>";
+                }
+
+                CreateText(dialogBox.transform, "DialogText", new Vector2(0.04f, 0.05f), new Vector2(0.96f, 0.95f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, false, dialogText);
+
+                // If failed, hide controls and only show Close
+                if (pitch.negotiationFailed)
+                {
+                    var exitBtn = CreateNativeButton(contentContainer.transform, "ExitBtn", new Vector2(0f, -280f), new Vector2(220f, 44f), () =>
+                    {
+                        PublishingManager.Data.currentPitches.Remove(pitch);
+                        CloseModalDialog();
+                        RefreshActiveTab();
+                    }, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+                    exitBtn.GetComponent<Image>().color = new Color(0.75f, 0.25f, 0.25f, 1f);
+                    exitBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.Close;
+                    return;
+                }
+
+                // --- 3. Negotiable Terms Controls ---
+                float startY = -142f;
+
+                // Term 1: Publisher Royalty Share
+                CreateText(contentContainer.transform, "CutTitle", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(4f, startY), new Vector2(-4f, startY + 22f), TextAnchor.MiddleLeft, 13, true,
+                    $"{PublishingDealsLabels.RoyaltySplit} ({PublishingDealsLabels.PublisherCut} {selectedPlayerCut:F0}%)");
+
+                float[] cuts = { 15f, 25f, 35f, 50f, 65f };
+                float cutBtnW = 118f;
+                float cutSpacing = 6f;
+                for (int i = 0; i < cuts.Length; i++)
+                {
+                    float cutVal = cuts[i];
+                    bool isSelected = Mathf.Approximately(selectedPlayerCut, cutVal);
+                    float btnX = i * (cutBtnW + cutSpacing);
+
+                    var cBtn = CreateNativeButton(contentContainer.transform, $"CutBtn_{cutVal}", new Vector2(btnX + cutBtnW * 0.5f, startY - 24f), new Vector2(cutBtnW, 32f), () =>
+                    {
+                        selectedPlayerCut = cutVal;
+                        rebuildContent();
+                    }, new Vector2(0f, 1f), new Vector2(0f, 1f));
+
+                    cBtn.GetComponent<Image>().color = isSelected ? new Color(0.161f, 0.502f, 0.725f, 1f) : new Color(0.82f, 0.84f, 0.88f, 1f);
+                    var txt = cBtn.GetComponentInChildren<Text>();
+                    txt.text = $"{cutVal:F0}%";
+                    txt.fontSize = 13;
+                    txt.color = isSelected ? Color.white : new Color(0.2f, 0.2f, 0.2f, 1f);
+                }
+
+                // Term 2: Upfront Funding Adjustment
+                float budgetY = startY - 76f;
+                CreateText(contentContainer.transform, "BudgetTitle", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(4f, budgetY), new Vector2(-4f, budgetY + 22f), TextAnchor.MiddleLeft, 13, true,
+                    $"{PublishingDealsLabels.PitchBudget} ${_ms.GetMoney((long)(pitch.requestedBudget * selectedBudgetMult), true)}");
+
+                float[] bMults = { 0.85f, 1.0f, 1.25f };
+                string[] bLabels = { PublishingDealsLabels.BudgetCut, PublishingDealsLabels.BudgetStandard, PublishingDealsLabels.BudgetBonus };
+                float bBtnW = 200f;
+                for (int i = 0; i < 3; i++)
+                {
+                    float mVal = bMults[i];
+                    bool isSelected = Mathf.Approximately(selectedBudgetMult, mVal);
+                    float btnX = i * (bBtnW + cutSpacing);
+
+                    var bBtn = CreateNativeButton(contentContainer.transform, $"BudgetBtn_{i}", new Vector2(btnX + bBtnW * 0.5f, budgetY - 24f), new Vector2(bBtnW, 32f), () =>
+                    {
+                        selectedBudgetMult = mVal;
+                        rebuildContent();
+                    }, new Vector2(0f, 1f), new Vector2(0f, 1f));
+
+                    bBtn.GetComponent<Image>().color = isSelected ? new Color(0.161f, 0.502f, 0.725f, 1f) : new Color(0.82f, 0.84f, 0.88f, 1f);
+                    var txt = bBtn.GetComponentInChildren<Text>();
+                    txt.text = bLabels[i];
+                    txt.fontSize = 12;
+                    txt.color = isSelected ? Color.white : new Color(0.2f, 0.2f, 0.2f, 1f);
+                }
+
+                // Term 3: Platform Exclusivity
+                float exclY = budgetY - 76f;
+                var playerConsole = _ms?.arrayPlatformsScripts?.FirstOrDefault(p => p != null && p.ownerID == _ms.myID && p.isUnlocked && !p.vomMarktGenommen);
+                string consoleName = playerConsole != null ? playerConsole.GetName() : "";
+                bool isExclSelected = exclusivePlatformId >= 0;
+
+                string exclButtonText = isExclSelected ?
+                    $"[X] {PublishingDealsLabels.ConsoleExclOption} ({consoleName})" :
+                    $"[ ] {PublishingDealsLabels.MultiplatformOption}";
+
+                var exclBtn = CreateNativeButton(contentContainer.transform, "ExclToggle", new Vector2(310f, exclY - 14f), new Vector2(620f, 34f), () =>
+                {
+                    if (playerConsole != null)
+                    {
+                        exclusivePlatformId = (exclusivePlatformId == -1) ? playerConsole.myID : -1;
+                        permanent = exclusivePlatformId >= 0;
+                        rebuildContent();
+                    }
+                }, new Vector2(0f, 1f), new Vector2(0f, 1f));
+
+                exclBtn.GetComponent<Image>().color = isExclSelected ? new Color(0.18f, 0.65f, 0.35f, 1f) : new Color(0.82f, 0.84f, 0.88f, 1f);
+                var eTxt = exclBtn.GetComponentInChildren<Text>();
+                eTxt.text = exclButtonText;
+                eTxt.fontSize = 12;
+                eTxt.color = isExclSelected ? Color.white : new Color(0.2f, 0.2f, 0.2f, 1f);
+                if (playerConsole == null) exclBtn.GetComponent<Button>().interactable = false;
+
+                // --- 4. Bottom Action Bar ---
+                float actionsY = -395f;
+
+                if (pitch.agreementReached)
+                {
+                    // Sign Deal Button
+                    var signBtn = CreateNativeButton(contentContainer.transform, "SignBtn", new Vector2(-110f, actionsY), new Vector2(230f, 44f), () =>
+                    {
+                        bool success = PublishingManager.FundAndSignDeal(_ms, pitch, pitch.currentPubCutOffer, exclusivePlatformId, permanent, _guiMain);
+                        if (success)
+                        {
+                            CloseModalDialog();
+                            RefreshActiveTab();
+                        }
+                    }, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+                    signBtn.GetComponent<Image>().color = new Color(0.18f, 0.65f, 0.35f, 1f);
+                    signBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.SignAndBegin;
+
+                    // Walk Away / Cancel
+                    var cancelBtn = CreateNativeButton(contentContainer.transform, "CancelBtn", new Vector2(130f, actionsY), new Vector2(170f, 44f), CloseModalDialog, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+                    cancelBtn.GetComponent<Image>().color = new Color(0.6f, 0.6f, 0.6f, 1f);
+                    cancelBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.WalkAway;
+                }
+                else
+                {
+                    // Submit Proposal
+                    var proposeBtn = CreateNativeButton(contentContainer.transform, "ProposeBtn", new Vector2(-155f, actionsY), new Vector2(200f, 44f), () =>
+                    {
+                        PublishingManager.EvaluateNegotiationProposal(_ms, pitch, selectedPlayerCut, selectedBudgetMult, exclusivePlatformId >= 0);
+                        rebuildContent();
+                    }, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+                    proposeBtn.GetComponent<Image>().color = new Color(0.85f, 0.55f, 0.15f, 1f);
+                    proposeBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.SubmitProposal;
+
+                    // Accept Studio Counter (if studio made counter-offer)
+                    if (pitch.hasCounterOffer)
+                    {
+                        var acceptCounterBtn = CreateNativeButton(contentContainer.transform, "AcceptCounterBtn", new Vector2(50f, actionsY), new Vector2(190f, 44f), () =>
+                        {
+                            pitch.agreementReached = true;
+                            pitch.hasCounterOffer = false;
+                            rebuildContent();
+                        }, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+                        acceptCounterBtn.GetComponent<Image>().color = new Color(0.161f, 0.502f, 0.725f, 1f);
+                        acceptCounterBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.AcceptStudioTerms;
+                    }
+
+                    // Walk Away
+                    float walkX = pitch.hasCounterOffer ? 210f : 110f;
+                    var walkBtn = CreateNativeButton(contentContainer.transform, "WalkBtn", new Vector2(walkX, actionsY), new Vector2(130f, 44f), CloseModalDialog, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+                    walkBtn.GetComponent<Image>().color = new Color(0.6f, 0.6f, 0.6f, 1f);
+                    walkBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.WalkAway;
                 }
             };
 
-            for (int i = 0; i < 3; i++)
-            {
-                float cut = splits[i];
-                var sBtn = CreateNativeButton(_activeModalDialog.transform, $"SBtn_{cut}", new Vector2((i - 1) * 160f, 40f), new Vector2(150f, 36f), () =>
-                {
-                    playerRoyaltyCut = cut;
-                    updateSplitBtns();
-                }, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
-
-                sBtns[i] = sBtn.GetComponent<Button>();
-                sBtn.GetComponentInChildren<Text>().text = $"{PublishingDealsLabels.PubShare} {cut:F0}%";
-            }
-            updateSplitBtns();
-
-            // Console Exclusivity Option (Check if player owns a console)
-            var playerConsole = _ms?.arrayPlatformsScripts?.FirstOrDefault(p => p != null && p.ownerID == _ms.myID && p.isUnlocked && !p.vomMarktGenommen);
-            string exclText = playerConsole != null ? $"Make Exclusive to {playerConsole.GetName()} (System Seller)" : "Multiplatform Release";
-
-            var exclToggleBtn = CreateNativeButton(_activeModalDialog.transform, "ExclToggle", new Vector2(0f, -40f), new Vector2(460f, 40f), null, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
-            var exclToggleTxt = exclToggleBtn.GetComponentInChildren<Text>();
-
-            Action updateExclToggle = () =>
-            {
-                bool isExcl = exclusivePlatformId >= 0;
-                exclToggleBtn.GetComponent<Image>().color = isExcl ? new Color(0.18f, 0.65f, 0.35f, 1f) : new Color(0.70f, 0.72f, 0.76f, 1f);
-                exclToggleTxt.text = $"{(isExcl ? "[X]" : "[ ]")} {exclText}";
-            };
-            updateExclToggle();
-
-            if (playerConsole != null)
-            {
-                exclToggleBtn.GetComponent<Button>().onClick.AddListener(() =>
-                {
-                    exclusivePlatformId = (exclusivePlatformId == -1) ? playerConsole.myID : -1;
-                    permanent = exclusivePlatformId >= 0;
-                    updateExclToggle();
-                });
-            }
-            else
-            {
-                exclToggleBtn.GetComponent<Button>().interactable = false;
-            }
-
-            // Confirm Fund & Sign Button
-            var signBtn = CreateNativeButton(_activeModalDialog.transform, "SignBtn", new Vector2(-110f, -165f), new Vector2(180f, 40f), () =>
-            {
-                bool success = PublishingManager.FundAndSignDeal(_ms, pitch, playerRoyaltyCut, exclusivePlatformId, permanent, _guiMain);
-                if (success)
-                {
-                    CloseModalDialog();
-                    RefreshActiveTab();
-                }
-            }, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
-            signBtn.GetComponent<Image>().color = new Color(0.18f, 0.65f, 0.35f, 1f);
-            signBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.AcceptDeal;
-
-            // Cancel Button
-            var cancelBtn = CreateNativeButton(_activeModalDialog.transform, "CancelBtn", new Vector2(110f, -165f), new Vector2(140f, 40f), CloseModalDialog, new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f));
-            cancelBtn.GetComponent<Image>().color = new Color(0.6f, 0.6f, 0.6f, 1f);
-            cancelBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.Close;
+            rebuildContent();
         }
 
         #endregion

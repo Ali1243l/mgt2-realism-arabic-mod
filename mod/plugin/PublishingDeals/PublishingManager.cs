@@ -96,6 +96,10 @@ namespace MGT2Mod.PublishingDeals
             string[] noun = { "Vanguard", "Echoes", "Odyssey", "Protocol", "Horizon", "Ascent", "Legacy", "Frontier" };
             string title = $"{prefix[UnityEngine.Random.Range(0, prefix.Length)]} {noun[UnityEngine.Random.Range(0, noun.Length)]}";
 
+            int patience = tier == DealTier.MajorBlockbuster ? 3 : (tier == DealTier.MidTierProject ? 4 : 5);
+            if (pub != null && pub.relation > 60f) patience++;
+            if (pub != null && pub.stars >= 4.5f) patience = Math.Max(2, patience - 1);
+
             return new StudioPitch
             {
                 pitchId = _nextId,
@@ -109,17 +113,114 @@ namespace MGT2Mod.PublishingDeals
                 proposedRoyaltySplit = devCut,
                 devWeeks = devWeeks,
                 estimatedQuality = quality,
-                expirationWeeks = 8
+                expirationWeeks = 8,
+                studioPatience = patience,
+                maxPatience = patience,
+                currentDevCutOffer = devCut,
+                currentPubCutOffer = 100f - devCut,
+                currentBudgetOffer = budget,
+                isExclusiveDemanded = false,
+                hasCounterOffer = false,
+                agreementReached = false,
+                negotiationFailed = false,
+                negotiationRound = 0,
+                lastCounterReason = ""
             };
+        }
+
+        public static bool EvaluateNegotiationProposal(mainScript ms, StudioPitch pitch, float demandedPubCut, float budgetMult, bool demandExcl)
+        {
+            if (ms == null || pitch == null || pitch.negotiationFailed) return false;
+
+            pitch.negotiationRound++;
+
+            var pub = GameObject.FindGameObjectsWithTag("Publisher")
+                .Select(go => go.GetComponent<publisherScript>())
+                .FirstOrDefault(p => p != null && p.myID == pitch.developerId);
+
+            float studioStars = pub != null ? pub.stars : 3f;
+            float relation = pub != null ? pub.relation : 50f;
+
+            // Cut satisfaction
+            float extraPlayerCut = demandedPubCut - (100f - pitch.proposedRoyaltySplit);
+            float prideMultiplier = 1.0f + (studioStars / 5f) * 0.8f;
+            float cutPenalty = extraPlayerCut > 0 ? (extraPlayerCut * 2.2f * prideMultiplier) : (extraPlayerCut * 1.2f);
+
+            // Budget effect
+            float budgetBonusScore = 0f;
+            if (budgetMult >= 1.20f)
+            {
+                budgetBonusScore = (pitch.tier == DealTier.IndiePrototype) ? 30f : 20f;
+            }
+            else if (budgetMult <= 0.90f)
+            {
+                budgetBonusScore = -25f;
+            }
+
+            // Exclusivity penalty
+            float exclPenalty = 0f;
+            if (demandExcl)
+            {
+                exclPenalty = 25f * (studioStars / 3.5f);
+                if (budgetMult >= 1.20f) exclPenalty *= 0.5f;
+            }
+
+            // Publisher prestige leverage
+            float playerPrestige = 0f;
+            int playerFans = ms.genres_ != null ? ms.genres_.GetAmountFans() : 0;
+            if (playerFans > 50000) playerPrestige += Mathf.Clamp(playerFans / 25000f, 0f, 20f);
+            if (ms.money > 10000000L) playerPrestige += 8f;
+            if (relation > 65f) playerPrestige += 10f;
+
+            float score = 55f - cutPenalty + budgetBonusScore - exclPenalty + playerPrestige;
+            pitch.currentBudgetOffer = (long)(pitch.requestedBudget * budgetMult);
+            pitch.isExclusiveDemanded = demandExcl;
+
+            if (score >= 48f)
+            {
+                pitch.agreementReached = true;
+                pitch.hasCounterOffer = false;
+                pitch.currentPubCutOffer = demandedPubCut;
+                pitch.currentDevCutOffer = 100f - demandedPubCut;
+                pitch.lastCounterReason = PublishingDealsLabels.StudioAcceptMsg;
+                return true;
+            }
+            else
+            {
+                int patienceLoss = score < 25f ? 2 : 1;
+                pitch.studioPatience = Math.Max(0, pitch.studioPatience - patienceLoss);
+
+                if (pitch.studioPatience <= 0)
+                {
+                    pitch.negotiationFailed = true;
+                    pitch.agreementReached = false;
+                    pitch.hasCounterOffer = false;
+                    pitch.lastCounterReason = PublishingDealsLabels.StudioWalkoutMsg;
+                    return false;
+                }
+
+                float minPubCut = 100f - pitch.proposedRoyaltySplit;
+                float compromiseCut = minPubCut + Mathf.Max(0f, (demandedPubCut - minPubCut) * 0.4f);
+                compromiseCut = Mathf.Round(compromiseCut / 5f) * 5f;
+                if (compromiseCut < minPubCut) compromiseCut = minPubCut;
+
+                pitch.hasCounterOffer = true;
+                pitch.agreementReached = false;
+                pitch.currentPubCutOffer = compromiseCut;
+                pitch.currentDevCutOffer = 100f - compromiseCut;
+                pitch.lastCounterReason = PublishingDealsLabels.StudioCounterMsg;
+                return false;
+            }
         }
 
         public static bool FundAndSignDeal(mainScript ms, StudioPitch pitch, float playerCut, int exclusivePlatformId, bool permanent, GUI_Main guiMain)
         {
             if (ms == null || pitch == null) return false;
-            if (ms.money < pitch.requestedBudget) return false;
+            long actualBudget = pitch.currentBudgetOffer > 0 ? pitch.currentBudgetOffer : pitch.requestedBudget;
+            if (ms.money < actualBudget) return false;
 
             // Deduct funding
-            ms.Pay(pitch.requestedBudget, 25);
+            ms.Pay(actualBudget, 25);
 
             var deal = new ActiveSecondPartyDeal
             {
@@ -129,7 +230,7 @@ namespace MGT2Mod.PublishingDeals
                 gameTitle = pitch.gameTitle,
                 genre = pitch.genre,
                 subgenre = pitch.subgenre,
-                fundedBudget = pitch.requestedBudget,
+                fundedBudget = actualBudget,
                 playerRoyaltySplit = playerCut,
                 weeksLeft = pitch.devWeeks,
                 totalDevWeeks = pitch.devWeeks,
@@ -154,7 +255,7 @@ namespace MGT2Mod.PublishingDeals
                 guiMain.MessageBox(PublishingDealsLabels.DealSignedNotice, false);
             }
 
-            PublishingDealsPlugin.Log.LogInfo($"Signed publishing deal for {pitch.gameTitle} with {pitch.developerName} (Budget: ${pitch.requestedBudget})");
+            PublishingDealsPlugin.Log.LogInfo($"Signed publishing deal for {pitch.gameTitle} with {pitch.developerName} (Budget: ${actualBudget}, PlayerCut: {playerCut}%)");
             return true;
         }
 

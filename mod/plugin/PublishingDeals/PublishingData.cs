@@ -25,6 +25,19 @@ namespace MGT2Mod.PublishingDeals
         public int devWeeks;
         public float estimatedQuality;     // Expected base quality (40-90)
         public int expirationWeeks = 8;
+
+        // Dynamic Negotiation state
+        public int studioPatience = 4;
+        public int maxPatience = 4;
+        public float currentDevCutOffer = 70f;
+        public float currentPubCutOffer = 30f;
+        public long currentBudgetOffer;
+        public bool isExclusiveDemanded = false;
+        public bool hasCounterOffer = false;
+        public bool agreementReached = false;
+        public bool negotiationFailed = false;
+        public int negotiationRound = 0;
+        public string lastCounterReason = "";
     }
 
     [Serializable]
