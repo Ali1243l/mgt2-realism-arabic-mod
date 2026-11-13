@@ -6,6 +6,7 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
+using Ali.Mgt2.Simulation;
 
 namespace MGT2Mod.CommunityDynamics
 {
@@ -319,20 +320,28 @@ namespace MGT2Mod.CommunityDynamics
             var bullshot = Data.activeBullshots.FirstOrDefault(b => b.gameId == game.myID);
             var streamer = Data.activeStreamers.FirstOrDefault(s => s.gameId == game.myID);
 
-            // Check Review Bombing Trigger
+            // Check Review Bombing Trigger via Archon's ViralCrisisEngine
             if (bullshot != null && bullshot.isDeceptive)
             {
-                if (game.points_bugs >= 10f || game.reviewTotal < 70)
+                var vState = new ViralCrisisState
+                {
+                    ExpectationDebt = 45.0,
+                    PromisedQualityScore = 92.0,
+                    StudioTrustMetric = (double)Data.overallSentiment * 100.0
+                };
+                var shock = ViralCrisisEngine.EvaluateReleaseExpectationShock(vState, (double)game.reviewTotal, null);
+
+                if (shock.RageSeverity > 10.0 || game.points_bugs >= 10f || game.reviewTotal < 70)
                 {
                     // REVIEW BOMBING!
-                    int negativeSurge = Mathf.RoundToInt(game.sellsPerWeek != null && game.sellsPerWeek.Length > 0 ? game.sellsPerWeek[0] * 0.8f + 8000 : 12000);
+                    int negativeSurge = Mathf.RoundToInt((float)(shock.RageSeverity * 220.0 + 8000.0));
                     game.userNegativ += negativeSurge;
 
                     Data.activeReviewBombs.Add(new ReviewBombState
                     {
                         gameId = game.myID,
                         gameName = game.GetNameSimple(),
-                        weeksRemaining = 6,
+                        weeksRemaining = MathUtil.ClampInt((int)Math.Ceiling(shock.RageSeverity / 14.0) + 2, 3, 10),
                         apologyIssued = false,
                         hotfixCommitted = false,
                         compensationGiven = false,
@@ -379,10 +388,15 @@ namespace MGT2Mod.CommunityDynamics
                 Data.activeBullshots.Remove(bullshot);
             }
 
-            // Check Streamer Impact
+            // Check Streamer Impact via Archon's Influencer Simulation
             if (streamer != null)
             {
-                if (game.points_bugs < 5f && game.reviewTotal >= 75)
+                var arch = (InfluencerArchetype)streamer.streamerTier;
+                double subs = streamer.streamerTier == 0 ? 12000000.0 : (streamer.streamerTier == 1 ? 1500000.0 : 800000.0);
+                var vState = new ViralCrisisState { StudioTrustMetric = Data.overallSentiment * 100.0 };
+                var impact = ViralCrisisEngine.EvaluateInfluencerImpact(arch, (double)game.reviewTotal, subs, vState, new System.Random());
+
+                if (impact.QualityAmplifiedMultiplier >= 1.20 && game.points_bugs < 7f)
                 {
                     streamer.outcome = 1; // Viral Explosion
                     AddPost(new SocialPost
@@ -398,7 +412,7 @@ namespace MGT2Mod.CommunityDynamics
                         week = ms.week
                     });
                 }
-                else if (game.points_bugs >= 15f)
+                else if (game.points_bugs >= 14f || impact.QualityAmplifiedMultiplier < 0.85)
                 {
                     streamer.outcome = 2; // Meme Mockery
                     AddPost(new SocialPost

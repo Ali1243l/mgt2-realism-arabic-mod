@@ -31,6 +31,8 @@ namespace MGT2Mod.StockMarket
         public bool mandateExclusivePublishing; // 51% majority directive: publish through player
         public int mandateGenre = -1;           // 51% majority directive: -1 = free choice, >= 0 = forced genre
         public bool absorbedAsSubsidiary;       // 100% full acquisition: converted to official subsidiary
+        public double previousSharePrice;       // Track weekly price trend
+        public double priceTrendPercent;        // +% / -% drift
     }
 
     [Serializable]

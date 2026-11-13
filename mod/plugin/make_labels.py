@@ -223,6 +223,10 @@ LABELS = {
         "DeveloperCut": ("Studio Split:", "حصة الاستوديو:"),
         "PublisherCut": ("Publisher Split:", "حصة الناشر:"),
         "SignAndBegin": ("Sign & Begin Dev", "توقيع العقد وبدء التطوير"),
+        "ReasonGreedyCut": ("The studio finds your cut excessively high for their prestige.", "يرى الاستوديو أن حصتك مبالغ فيها مقارنة بمكانته وتاريخه."),
+        "ReasonExclPremium": ("Exclusivity demands a higher upfront funding budget.", "يشترط الاستوديو ميزانية تمويل أعلى لقبول حصرية الكونسول."),
+        "ReasonLowFans": ("The studio doubts your fan reach and demands safer terms.", "يشكك الاستوديو في قدرتك التسويقية ويطلب شروطاً أكثر أماناً."),
+        "ReasonLowBudget": ("The proposed budget is too low for this project scope.", "التمويل المعروض أقل من تكاليف التطوير الفعلية للمشروع."),
     },
     "CommunityDynamics": {
         "Title": ("Community Dynamics & Social Hype", "مجتمع اللاعبين وتريندات السوشيال"),

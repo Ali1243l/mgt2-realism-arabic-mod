@@ -964,8 +964,13 @@ namespace MGT2Mod.StockMarket
             typeGo.color = new Color(0.45f, 0.48f, 0.52f, 1f);
 
             // Valuation & Share Price
+            if (stock.previousSharePrice <= 0.001) stock.previousSharePrice = sharePrice;
+            double pctChange = stock.previousSharePrice > 0 ? ((sharePrice - stock.previousSharePrice) / stock.previousSharePrice) * 100.0 : 0.0;
+            string trendStr = pctChange > 0.05 ? $"+{pctChange:F1}%" : (pctChange < -0.05 ? $"{pctChange:F1}%" : "0.0%");
+            string trendCol = pctChange > 0.05 ? "#1E8C3A" : (pctChange < -0.05 ? "#C0392B" : "#7F8C8D");
+
             CreateText(row.transform, "Valuation", new Vector2(0.35f, 0.48f), new Vector2(0.55f, 0.92f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 14, true, $"<color=#1E8C3A>{_ms.GetMoney(marketCap, true)}</color>");
-            CreateText(row.transform, "SharePrice", new Vector2(0.35f, 0.08f), new Vector2(0.55f, 0.48f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 12, false, $"${sharePrice:F2} / sh");
+            CreateText(row.transform, "SharePrice", new Vector2(0.35f, 0.08f), new Vector2(0.55f, 0.48f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 12, false, $"${sharePrice:F2}  <color={trendCol}><b>{trendStr}</b></color>");
 
             // Player Stake
             string stakeColor = stock.playerShare >= 51f ? "#1E8C3A" : stock.playerShare > 0f ? "#1E6FB8" : "#666666";

@@ -6,6 +6,7 @@ using BepInEx;
 using BepInEx.Logging;
 using HarmonyLib;
 using UnityEngine;
+using Ali.Mgt2.Simulation;
 
 namespace MGT2Mod.PublishingDeals
 {
@@ -138,45 +139,64 @@ namespace MGT2Mod.PublishingDeals
                 .Select(go => go.GetComponent<publisherScript>())
                 .FirstOrDefault(p => p != null && p.myID == pitch.developerId);
 
-            float studioStars = pub != null ? pub.stars : 3f;
-            float relation = pub != null ? pub.relation : 50f;
-
-            // Cut satisfaction
-            float extraPlayerCut = demandedPubCut - (100f - pitch.proposedRoyaltySplit);
-            float prideMultiplier = 1.0f + (studioStars / 5f) * 0.8f;
-            float cutPenalty = extraPlayerCut > 0 ? (extraPlayerCut * 2.2f * prideMultiplier) : (extraPlayerCut * 1.2f);
-
-            // Budget effect
-            float budgetBonusScore = 0f;
-            if (budgetMult >= 1.20f)
-            {
-                budgetBonusScore = (pitch.tier == DealTier.IndiePrototype) ? 30f : 20f;
-            }
-            else if (budgetMult <= 0.90f)
-            {
-                budgetBonusScore = -25f;
-            }
-
-            // Exclusivity penalty
-            float exclPenalty = 0f;
-            if (demandExcl)
-            {
-                exclPenalty = 25f * (studioStars / 3.5f);
-                if (budgetMult >= 1.20f) exclPenalty *= 0.5f;
-            }
-
-            // Publisher prestige leverage
-            float playerPrestige = 0f;
             int playerFans = ms.genres_ != null ? ms.genres_.GetAmountFans() : 0;
-            if (playerFans > 50000) playerPrestige += Mathf.Clamp(playerFans / 25000f, 0f, 20f);
-            if (ms.money > 10000000L) playerPrestige += 8f;
-            if (relation > 65f) playerPrestige += 10f;
+            var playerPub = GameObject.FindGameObjectsWithTag("Publisher")
+                .Select(go => go.GetComponent<publisherScript>())
+                .FirstOrDefault(p => p != null && p.isPlayer);
+            int playerAwards = (playerPub != null && playerPub.awards != null) ? playerPub.awards.Sum() : 0;
 
-            float score = 55f - cutPenalty + budgetBonusScore - exclPenalty + playerPrestige;
-            pitch.currentBudgetOffer = (long)(pitch.requestedBudget * budgetMult);
+            var playerConsole = ms.arrayPlatformsScripts?.FirstOrDefault(p => p != null && p.ownerID == ms.myID && p.isUnlocked && !p.vomMarktGenommen);
+            double consoleMarketShare = playerConsole != null ? (double)playerConsole.marktanteil : 0.0;
+
+            var publisher = new PublisherProfile
+            {
+                CashReserve = (double)ms.money,
+                TotalFans = playerFans,
+                AwardCount = playerAwards,
+                HistoricalHitRatio = 0.75,
+                ConsoleMarketSharePercent = consoleMarketShare,
+                Reputation = pub != null ? (double)pub.relation : 50.0
+            };
+
+            var studio = new TargetStudioProfile
+            {
+                Stars = pub != null ? pub.stars : (pitch.tier == DealTier.MajorBlockbuster ? 4.5 : (pitch.tier == DealTier.MidTierProject ? 3.5 : 2.0)),
+                CashReserve = pub != null ? (double)pub.firmenwert * 0.15 : 200000.0,
+                AgeYears = pub != null ? Math.Max(1, ms.year - pub.date_year) : 3,
+                PastAwards = (pub != null && pub.awards != null) ? pub.awards.Sum() : 0,
+                RequestedBudget = (double)pitch.requestedBudget,
+                RequestedDevRoyaltyPercent = (double)pitch.proposedRoyaltySplit,
+                CurrentPatience = (double)pitch.studioPatience * 20.0,
+                MaxPatience = (double)pitch.maxPatience * 20.0,
+                ExpectedGameRoi = 1.5
+            };
+
+            var offer = new DealOffer
+            {
+                OfferedBudget = (double)pitch.requestedBudget * budgetMult,
+                OfferedDevRoyaltyPercent = 100.0 - (double)demandedPubCut,
+                MarketingCommitment = (double)pitch.requestedBudget * 0.15,
+                RequireConsoleExclusivity = demandExcl
+            };
+
+            int totalWeeks = ms.year * 48 + ms.month * 4 + ms.week;
+            var synergy = new CrossSystemSynergyContext
+            {
+                OwnedEquityPercent = (pub != null) ? pub.share : 0.0,
+                ActiveReviewBombSeverity = 0.0,
+                StudioTrustMetric = 60.0,
+                MacroPhase = StockDriftEngine.GetMacroPhaseForWeek(totalWeeks)
+            };
+
+            var result = PublishingNegotiationMath.EvaluateAndRespond(publisher, studio, offer, pitch.negotiationRound, synergy);
+
+            pitch.currentBudgetOffer = (long)offer.OfferedBudget;
             pitch.isExclusiveDemanded = demandExcl;
 
-            if (score >= 48f)
+            // Map patience back to 0-5 scale
+            pitch.studioPatience = MathUtil.ClampInt((int)Math.Ceiling(result.RemainingPatience / 20.0), 0, pitch.maxPatience);
+
+            if (result.Status == NegotiationStatus.Accepted)
             {
                 pitch.agreementReached = true;
                 pitch.hasCounterOffer = false;
@@ -185,31 +205,50 @@ namespace MGT2Mod.PublishingDeals
                 pitch.lastCounterReason = PublishingDealsLabels.StudioAcceptMsg;
                 return true;
             }
+            else if (result.Status == NegotiationStatus.Walkout || pitch.studioPatience <= 0)
+            {
+                pitch.negotiationFailed = true;
+                pitch.agreementReached = false;
+                pitch.hasCounterOffer = false;
+                pitch.lastCounterReason = PublishingDealsLabels.StudioWalkoutMsg;
+                return false;
+            }
             else
             {
-                int patienceLoss = score < 25f ? 2 : 1;
-                pitch.studioPatience = Math.Max(0, pitch.studioPatience - patienceLoss);
-
-                if (pitch.studioPatience <= 0)
-                {
-                    pitch.negotiationFailed = true;
-                    pitch.agreementReached = false;
-                    pitch.hasCounterOffer = false;
-                    pitch.lastCounterReason = PublishingDealsLabels.StudioWalkoutMsg;
-                    return false;
-                }
-
-                float minPubCut = 100f - pitch.proposedRoyaltySplit;
-                float compromiseCut = minPubCut + Mathf.Max(0f, (demandedPubCut - minPubCut) * 0.4f);
-                compromiseCut = Mathf.Round(compromiseCut / 5f) * 5f;
-                if (compromiseCut < minPubCut) compromiseCut = minPubCut;
-
+                // Counter-offer
                 pitch.hasCounterOffer = true;
                 pitch.agreementReached = false;
-                pitch.currentPubCutOffer = compromiseCut;
-                pitch.currentDevCutOffer = 100f - compromiseCut;
-                pitch.lastCounterReason = PublishingDealsLabels.StudioCounterMsg;
+                if (result.CounterOffer != null)
+                {
+                    pitch.currentDevCutOffer = (float)result.CounterOffer.OfferedDevRoyaltyPercent;
+                    pitch.currentPubCutOffer = (float)(100.0 - result.CounterOffer.OfferedDevRoyaltyPercent);
+                    pitch.currentBudgetOffer = (long)result.CounterOffer.OfferedBudget;
+                }
+                else
+                {
+                    pitch.currentPubCutOffer = Mathf.Clamp(demandedPubCut - 10f, 100f - pitch.proposedRoyaltySplit, demandedPubCut);
+                    pitch.currentDevCutOffer = 100f - pitch.currentPubCutOffer;
+                }
+
+                pitch.lastCounterReason = MapReasonCodeToMessage(result.DominantReasonCode);
                 return false;
+            }
+        }
+
+        private static string MapReasonCodeToMessage(string reasonCode)
+        {
+            switch (reasonCode)
+            {
+                case "PUBLISHER_CUT_TOO_GREEDY":
+                    return PublishingDealsLabels.ReasonGreedyCut;
+                case "EXCLUSIVITY_REQUIRES_BUDGET_PREMIUM":
+                    return PublishingDealsLabels.ReasonExclPremium;
+                case "INSUFFICIENT_FAN_REACH":
+                    return PublishingDealsLabels.ReasonLowFans;
+                case "UPFRONT_BUDGET_TOO_LOW":
+                    return PublishingDealsLabels.ReasonLowBudget;
+                default:
+                    return PublishingDealsLabels.StudioCounterMsg;
             }
         }
 
@@ -403,13 +442,39 @@ namespace MGT2Mod.PublishingDeals
                 var bidding = Data.activeBiddingWars[bIdx];
                 bidding.weeksLeft--;
 
-                // AI competitors counter-bid
-                if (bidding.weeksLeft > 1 && UnityEngine.Random.Range(0, 100) < 40)
+                // AI competitors counter-bid using Archon's simulation engine
+                if (bidding.weeksLeft > 1 && bidding.leadingBidderId == -1)
                 {
-                    long raise = (long)UnityEngine.Random.Range(100000f, 500000f);
-                    bidding.currentHighestBid += raise;
-                    bidding.leadingBidderId = bidding.developerId;
-                    bidding.leadingBidderName = bidding.developerName;
+                    var competitorPub = GameObject.FindGameObjectsWithTag("Publisher")
+                        .Select(go => go.GetComponent<publisherScript>())
+                        .FirstOrDefault(p => p != null && p.myID == bidding.developerId);
+
+                    int totalWeeks = ms.year * 48 + ms.month * 4 + ms.week;
+                    var macroPhase = StockDriftEngine.GetMacroPhaseForWeek(totalWeeks);
+
+                    var aiBidder = new AiCompetitorBidder
+                    {
+                        PublisherId = bidding.developerName,
+                        CashReserve = competitorPub != null ? (double)competitorPub.firmenwert * 0.40 : 8000000.0,
+                        CurrentExclusiveCount = 2,
+                        Aggressiveness = 1.15,
+                        HasFolded = false
+                    };
+
+                    var decision = PublishingNegotiationMath.SimulateBiddingWarTurn(
+                        aiBidder,
+                        (double)bidding.currentHighestBid,
+                        (double)bidding.currentHighestBid * 0.90,
+                        ConsoleLifecycleStage.Growth,
+                        macroPhase);
+
+                    if (decision.StayInWar && decision.NextBidAmount > bidding.currentHighestBid)
+                    {
+                        bidding.currentHighestBid = (long)decision.NextBidAmount;
+                        bidding.leadingBidderId = bidding.developerId;
+                        bidding.leadingBidderName = bidding.developerName;
+                        PublishingDealsPlugin.Log.LogInfo($"AI {bidding.developerName} counter-bid ${bidding.currentHighestBid} on {bidding.gameTitle}");
+                    }
                 }
 
                 if (bidding.weeksLeft <= 0 && !bidding.resolved)

@@ -27,4 +27,8 @@
     <Reference Include="0Harmony" HintPath="$(GameDir)\BepInEx\core\0Harmony.dll" Private="false" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Include="..\Shared\SimulationMath.cs" Link="SimulationMath.cs" />
+  </ItemGroup>
+
 </Project>
