@@ -508,14 +508,15 @@ namespace MGT2Mod.PublishingDeals
             CreateText(card.transform, "Time", new Vector2(0.40f, 0.08f), new Vector2(0.68f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false, $"{PublishingDealsLabels.DevTime} {pitch.devWeeks} {PublishingDealsLabels.Weeks}  |  {PublishingDealsLabels.DeveloperCut} {Mathf.RoundToInt(pitch.proposedRoyaltySplit)}%");
 
             // Start Negotiation Button
-            var fundBtn = CreateNativeButton(card.transform, "FundBtn", new Vector2(-15f, 0f), new Vector2(175f, 40f), () =>
+            var fundBtn = CreateNativeButton(card.transform, "FundBtn", new Vector2(-16f, 0f), new Vector2(185f, 40f), () =>
             {
                 ShowDealNegotiationModal(pitch);
             }, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
             fundBtn.GetComponent<Image>().color = new Color(0.161f, 0.502f, 0.725f, 1f);
             var fTxt = fundBtn.GetComponentInChildren<Text>();
             fTxt.text = PublishingDealsLabels.StartNegotiation;
-            fTxt.fontSize = 12;
+            fTxt.fontSize = 13;
+            fTxt.fontStyle = FontStyle.Bold;
 
             return card;
         }
@@ -560,16 +561,17 @@ namespace MGT2Mod.PublishingDeals
             CreateText(card.transform, "Dev", new Vector2(0.03f, 0.08f), new Vector2(0.40f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false, $"{deal.developerName}  ({status})");
 
             CreateText(card.transform, "Financials", new Vector2(0.40f, 0.08f), new Vector2(0.70f, 0.92f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 13, false,
-                $"{PublishingDealsLabels.FundedBudget} ${_ms.GetMoney(deal.fundedBudget, true)}\n{PublishingDealsLabels.EarnedProfits} <b><color=#1E8C3A>{_ms.GetMoney(deal.totalRevenueEarned, true)}</color></b>");
+                $"{PublishingDealsLabels.FundedBudget} {_ms.GetMoney(deal.fundedBudget, true)}\n{PublishingDealsLabels.EarnedProfits} <b><color=#1E8C3A>{_ms.GetMoney(deal.totalRevenueEarned, true)}</color></b>");
 
             // Status Badge
             string badgeText = !deal.isReleased ? PublishingDealsLabels.StatusInDev : $"{PublishingDealsLabels.StatusReleased} ({PublishingDealsLabels.Score} {deal.reviewScore}%)";
             Color badgeColor = !deal.isReleased ? new Color(0.161f, 0.502f, 0.725f, 1f) : new Color(0.18f, 0.65f, 0.35f, 1f);
-            var badge = CreateNativeButton(card.transform, "StatusBadge", new Vector2(-15f, 0f), new Vector2(175f, 38f), null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
+            var badge = CreateNativeButton(card.transform, "StatusBadge", new Vector2(-16f, 0f), new Vector2(185f, 38f), null, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
             badge.GetComponent<Image>().color = badgeColor;
             var bTxt = badge.GetComponentInChildren<Text>();
             bTxt.text = badgeText;
-            bTxt.fontSize = 11;
+            bTxt.fontSize = 12;
+            bTxt.fontStyle = FontStyle.Bold;
 
             return card;
         }
@@ -614,18 +616,19 @@ namespace MGT2Mod.PublishingDeals
 
             string leader = war.leadingBidderId == -1 ? $"<color=#1E8C3A>{PublishingDealsLabels.YouLeading}</color>" : war.leadingBidderName;
             CreateText(card.transform, "BidInfo", new Vector2(0.40f, 0.08f), new Vector2(0.70f, 0.92f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 13, false,
-                $"{PublishingDealsLabels.CurrentHighestBid} <b>{leader}</b>\nBid: <b><color=#1E8C3A>{_ms.GetMoney(war.currentHighestBid, true)}</color></b>");
+                $"{PublishingDealsLabels.CurrentHighestBid} <b>{leader}</b>\n{PublishingDealsLabels.HighestBidAmount} <b><color=#1E8C3A>{_ms.GetMoney(war.currentHighestBid, true)}</color></b>");
 
             long counterBidAmount = war.currentHighestBid + 250000L;
-            var bidBtn = CreateNativeButton(card.transform, "CounterBidBtn", new Vector2(-15f, 0f), new Vector2(175f, 40f), () =>
+            var bidBtn = CreateNativeButton(card.transform, "CounterBidBtn", new Vector2(-16f, 0f), new Vector2(185f, 40f), () =>
             {
                 bool success = PublishingManager.PlaceCounterBid(_ms, war, counterBidAmount, _guiMain);
                 if (success) RefreshActiveTab();
             }, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
             bidBtn.GetComponent<Image>().color = new Color(0.85f, 0.55f, 0.15f, 1f);
             var bTxt = bidBtn.GetComponentInChildren<Text>();
-            bTxt.text = $"{PublishingDealsLabels.CounterBid} (+${_ms.GetMoney(250000L, false)})";
-            bTxt.fontSize = 11;
+            bTxt.text = $"{PublishingDealsLabels.CounterBid} (+{_ms.GetMoney(250000L, true)})";
+            bTxt.fontSize = 12;
+            bTxt.fontStyle = FontStyle.Bold;
 
             return card;
         }
@@ -658,7 +661,7 @@ namespace MGT2Mod.PublishingDeals
             _activeModalDialog = new GameObject("NegotiationModal", typeof(RectTransform), typeof(Image));
             _activeModalDialog.transform.SetParent(_windowMainRt, false);
             var mRt = (RectTransform)_activeModalDialog.transform;
-            mRt.sizeDelta = new Vector2(660f, 530f);
+            mRt.sizeDelta = pitch.negotiationFailed ? new Vector2(660f, 260f) : new Vector2(660f, 520f);
             mRt.anchoredPosition = Vector2.zero;
 
             var bg = _activeModalDialog.GetComponent<Image>();
@@ -741,52 +744,71 @@ namespace MGT2Mod.PublishingDeals
                                  (pitch.tier == DealTier.MidTierProject ? PublishingDealsLabels.TierMid : PublishingDealsLabels.TierIndie);
 
                 CreateText(statusCard.transform, "StudioInfo", new Vector2(0.03f, 0.52f), new Vector2(0.55f, 0.94f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 14, true,
-                    $"<b>{pitch.developerName}</b> ({tierName})");
+                    $"<b>{pitch.developerName}</b>  -  {tierName}");
 
                 CreateText(statusCard.transform, "OriginalOffer", new Vector2(0.03f, 0.08f), new Vector2(0.55f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false,
-                    $"{PublishingDealsLabels.PitchBudget} ${_ms.GetMoney(pitch.requestedBudget, true)}  |  {PublishingDealsLabels.DeveloperCut} {pitch.proposedRoyaltySplit:F0}%");
+                    $"{PublishingDealsLabels.PitchBudget} {_ms.GetMoney(pitch.requestedBudget, true)}  |  {PublishingDealsLabels.DeveloperCut} {pitch.proposedRoyaltySplit:F0}%");
 
                 // Patience Indicator
-                string patienceBlocks;
                 string patienceDesc;
                 Color patienceColor;
 
                 if (pitch.negotiationFailed)
                 {
-                    patienceBlocks = "□□□□□";
-                    patienceDesc = PublishingDealsLabels.StudioWalkoutMsg;
+                    patienceDesc = PublishingDealsLabels.PatienceWalkout;
                     patienceColor = new Color(0.75f, 0.20f, 0.20f, 1f);
                 }
                 else if (pitch.studioPatience >= 4)
                 {
-                    patienceBlocks = "■■■■■";
                     patienceDesc = PublishingDealsLabels.PatienceCalm;
                     patienceColor = new Color(0.12f, 0.55f, 0.22f, 1f);
                 }
                 else if (pitch.studioPatience == 3)
                 {
-                    patienceBlocks = "■■■□□";
                     patienceDesc = PublishingDealsLabels.PatienceTense;
                     patienceColor = new Color(0.85f, 0.55f, 0.15f, 1f);
                 }
                 else if (pitch.studioPatience == 2)
                 {
-                    patienceBlocks = "■■□□□";
                     patienceDesc = PublishingDealsLabels.PatienceTense;
                     patienceColor = new Color(0.85f, 0.40f, 0.15f, 1f);
                 }
                 else
                 {
-                    patienceBlocks = "■□□□□";
                     patienceDesc = PublishingDealsLabels.PatienceAngered;
                     patienceColor = new Color(0.85f, 0.20f, 0.20f, 1f);
                 }
 
-                CreateText(statusCard.transform, "PatienceLabel", new Vector2(0.56f, 0.52f), new Vector2(0.97f, 0.94f), Vector2.zero, Vector2.zero, TextAnchor.MiddleRight, 13, true,
-                    $"{PublishingDealsLabels.StudioPatience} <color=#{ColorUtility.ToHtmlStringRGB(patienceColor)}>{patienceBlocks} ({pitch.studioPatience}/{pitch.maxPatience})</color>");
+                // Patience Label & Number
+                CreateText(statusCard.transform, "PatienceLabel", new Vector2(0.55f, 0.52f), new Vector2(0.97f, 0.94f), Vector2.zero, Vector2.zero, TextAnchor.MiddleRight, 13, true,
+                    $"{PublishingDealsLabels.StudioPatience} <b><color=#{ColorUtility.ToHtmlStringRGB(patienceColor)}>({pitch.studioPatience}/{pitch.maxPatience})</color></b>");
 
-                CreateText(statusCard.transform, "PatienceState", new Vector2(0.56f, 0.08f), new Vector2(0.97f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleRight, 12, false,
-                    $"<color=#{ColorUtility.ToHtmlStringRGB(patienceColor)}>{patienceDesc}</color>");
+                // Sleek Visual Patience Progress Bar (no broken unicode blocks)
+                var barBg = new GameObject("PatienceBarBg", typeof(RectTransform), typeof(Image));
+                barBg.transform.SetParent(statusCard.transform, false);
+                var bRt = (RectTransform)barBg.transform;
+                bRt.anchorMin = new Vector2(0.97f, 0.34f);
+                bRt.anchorMax = new Vector2(0.97f, 0.34f);
+                bRt.pivot = new Vector2(1f, 0.5f);
+                bRt.anchoredPosition = Vector2.zero;
+                bRt.sizeDelta = new Vector2(140f, 9f);
+                var barBgImg = barBg.GetComponent<Image>();
+                barBgImg.sprite = GetGameSprite("whiteSimple");
+                barBgImg.color = new Color(0.72f, 0.74f, 0.78f, 1f);
+
+                float fillRatio = Mathf.Clamp01((float)pitch.studioPatience / Mathf.Max(1f, (float)pitch.maxPatience));
+                var barFill = new GameObject("Fill", typeof(RectTransform), typeof(Image));
+                barFill.transform.SetParent(barBg.transform, false);
+                var fRt = (RectTransform)barFill.transform;
+                fRt.anchorMin = new Vector2(0f, 0f);
+                fRt.anchorMax = new Vector2(fillRatio, 1f);
+                fRt.sizeDelta = Vector2.zero;
+                var fillImg = barFill.GetComponent<Image>();
+                fillImg.sprite = GetGameSprite("whiteSimple");
+                fillImg.color = patienceColor;
+
+                CreateText(statusCard.transform, "PatienceState", new Vector2(0.55f, 0.04f), new Vector2(0.97f, 0.28f), Vector2.zero, Vector2.zero, TextAnchor.MiddleRight, 11, false,
+                    $"<color=#{ColorUtility.ToHtmlStringRGB(patienceColor)}><b>{patienceDesc}</b></color>");
 
                 // --- 2. Dynamic Dialogue & Counter-Offer Box ---
                 var dialogBox = new GameObject("DialogBox", typeof(RectTransform), typeof(Image));
@@ -824,73 +846,80 @@ namespace MGT2Mod.PublishingDeals
 
                 CreateText(dialogBox.transform, "DialogText", new Vector2(0.04f, 0.05f), new Vector2(0.96f, 0.95f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, false, dialogText);
 
-                // If failed, hide controls and only show Close
+                // If failed, compact modal and only show Close button
                 if (pitch.negotiationFailed)
                 {
-                    var exitBtn = CreateNativeButton(contentContainer.transform, "ExitBtn", new Vector2(0f, -280f), new Vector2(220f, 44f), () =>
+                    mRt.sizeDelta = new Vector2(660f, 250f);
+                    var exitBtn = CreateNativeButton(contentContainer.transform, "ExitBtn", new Vector2(0f, -145f), new Vector2(220f, 40f), () =>
                     {
                         PublishingManager.Data.currentPitches.Remove(pitch);
                         CloseModalDialog();
                         RefreshActiveTab();
                     }, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
                     exitBtn.GetComponent<Image>().color = new Color(0.75f, 0.25f, 0.25f, 1f);
-                    exitBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.Close;
+                    var exitTxt = exitBtn.GetComponentInChildren<Text>();
+                    exitTxt.text = PublishingDealsLabels.Close;
+                    exitTxt.fontStyle = FontStyle.Bold;
                     return;
                 }
+                mRt.sizeDelta = new Vector2(660f, 520f);
 
                 // --- 3. Negotiable Terms Controls ---
                 float startY = -142f;
 
                 // Term 1: Publisher Royalty Share
                 CreateText(contentContainer.transform, "CutTitle", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(4f, startY), new Vector2(-4f, startY + 22f), TextAnchor.MiddleLeft, 13, true,
-                    $"{PublishingDealsLabels.RoyaltySplit} ({PublishingDealsLabels.PublisherCut} {selectedPlayerCut:F0}%)");
+                    $"{PublishingDealsLabels.RoyaltySplit}  {PublishingDealsLabels.PublisherCut} {selectedPlayerCut:F0}%  |  {PublishingDealsLabels.DeveloperCut} {100f - selectedPlayerCut:F0}%");
 
                 float[] cuts = { 15f, 25f, 35f, 50f, 65f };
                 float cutBtnW = 118f;
-                float cutSpacing = 6f;
+                float cutSpacing = 10f;
                 for (int i = 0; i < cuts.Length; i++)
                 {
                     float cutVal = cuts[i];
                     bool isSelected = Mathf.Approximately(selectedPlayerCut, cutVal);
                     float btnX = i * (cutBtnW + cutSpacing);
 
-                    var cBtn = CreateNativeButton(contentContainer.transform, $"CutBtn_{cutVal}", new Vector2(btnX + cutBtnW * 0.5f, startY - 24f), new Vector2(cutBtnW, 32f), () =>
+                    var cBtn = CreateNativeButton(contentContainer.transform, $"CutBtn_{cutVal}", new Vector2(btnX + cutBtnW * 0.5f, startY - 24f), new Vector2(cutBtnW, 34f), () =>
                     {
                         selectedPlayerCut = cutVal;
                         rebuildContent();
-                    }, new Vector2(0f, 1f), new Vector2(0f, 1f));
+                    }, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0.5f, 0.5f));
 
                     cBtn.GetComponent<Image>().color = isSelected ? new Color(0.161f, 0.502f, 0.725f, 1f) : new Color(0.82f, 0.84f, 0.88f, 1f);
                     var txt = cBtn.GetComponentInChildren<Text>();
                     txt.text = $"{cutVal:F0}%";
                     txt.fontSize = 13;
+                    txt.fontStyle = isSelected ? FontStyle.Bold : FontStyle.Normal;
                     txt.color = isSelected ? Color.white : new Color(0.2f, 0.2f, 0.2f, 1f);
                 }
 
                 // Term 2: Upfront Funding Adjustment
                 float budgetY = startY - 76f;
                 CreateText(contentContainer.transform, "BudgetTitle", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(4f, budgetY), new Vector2(-4f, budgetY + 22f), TextAnchor.MiddleLeft, 13, true,
-                    $"{PublishingDealsLabels.PitchBudget} ${_ms.GetMoney((long)(pitch.requestedBudget * selectedBudgetMult), true)}");
+                    $"{PublishingDealsLabels.PitchBudget} {_ms.GetMoney((long)(pitch.requestedBudget * selectedBudgetMult), true)}");
 
                 float[] bMults = { 0.85f, 1.0f, 1.25f };
                 string[] bLabels = { PublishingDealsLabels.BudgetCut, PublishingDealsLabels.BudgetStandard, PublishingDealsLabels.BudgetBonus };
-                float bBtnW = 200f;
+                float bBtnW = 202f;
+                float bSpacing = 12f;
                 for (int i = 0; i < 3; i++)
                 {
                     float mVal = bMults[i];
                     bool isSelected = Mathf.Approximately(selectedBudgetMult, mVal);
-                    float btnX = i * (bBtnW + cutSpacing);
+                    float btnX = i * (bBtnW + bSpacing);
 
-                    var bBtn = CreateNativeButton(contentContainer.transform, $"BudgetBtn_{i}", new Vector2(btnX + bBtnW * 0.5f, budgetY - 24f), new Vector2(bBtnW, 32f), () =>
+                    var bBtn = CreateNativeButton(contentContainer.transform, $"BudgetBtn_{i}", new Vector2(btnX + bBtnW * 0.5f, budgetY - 24f), new Vector2(bBtnW, 34f), () =>
                     {
                         selectedBudgetMult = mVal;
                         rebuildContent();
-                    }, new Vector2(0f, 1f), new Vector2(0f, 1f));
+                    }, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0.5f, 0.5f));
 
                     bBtn.GetComponent<Image>().color = isSelected ? new Color(0.161f, 0.502f, 0.725f, 1f) : new Color(0.82f, 0.84f, 0.88f, 1f);
                     var txt = bBtn.GetComponentInChildren<Text>();
                     txt.text = bLabels[i];
                     txt.fontSize = 12;
+                    txt.fontStyle = isSelected ? FontStyle.Bold : FontStyle.Normal;
                     txt.color = isSelected ? Color.white : new Color(0.2f, 0.2f, 0.2f, 1f);
                 }
 
@@ -900,11 +929,21 @@ namespace MGT2Mod.PublishingDeals
                 string consoleName = playerConsole != null ? playerConsole.GetName() : "";
                 bool isExclSelected = exclusivePlatformId >= 0;
 
-                string exclButtonText = isExclSelected ?
-                    $"[X] {PublishingDealsLabels.ConsoleExclOption} ({consoleName})" :
-                    $"[ ] {PublishingDealsLabels.MultiplatformOption}";
+                string exclButtonText;
+                if (playerConsole == null)
+                {
+                    exclButtonText = $"[  ] {PublishingDealsLabels.MultiplatformOption}";
+                }
+                else if (isExclSelected)
+                {
+                    exclButtonText = $"[✓] {PublishingDealsLabels.ConsoleExclOption}: {consoleName}";
+                }
+                else
+                {
+                    exclButtonText = $"[  ] {PublishingDealsLabels.MultiplatformOption} (غير حصري)";
+                }
 
-                var exclBtn = CreateNativeButton(contentContainer.transform, "ExclToggle", new Vector2(310f, exclY - 14f), new Vector2(620f, 34f), () =>
+                var exclBtn = CreateNativeButton(contentContainer.transform, "ExclToggle", new Vector2(316f, exclY - 14f), new Vector2(632f, 36f), () =>
                 {
                     if (playerConsole != null)
                     {
@@ -912,12 +951,13 @@ namespace MGT2Mod.PublishingDeals
                         permanent = exclusivePlatformId >= 0;
                         rebuildContent();
                     }
-                }, new Vector2(0f, 1f), new Vector2(0f, 1f));
+                }, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(0.5f, 0.5f));
 
                 exclBtn.GetComponent<Image>().color = isExclSelected ? new Color(0.18f, 0.65f, 0.35f, 1f) : new Color(0.82f, 0.84f, 0.88f, 1f);
                 var eTxt = exclBtn.GetComponentInChildren<Text>();
                 eTxt.text = exclButtonText;
                 eTxt.fontSize = 12;
+                eTxt.fontStyle = isExclSelected ? FontStyle.Bold : FontStyle.Normal;
                 eTxt.color = isExclSelected ? Color.white : new Color(0.2f, 0.2f, 0.2f, 1f);
                 if (playerConsole == null) exclBtn.GetComponent<Button>().interactable = false;
 
@@ -927,7 +967,7 @@ namespace MGT2Mod.PublishingDeals
                 if (pitch.agreementReached)
                 {
                     // Sign Deal Button
-                    var signBtn = CreateNativeButton(contentContainer.transform, "SignBtn", new Vector2(-110f, actionsY), new Vector2(230f, 44f), () =>
+                    var signBtn = CreateNativeButton(contentContainer.transform, "SignBtn", new Vector2(-110f, actionsY), new Vector2(240f, 44f), () =>
                     {
                         bool success = PublishingManager.FundAndSignDeal(_ms, pitch, pitch.currentPubCutOffer, exclusivePlatformId, permanent, _guiMain);
                         if (success)
@@ -937,7 +977,9 @@ namespace MGT2Mod.PublishingDeals
                         }
                     }, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
                     signBtn.GetComponent<Image>().color = new Color(0.18f, 0.65f, 0.35f, 1f);
-                    signBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.SignAndBegin;
+                    var sTxt = signBtn.GetComponentInChildren<Text>();
+                    sTxt.text = PublishingDealsLabels.SignAndBegin;
+                    sTxt.fontStyle = FontStyle.Bold;
 
                     // Walk Away / Cancel
                     var cancelBtn = CreateNativeButton(contentContainer.transform, "CancelBtn", new Vector2(130f, actionsY), new Vector2(170f, 44f), CloseModalDialog, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
@@ -946,33 +988,49 @@ namespace MGT2Mod.PublishingDeals
                 }
                 else
                 {
-                    // Submit Proposal
-                    var proposeBtn = CreateNativeButton(contentContainer.transform, "ProposeBtn", new Vector2(-155f, actionsY), new Vector2(200f, 44f), () =>
-                    {
-                        PublishingManager.EvaluateNegotiationProposal(_ms, pitch, selectedPlayerCut, selectedBudgetMult, exclusivePlatformId >= 0);
-                        rebuildContent();
-                    }, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
-                    proposeBtn.GetComponent<Image>().color = new Color(0.85f, 0.55f, 0.15f, 1f);
-                    proposeBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.SubmitProposal;
-
-                    // Accept Studio Counter (if studio made counter-offer)
                     if (pitch.hasCounterOffer)
                     {
-                        var acceptCounterBtn = CreateNativeButton(contentContainer.transform, "AcceptCounterBtn", new Vector2(50f, actionsY), new Vector2(190f, 44f), () =>
+                        var proposeBtn = CreateNativeButton(contentContainer.transform, "ProposeBtn", new Vector2(-190f, actionsY), new Vector2(190f, 44f), () =>
+                        {
+                            PublishingManager.EvaluateNegotiationProposal(_ms, pitch, selectedPlayerCut, selectedBudgetMult, exclusivePlatformId >= 0);
+                            rebuildContent();
+                        }, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+                        proposeBtn.GetComponent<Image>().color = new Color(0.85f, 0.55f, 0.15f, 1f);
+                        var pTxt = proposeBtn.GetComponentInChildren<Text>();
+                        pTxt.text = PublishingDealsLabels.SubmitProposal;
+                        pTxt.fontStyle = FontStyle.Bold;
+
+                        var acceptCounterBtn = CreateNativeButton(contentContainer.transform, "AcceptCounterBtn", new Vector2(10f, actionsY), new Vector2(190f, 44f), () =>
                         {
                             pitch.agreementReached = true;
                             pitch.hasCounterOffer = false;
                             rebuildContent();
                         }, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
                         acceptCounterBtn.GetComponent<Image>().color = new Color(0.161f, 0.502f, 0.725f, 1f);
-                        acceptCounterBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.AcceptStudioTerms;
-                    }
+                        var aTxt = acceptCounterBtn.GetComponentInChildren<Text>();
+                        aTxt.text = PublishingDealsLabels.AcceptStudioTerms;
+                        aTxt.fontStyle = FontStyle.Bold;
 
-                    // Walk Away
-                    float walkX = pitch.hasCounterOffer ? 210f : 110f;
-                    var walkBtn = CreateNativeButton(contentContainer.transform, "WalkBtn", new Vector2(walkX, actionsY), new Vector2(130f, 44f), CloseModalDialog, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
-                    walkBtn.GetComponent<Image>().color = new Color(0.6f, 0.6f, 0.6f, 1f);
-                    walkBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.WalkAway;
+                        var walkBtn = CreateNativeButton(contentContainer.transform, "WalkBtn", new Vector2(200f, actionsY), new Vector2(150f, 44f), CloseModalDialog, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+                        walkBtn.GetComponent<Image>().color = new Color(0.6f, 0.6f, 0.6f, 1f);
+                        walkBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.WalkAway;
+                    }
+                    else
+                    {
+                        var proposeBtn = CreateNativeButton(contentContainer.transform, "ProposeBtn", new Vector2(-110f, actionsY), new Vector2(240f, 44f), () =>
+                        {
+                            PublishingManager.EvaluateNegotiationProposal(_ms, pitch, selectedPlayerCut, selectedBudgetMult, exclusivePlatformId >= 0);
+                            rebuildContent();
+                        }, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+                        proposeBtn.GetComponent<Image>().color = new Color(0.85f, 0.55f, 0.15f, 1f);
+                        var pTxt = proposeBtn.GetComponentInChildren<Text>();
+                        pTxt.text = PublishingDealsLabels.SubmitProposal;
+                        pTxt.fontStyle = FontStyle.Bold;
+
+                        var walkBtn = CreateNativeButton(contentContainer.transform, "WalkBtn", new Vector2(130f, actionsY), new Vector2(170f, 44f), CloseModalDialog, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
+                        walkBtn.GetComponent<Image>().color = new Color(0.6f, 0.6f, 0.6f, 1f);
+                        walkBtn.GetComponentInChildren<Text>().text = PublishingDealsLabels.WalkAway;
+                    }
                 }
             };
 
@@ -1020,15 +1078,17 @@ namespace MGT2Mod.PublishingDeals
             return t;
         }
 
-        private GameObject CreateNativeButton(Transform parent, string name, Vector2 anchoredPos, Vector2 size, UnityEngine.Events.UnityAction onClick, Vector2? anchorMin = null, Vector2? anchorMax = null)
+        private GameObject CreateNativeButton(Transform parent, string name, Vector2 anchoredPos, Vector2 size, UnityEngine.Events.UnityAction onClick, Vector2? anchorMin = null, Vector2? anchorMax = null, Vector2? pivot = null)
         {
             var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
             go.transform.SetParent(parent, false);
 
+            var aMin = anchorMin ?? new Vector2(0f, 1f);
+            var aMax = anchorMax ?? new Vector2(0f, 1f);
             var rt = (RectTransform)go.transform;
-            rt.anchorMin = anchorMin ?? new Vector2(0f, 1f);
-            rt.anchorMax = anchorMax ?? new Vector2(0f, 1f);
-            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchorMin = aMin;
+            rt.anchorMax = aMax;
+            rt.pivot = pivot ?? ((aMin == aMax) ? aMin : new Vector2(0.5f, 0.5f));
             rt.anchoredPosition = anchoredPos;
             rt.sizeDelta = size;
 
@@ -1057,9 +1117,11 @@ namespace MGT2Mod.PublishingDeals
 
             var txt = txtGo.GetComponent<Text>();
             txt.font = GetGameFont();
-            txt.fontSize = 14;
+            txt.fontSize = 13;
             txt.color = Color.white;
             txt.alignment = TextAnchor.MiddleCenter;
+            txt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            txt.verticalOverflow = VerticalWrapMode.Overflow;
 
             return go;
         }

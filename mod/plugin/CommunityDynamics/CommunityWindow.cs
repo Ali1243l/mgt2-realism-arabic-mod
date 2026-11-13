@@ -391,25 +391,24 @@ namespace MGT2Mod.CommunityDynamics
             barRt.anchoredPosition = new Vector2(0f, -80f);
             barRt.sizeDelta = new Vector2(-16f, 36f);
 
-            float w = (844f - 18f) / 4f;
-
             _tab0Panel = null;
-            CreateTabButton(bar.transform, 0, 0f * (w + 6f), w, CommunityDynamicsLabels.TabFeed, out _tab0Bg, out _tab0Label);
-            CreateTabButton(bar.transform, 1, 1f * (w + 6f), w, CommunityDynamicsLabels.TabMarketing, out _tab1Bg, out _tab1Label);
-            CreateTabButton(bar.transform, 2, 2f * (w + 6f), w, CommunityDynamicsLabels.TabStreamers, out _tab2Bg, out _tab2Label);
-            CreateTabButton(bar.transform, 3, 3f * (w + 6f), w, CommunityDynamicsLabels.TabCrisis, out _tab3Bg, out _tab3Label);
+            CreateTabButton(bar.transform, 0, new Vector2(0.000f, 0f), new Vector2(0.244f, 1f), CommunityDynamicsLabels.TabFeed, out _tab0Bg, out _tab0Label);
+            CreateTabButton(bar.transform, 1, new Vector2(0.252f, 0f), new Vector2(0.496f, 1f), CommunityDynamicsLabels.TabMarketing, out _tab1Bg, out _tab1Label);
+            CreateTabButton(bar.transform, 2, new Vector2(0.504f, 0f), new Vector2(0.748f, 1f), CommunityDynamicsLabels.TabStreamers, out _tab2Bg, out _tab2Label);
+            CreateTabButton(bar.transform, 3, new Vector2(0.756f, 0f), new Vector2(1.000f, 1f), CommunityDynamicsLabels.TabCrisis, out _tab3Bg, out _tab3Label);
         }
 
-        private void CreateTabButton(Transform parent, int tabIdx, float posX, float width, string label, out Image bgImg, out Text labelTxt)
+        private void CreateTabButton(Transform parent, int tabIdx, Vector2 anchorMin, Vector2 anchorMax, string label, out Image bgImg, out Text labelTxt)
         {
             var btnObj = new GameObject($"Tab_{tabIdx}", typeof(RectTransform), typeof(Image), typeof(Button));
             btnObj.transform.SetParent(parent, false);
             var btnRt = (RectTransform)btnObj.transform;
-            btnRt.anchorMin = new Vector2(0f, 0.5f);
-            btnRt.anchorMax = new Vector2(0f, 0.5f);
-            btnRt.pivot = new Vector2(0f, 0.5f);
-            btnRt.anchoredPosition = new Vector2(posX, 0f);
-            btnRt.sizeDelta = new Vector2(width, 34f);
+            btnRt.anchorMin = anchorMin;
+            btnRt.anchorMax = anchorMax;
+            btnRt.pivot = new Vector2(0.5f, 0.5f);
+            btnRt.offsetMin = Vector2.zero;
+            btnRt.offsetMax = Vector2.zero;
+            btnRt.sizeDelta = Vector2.zero;
 
             bgImg = btnObj.GetComponent<Image>();
             bgImg.sprite = GetGameSprite("uiSquareVerlauf");
@@ -429,6 +428,8 @@ namespace MGT2Mod.CommunityDynamics
             labelTxt.fontStyle = FontStyle.Bold;
             labelTxt.color = Color.white;
             labelTxt.alignment = TextAnchor.MiddleCenter;
+            labelTxt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            labelTxt.verticalOverflow = VerticalWrapMode.Overflow;
             labelTxt.text = label;
 
             var btn = btnObj.GetComponent<Button>();
@@ -563,11 +564,11 @@ namespace MGT2Mod.CommunityDynamics
             int bombCount = CommunityManager.Data.activeReviewBombs.Count;
             if (bombCount > 0)
             {
-                _crisisText.text = $"<color=#FF4444>[! {bombCount} Review Bomb Alert !]</color>";
+                _crisisText.text = $"<color=#FF4444>[! {CommunityDynamicsLabels.ReviewBombAlert} ({bombCount}) !]</color>";
             }
             else
             {
-                _crisisText.text = "<color=#88FF88>[Normal Community Pulse]</color>";
+                _crisisText.text = $"<color=#88FF88>{CommunityDynamicsLabels.PulseNormal}</color>";
             }
         }
 
@@ -667,14 +668,14 @@ namespace MGT2Mod.CommunityDynamics
 
             string tag = post.sentiment switch
             {
-                1 => "<color=#FF9933>[Hype]</color>",
-                2 => "<color=#55FF55>[Legendary]</color>",
-                3 => "<color=#FFFF55>[Skeptical]</color>",
-                4 => "<color=#FF3333>[RAGE / REVIEW BOMB]</color>",
-                _ => "<color=#AAAAAA>[Community]</color>"
+                1 => $"<color=#FF9933>{CommunityDynamicsLabels.TagHype}</color>",
+                2 => $"<color=#55FF55>{CommunityDynamicsLabels.TagLegendary}</color>",
+                3 => $"<color=#FFFF55>{CommunityDynamicsLabels.TagSkeptical}</color>",
+                4 => $"<color=#FF3333>{CommunityDynamicsLabels.TagRage}</color>",
+                _ => $"<color=#AAAAAA>{CommunityDynamicsLabels.TagCommunity}</color>"
             };
 
-            topTxt.text = $"<color=#55DDFF>{post.authorHandle}</color>  {tag}  <color=#CCCCCC>• Y{post.year} W{post.week}</color>";
+            topTxt.text = $"<color=#55DDFF>{post.authorHandle}</color>  {tag}  <color=#CCCCCC>• {CommunityDynamicsLabels.YearLabel} {post.year} {CommunityDynamicsLabels.WeekLabel} {post.week}</color>";
 
             // Body
             var bodyObj = new GameObject("Body", typeof(RectTransform), typeof(Text));
@@ -702,7 +703,7 @@ namespace MGT2Mod.CommunityDynamics
             footTxt.font = GetGameFont();
             footTxt.fontSize = 11;
             footTxt.color = new Color(0.7f, 0.7f, 0.7f);
-            footTxt.text = $"<color=#FF5577>♥ {post.likes:N0}</color>  |  <color=#55AAFF>🔁 {post.retweets:N0}</color>  {(string.IsNullOrEmpty(post.gameName) ? "" : "• Game: <color=#FFEE88>" + post.gameName + "</color>")}";
+            footTxt.text = $"<color=#FF5577>♥ {post.likes:N0}</color>  |  <color=#55AAFF>🔁 {post.retweets:N0}</color>  {(string.IsNullOrEmpty(post.gameName) ? "" : $"• {CommunityDynamicsLabels.GameLabel} <color=#FFEE88>{post.gameName}</color>")}";
 
             return card;
         }
@@ -838,12 +839,12 @@ namespace MGT2Mod.CommunityDynamics
             titleTxt.fontSize = 13;
             titleTxt.fontStyle = FontStyle.Bold;
             titleTxt.color = Color.white;
-            titleTxt.text = $"<color=#55DDFF>{game.GetNameSimple()}</color>  •  {(game.isOnMarket ? "Released" : "In Development")}";
+            titleTxt.text = $"<color=#55DDFF>{game.GetNameSimple()}</color>  •  {(game.isOnMarket ? CommunityDynamicsLabels.InMarket : CommunityDynamicsLabels.InDev)}";
 
             // 3 Streamer Tiers
             CreateActionButton(card.transform, new Vector2(0.02f, 0.08f), new Vector2(0.32f, 0.62f),
                 CommunityDynamicsLabels.StreamerMega,
-                "$120,000 | 10M+ Subs",
+                CommunityDynamicsLabels.Subs10M,
                 new Color(0.6f, 0.3f, 0.7f, 1f),
                 () =>
                 {
@@ -854,7 +855,7 @@ namespace MGT2Mod.CommunityDynamics
 
             CreateActionButton(card.transform, new Vector2(0.35f, 0.08f), new Vector2(0.65f, 0.62f),
                 CommunityDynamicsLabels.StreamerNiche,
-                "$40,000 | Core Tech",
+                CommunityDynamicsLabels.CoreTech,
                 new Color(0.25f, 0.45f, 0.65f, 1f),
                 () =>
                 {
@@ -865,7 +866,7 @@ namespace MGT2Mod.CommunityDynamics
 
             CreateActionButton(card.transform, new Vector2(0.68f, 0.08f), new Vector2(0.98f, 0.62f),
                 CommunityDynamicsLabels.StreamerSpeedrun,
-                "$15,000 | Speedrunner",
+                CommunityDynamicsLabels.Speedrunner,
                 new Color(0.3f, 0.55f, 0.4f, 1f),
                 () =>
                 {
@@ -932,12 +933,12 @@ namespace MGT2Mod.CommunityDynamics
             titleTxt.fontSize = 13;
             titleTxt.fontStyle = FontStyle.Bold;
             titleTxt.color = Color.white;
-            titleTxt.text = $"<color=#FF5555>⚠ {bomb.gameName}</color>  •  Weeks Remaining: {bomb.weeksRemaining}  •  Negative Surge: -{bomb.initialNegativeSurge:N0}";
+            titleTxt.text = $"<color=#FF5555>⚠ {bomb.gameName}</color>  •  {CommunityDynamicsLabels.WeeksRemaining} {bomb.weeksRemaining}  •  {CommunityDynamicsLabels.NegativeSurge} -{bomb.initialNegativeSurge:N0}";
 
             // 3 PR Measures
             CreateActionButton(card.transform, new Vector2(0.02f, 0.08f), new Vector2(0.32f, 0.62f),
                 CommunityDynamicsLabels.ApologyRoadmap,
-                "$50,000 | Halts Crash",
+                CommunityDynamicsLabels.HaltCrash,
                 bomb.apologyIssued ? new Color(0.4f, 0.4f, 0.4f, 1f) : new Color(0.7f, 0.45f, 0.2f, 1f),
                 () =>
                 {
@@ -949,7 +950,7 @@ namespace MGT2Mod.CommunityDynamics
 
             CreateActionButton(card.transform, new Vector2(0.35f, 0.08f), new Vector2(0.65f, 0.62f),
                 CommunityDynamicsLabels.EmergencyHotfix,
-                "$75,000 | Rapid Fix",
+                CommunityDynamicsLabels.RapidFix,
                 bomb.hotfixCommitted ? new Color(0.4f, 0.4f, 0.4f, 1f) : new Color(0.3f, 0.55f, 0.5f, 1f),
                 () =>
                 {
@@ -961,7 +962,7 @@ namespace MGT2Mod.CommunityDynamics
 
             CreateActionButton(card.transform, new Vector2(0.68f, 0.08f), new Vector2(0.98f, 0.62f),
                 CommunityDynamicsLabels.PlayerCompensation,
-                "$100,000 | Ends Crisis",
+                CommunityDynamicsLabels.EndCrisis,
                 bomb.compensationGiven ? new Color(0.4f, 0.4f, 0.4f, 1f) : new Color(0.2f, 0.6f, 0.35f, 1f),
                 () =>
                 {
@@ -1004,6 +1005,8 @@ namespace MGT2Mod.CommunityDynamics
             txt.fontStyle = FontStyle.Bold;
             txt.color = Color.white;
             txt.alignment = TextAnchor.MiddleCenter;
+            txt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            txt.verticalOverflow = VerticalWrapMode.Overflow;
             txt.text = message;
 
             return card;
@@ -1037,6 +1040,8 @@ namespace MGT2Mod.CommunityDynamics
             txt.fontStyle = FontStyle.Bold;
             txt.color = Color.white;
             txt.alignment = TextAnchor.MiddleCenter;
+            txt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            txt.verticalOverflow = VerticalWrapMode.Overflow;
             txt.text = $"{title}\n<color=#DDDDDD>{sub}</color>";
 
             var btn = btnObj.GetComponent<Button>();

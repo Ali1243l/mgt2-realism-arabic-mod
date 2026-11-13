@@ -55,5 +55,25 @@ namespace MGT2Mod
         internal static string Likes => Arabic ? "\ufe8f\ufe8e\ufea0\ufecb\ufe87" : "Likes";
         internal static string Retweets => Arabic ? "\ufe94\ufedb\ufead\ufe8e\ufeb8\ufee3" : "Shares";
         internal static string Close => Arabic ? "\ufed5\ufefc\ufecf\ufe87" : "Close";
+        internal static string PulseNormal => Arabic ? "[\ufef2\ufecc\ufef4\ufe92\ufec3\ufeed \ufeae\ufed8\ufe98\ufeb4\ufee3 :\ufeca\ufee4\ufe98\ufea0\ufee4\ufedf\ufe8d \ufebe\ufe92\ufee7]" : "[Normal Community Pulse]";
+        internal static string ReviewBombAlert => Arabic ? "[! \ufe95\ufe8e\ufee4\ufef4\ufef4\ufed8\ufe97 \ufee1\ufeee\ufea0\ufeeb :\ufeea\ufef4\ufe92\ufee8\ufe97 !]" : "[Review Bomb Alert!]";
+        internal static string InMarket => Arabic ? "\ufed5\ufe8d\ufeee\ufeb3\ufef7\ufe8d \ufef2\ufed3" : "Released";
+        internal static string InDev => Arabic ? "\ufeae\ufef3\ufeee\ufec4\ufe98\ufedf\ufe8d \ufeaa\ufef4\ufed7" : "In Development";
+        internal static string WeeksRemaining => Arabic ? ":\ufe94\ufef4\ufed8\ufe92\ufe98\ufee4\ufedf\ufe8d \ufeca\ufef4\ufe91\ufe8e\ufeb3\ufef7\ufe8d" : "Weeks Remaining:";
+        internal static string NegativeSurge => Arabic ? ":\ufee6\ufef4\ufe92\ufea0\ufecc\ufee4\ufedf\ufe8d \ufeca\ufe9f\ufe8d\ufeae\ufe97" : "Negative Surge:";
+        internal static string Subs10M => Arabic ? "\ufeca\ufe91\ufe8e\ufe98\ufee3 \ufee6\ufef4\ufef3\ufefc\ufee3 $120,000 | +10" : "$120,000 | 10M+ Subs";
+        internal static string CoreTech => Arabic ? "\ufee5\ufeee\ufeb3\ufeae\ufee4\ufe98\ufee3 \ufee5\ufeee\ufecc\ufe9f\ufe8d\ufeae\ufee3 | $40,000" : "$40,000 | Tech Reviewers";
+        internal static string Speedrunner => Arabic ? "\ufe94\ufecb\ufeae\ufeb4\ufedf\ufe8d \ufeee\ufed3\ufeae\ufe98\ufea4\ufee3 | $15,000" : "$15,000 | Speedrunners";
+        internal static string HaltCrash => Arabic ? "\ufead\ufeee\ufeeb\ufeaa\ufe98\ufedf\ufe8d \ufed1\ufe8e\ufed8\ufef3\ufe87 | $50,000" : "$50,000 | Halts Decline";
+        internal static string RapidFix => Arabic ? "\ufeca\ufef3\ufeae\ufeb3 \ufe89\ufead\ufe8e\ufec3 \ufea1\ufefc\ufebb\ufe87 | $75,000" : "$75,000 | Rapid Fix";
+        internal static string EndCrisis => Arabic ? "\u064b\ufe8d\ufead\ufeee\ufed3 \ufe94\ufee3\ufeaf\ufef7\ufe8d \ufe80\ufe8e\ufeec\ufee7\ufe87 | $100,000" : "$100,000 | Resolves Crisis";
+        internal static string TagHype => Arabic ? "[\ufe90\ufed7\ufeae\ufe97\ufeed \ufeb1\ufe8e\ufee4\ufea3]" : "[Hype]";
+        internal static string TagLegendary => Arabic ? "[\ufef1\ufead\ufeee\ufec4\ufeb3\ufe83]" : "[Legendary]";
+        internal static string TagSkeptical => Arabic ? "[\ufea9\ufea9\ufeae\ufe98\ufee3\ufeed \ufeda\ufedc\ufeb8\ufee3]" : "[Skeptical]";
+        internal static string TagRage => Arabic ? "[\ufe95\ufe8e\ufee4\ufef4\ufef4\ufed8\ufe97 \ufed2\ufebc\ufed7]" : "[Review Bomb]";
+        internal static string TagCommunity => Arabic ? "[\ufee6\ufef4\ufe92\ufecb\ufefc\ufedf\ufe8d \ufeca\ufee4\ufe98\ufea0\ufee3]" : "[Community]";
+        internal static string YearLabel => Arabic ? "\ufe94\ufee8\ufeb3" : "Year";
+        internal static string WeekLabel => Arabic ? "\ufec9\ufeee\ufe92\ufeb3\ufe83" : "Week";
+        internal static string GameLabel => Arabic ? ":\ufe94\ufe92\ufecc\ufee0\ufedf\ufe8d" : "Game:";
     }
 }

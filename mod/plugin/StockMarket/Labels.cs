@@ -45,8 +45,13 @@ namespace MGT2Mod
         internal static string HostileTakeover => Arabic ? "\ufef2\ufe8b\ufe8d\ufeaa\ufecb \ufeab\ufe8d\ufeee\ufea4\ufe98\ufeb3\ufe8d" : "Hostile Takeover";
         internal static string Subsidiary => Arabic ? "\ufede\ufee3\ufe8e\ufedc\ufedf\ufe8e\ufe91 \ufe94\ufecc\ufe91\ufe8e\ufe98\ufedb \ufee2\ufebf" : "Absorb Subsidiary";
         internal static string NoCompetitors => Arabic ? ".\u064b\ufe8e\ufef4\ufedf\ufe8e\ufea3 \ufe94\ufe9f\ufead\ufeaa\ufee3 \ufe94\ufeb4\ufed3\ufe8e\ufee8\ufee3 \ufe95\ufe8e\ufeeb\ufeee\ufef3\ufea9\ufeee\ufe98\ufeb3\ufe8d \ufeaa\ufe9f\ufeee\ufe97 \ufefb" : "No public competitors found on the market.";
-        internal static string Valuation => Arabic ? ":\ufe94\ufee4\ufef4\ufed8\ufedf\ufe8d" : "Valuation:";
-        internal static string Owned => Arabic ? ":\ufed9\ufeee\ufee0\ufee4\ufee4\ufedf\ufe8d" : "Owned:";
+        internal static string Valuation => Arabic ? "\ufe94\ufef4\ufed7\ufeee\ufeb4\ufedf\ufe8d \ufe94\ufee4\ufef4\ufed8\ufedf\ufe8d" : "Market Cap";
+        internal static string Owned => Arabic ? "\ufe94\ufedb\ufeee\ufee0\ufee4\ufee4\ufedf\ufe8d \ufe94\ufebc\ufea4\ufedf\ufe8d" : "Owned Stake";
+        internal static string SharePriceTrend => Arabic ? "\ufeae\ufef4\ufed0\ufe98\ufedf\ufe8d\ufeed \ufee2\ufeec\ufeb4\ufedf\ufe8d \ufeae\ufecc\ufeb3" : "Share Price & Trend";
+        internal static string TradeActions => Arabic ? "5% \ufeca\ufef4\ufe91 / 5% \ufe80\ufe8d\ufeae\ufeb7" : "Buy 5% / Sell 5%";
+        internal static string NetProceedsReceived => Arabic ? ":\ufe94\ufee4\ufee0\ufe98\ufeb4\ufee4\ufedf\ufe8d \ufe94\ufef3\ufeaa\ufed8\ufee8\ufedf\ufe8d \ufe94\ufedf\ufeee\ufef4\ufeb4\ufedf\ufe8d \ufef2\ufed3\ufe8e\ufebb" : "Net Cash Proceeds:";
+        internal static string DepositNotice => Arabic ? "(\ufeee\ufef3\ufea9\ufeee\ufe98\ufeb3\ufefb\ufe8d \ufe94\ufee8\ufef3\ufeb0\ufea7 \ufef2\ufed3 \ufe93\ufeae\ufeb7\ufe8e\ufe92\ufee3 \ufec9\ufea9\ufeee\ufe97)" : "(Deposited to studio cash reserve)";
+        internal static string InitialSharePrice => Arabic ? ":\ufef2\ufedf\ufeed\ufef7\ufe8d \ufee2\ufeec\ufeb4\ufedf\ufe8d \ufeae\ufecc\ufeb3" : "Initial Share Price:";
         internal static string Close => Arabic ? "\ufed5\ufefc\ufecf\ufe87" : "Close";
         internal static string Refresh => Arabic ? "\ufe9a\ufef3\ufeaa\ufea4\ufe97" : "Refresh";
         internal static string TargetMetNotice => Arabic ? ".\ufeee\ufef3\ufea9\ufeee\ufe98\ufeb3\ufefb\ufe8d \ufe80\ufe8d\ufea9\ufe83 \ufee6\ufecb \u064d\ufebd\ufe8d\ufead \ufe93\ufead\ufe8d\ufea9\ufef9\ufe8d \ufeb2\ufee0\ufea0\ufee3 !\ufea1\ufe8e\ufea0\ufee8\ufe91 \ufef1\ufeee\ufee8\ufeb4\ufedf\ufe8d \ufeca\ufe91\ufeae\ufedf\ufe8d \ufed1\ufeaa\ufeeb \ufed6\ufef4\ufed8\ufea4\ufe97 \ufee2\ufe97" : "Quarterly Target Met! The Board of Directors is pleased with studio performance.";

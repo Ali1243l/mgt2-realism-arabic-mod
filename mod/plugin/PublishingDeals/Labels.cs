@@ -41,6 +41,8 @@ namespace MGT2Mod
         internal static string PatienceCalm => Arabic ? "\ufebd\ufeed\ufe8e\ufed4\ufe98\ufee0\ufedf \ufeb2\ufee4\ufea4\ufe98\ufee3\ufeed \ufe89\ufea9\ufe8e\ufeeb" : "Calm & Receptive";
         internal static string PatienceTense => Arabic ? "\ufea9\ufea9\ufeae\ufe98\ufee3\ufeed \ufeae\ufe97\ufeee\ufe98\ufee3" : "Tense & Hesitant";
         internal static string PatienceAngered => Arabic ? "!\ufe8f\ufe8e\ufea4\ufeb4\ufee7\ufefb\ufe8d \ufeda\ufeb7\ufeed \ufef0\ufee0\ufecb\ufeed \ufe90\ufebf\ufe8e\ufecf" : "Furious - Ready to Walk!";
+        internal static string PatienceWalkout => Arabic ? "\ufe94\ufed8\ufed4\ufebc\ufedf\ufe8d \ufee6\ufee3 \u064b\ufe8e\ufef4\ufe8b\ufe8e\ufeec\ufee7 \ufe90\ufea4\ufeb4\ufee7\ufe8d" : "Walked Away";
+        internal static string HighestBidAmount => Arabic ? ":\ufebd\ufeae\ufecc\ufedf\ufe8d \ufe94\ufee4\ufef4\ufed7" : "Current Bid:";
         internal static string StudioWelcoming => Arabic ? ":\u064b\ufefc\ufef3\ufeaa\ufe91 \u064b\ufe8e\ufebf\ufeae\ufecb \ufee1\ufeaa\ufed7 \ufeed\ufe83 \ufec1\ufeed\ufeae\ufeb8\ufedf\ufe8d \ufeca\ufe9f\ufe8d\ufead .\ufe94\ufef4\ufedf\ufeed\ufef7\ufe8d \ufeea\ufec3\ufeed\ufeae\ufeb7 \ufeee\ufef3\ufea9\ufeee\ufe98\ufeb3\ufefb\ufe8d \ufee1\ufeaa\ufed7" : "The studio has presented their terms. Review or counter-offer:";
         internal static string StudioCounterMsg => Arabic ? ":\u064b\ufefc\ufef3\ufeaa\ufe91 \u064b\ufe8e\ufebf\ufeae\ufecb \ufee1\ufeaa\ufed7\ufeed \u060c\ufe8e\ufeec\ufef4\ufed3 \ufece\ufedf\ufe8e\ufe92\ufee3 \ufeda\ufe98\ufebc\ufea3 \ufee5\ufe83 \ufeee\ufef3\ufea9\ufeee\ufe98\ufeb3\ufefb\ufe8d \ufeef\ufeae\ufef3" : "The studio rejects your proposal and offers counter-terms:";
         internal static string StudioAcceptMsg => Arabic ? ".\ufee5\ufef5\ufe8d \ufeaa\ufed8\ufecc\ufedf\ufe8d \ufeca\ufef4\ufed7\ufeee\ufe97 \ufeda\ufee8\ufedc\ufee4\ufef3 !\ufeda\ufec3\ufeed\ufeae\ufeb7 \ufef0\ufee0\ufecb \ufeee\ufef3\ufea9\ufeee\ufe98\ufeb3\ufefb\ufe8d \ufed6\ufed3\ufe8d\ufeed" : "Agreement reached! The studio is satisfied with your terms.";
@@ -53,7 +55,7 @@ namespace MGT2Mod
         internal static string BudgetCut => Arabic ? "(\ufee2\ufebc\ufea7 -15%) \ufebe\ufed4\ufea8\ufee3 \ufede\ufef3\ufeee\ufee4\ufe97" : "Frugal (-15% Discount)";
         internal static string TierIndie => Arabic ? "\ufede\ufed8\ufe98\ufeb4\ufee3 \ufe9d\ufeab\ufeee\ufee4\ufee7" : "Indie Prototype";
         internal static string TierMid => Arabic ? "\ufec2\ufeb3\ufeee\ufe98\ufee3 \ufec9\ufeed\ufeae\ufeb8\ufee3" : "Mid-Tier Project";
-        internal static string TierAAA => Arabic ? "(AAA) \ufee2\ufea8\ufebf \ufec9\ufeed\ufeae\ufeb8\ufee3" : "Major Blockbuster";
+        internal static string TierAAA => Arabic ? "AAA \ufee2\ufea8\ufebf \ufec9\ufeed\ufeae\ufeb8\ufee3" : "Major Blockbuster (AAA)";
         internal static string StatusInDev => Arabic ? "\ufeae\ufef3\ufeee\ufec4\ufe98\ufedf\ufe8d \ufeaa\ufef4\ufed7" : "In Development";
         internal static string StatusReleased => Arabic ? "\ufe95\ufe8e\ufecc\ufef4\ufe92\ufee4\ufedf\ufe8d\ufeed \ufed5\ufeee\ufeb4\ufedf\ufe8d \ufef2\ufed3" : "Released & Selling";
         internal static string Score => Arabic ? ":\ufee2\ufef4\ufef4\ufed8\ufe98\ufedf\ufe8d" : "Score:";

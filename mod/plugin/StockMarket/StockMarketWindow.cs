@@ -482,10 +482,11 @@ namespace MGT2Mod.StockMarket
 
             // Table Header Bar
             var colHeader = CreateNativeCard(_tab1Panel.transform, "ColHeader", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -48f), new Vector2(0f, 28f));
-            CreateText(colHeader.transform, "ColCompany", new Vector2(0.02f, 0f), new Vector2(0.35f, 1f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 13, true, StockMarketLabels.Competitors);
-            CreateText(colHeader.transform, "ColValuation", new Vector2(0.35f, 0f), new Vector2(0.55f, 1f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, true, StockMarketLabels.Valuation);
-            CreateText(colHeader.transform, "ColStake", new Vector2(0.55f, 0f), new Vector2(0.72f, 1f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, true, StockMarketLabels.Owned);
-            CreateText(colHeader.transform, "ColActions", new Vector2(0.72f, 0f), new Vector2(0.98f, 1f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, true, StockMarketLabels.Buy5 + " / " + StockMarketLabels.Sell5);
+            CreateText(colHeader.transform, "ColCompany", new Vector2(0.02f, 0f), new Vector2(0.30f, 1f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 13, true, StockMarketLabels.Competitors);
+            CreateText(colHeader.transform, "ColValuation", new Vector2(0.30f, 0f), new Vector2(0.48f, 1f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, true, StockMarketLabels.Valuation);
+            CreateText(colHeader.transform, "ColSharePrice", new Vector2(0.48f, 0f), new Vector2(0.66f, 1f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, true, StockMarketLabels.SharePriceTrend);
+            CreateText(colHeader.transform, "ColStake", new Vector2(0.66f, 0f), new Vector2(0.78f, 1f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, true, StockMarketLabels.Owned);
+            CreateText(colHeader.transform, "ColActions", new Vector2(0.78f, 0f), new Vector2(0.98f, 1f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, true, StockMarketLabels.TradeActions);
 
             // Scroll View for Competitors
             var scrollGo = new GameObject("CompetitorsScrollView", typeof(RectTransform), typeof(ScrollRect), typeof(Image));
@@ -578,40 +579,44 @@ namespace MGT2Mod.StockMarket
 
             // Card 2: Offering Size & Proceeds Configuration
             var cardConfig = CreateNativeCard(_preIpoContainer.transform, "CardConfig", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -148f), new Vector2(0f, 210f));
-            CreateText(cardConfig.transform, "Header", new Vector2(0.03f, 0.80f), new Vector2(0.97f, 0.96f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 16, true, StockMarketLabels.OfferingSize);
+            CreateText(cardConfig.transform, "Header", new Vector2(0.02f, 0.84f), new Vector2(0.98f, 0.98f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 16, true, StockMarketLabels.OfferingSize);
 
-            // 4 Offering Size Buttons (10%, 20%, 30%, 40%)
-            float btnW = 180f;
+            // 4 Offering Size Buttons (10%, 20%, 30%, 40%) - Distributed across full width
             for (int i = 0; i < 4; i++)
             {
                 int index = i;
                 float pct = _offeringSizes[i];
-                var btn = CreateNativeButton(cardConfig.transform, $"SizeBtn_{pct}", new Vector2(14f + i * (btnW + 12f), -72f), new Vector2(btnW, 36f), () =>
+                float xMin = 0.02f + i * 0.245f;
+                float xMax = xMin + 0.225f;
+
+                var btn = CreateNativeButton(cardConfig.transform, $"SizeBtn_{pct}", Vector2.zero, Vector2.zero, () =>
                 {
                     _selectedOfferingPct = pct;
                     UpdateOfferingButtonsState();
                     RefreshPreIpoCalculations();
-                });
+                }, new Vector2(xMin, 0.62f), new Vector2(xMax, 0.82f), new Vector2(0.5f, 0.5f));
 
                 _offeringButtons[i] = btn.GetComponent<Button>();
                 _offeringButtonBgs[i] = btn.GetComponent<Image>();
                 _offeringButtonTexts[i] = btn.GetComponentInChildren<Text>();
                 _offeringButtonTexts[i].text = $"{Mathf.RoundToInt(pct * 100f)}%";
+                _offeringButtonTexts[i].fontSize = 14;
+                _offeringButtonTexts[i].fontStyle = FontStyle.Bold;
             }
 
             // Inner Financial Ledger Box
-            var ledgerBox = CreateNativeCard(cardConfig.transform, "LedgerBox", new Vector2(0.02f, 0.08f), new Vector2(0.98f, 0.58f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            var ledgerBox = CreateNativeCard(cardConfig.transform, "LedgerBox", new Vector2(0.02f, 0.06f), new Vector2(0.98f, 0.56f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
             var ledgerImg = ledgerBox.GetComponent<Image>();
             ledgerImg.color = new Color(0.96f, 0.97f, 0.99f, 0.95f);
 
-            _ipoBreakdownText = CreateText(ledgerBox.transform, "Breakdown", new Vector2(0.03f, 0.10f), new Vector2(0.58f, 0.90f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 14, false);
-            _netProceedsText = CreateText(ledgerBox.transform, "NetProceeds", new Vector2(0.60f, 0.10f), new Vector2(0.97f, 0.90f), Vector2.zero, Vector2.zero, TextAnchor.MiddleRight, 16, true);
+            _ipoBreakdownText = CreateText(ledgerBox.transform, "Breakdown", new Vector2(0.03f, 0.08f), new Vector2(0.58f, 0.92f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 14, false);
+            _netProceedsText = CreateText(ledgerBox.transform, "NetProceeds", new Vector2(0.60f, 0.08f), new Vector2(0.97f, 0.92f), Vector2.zero, Vector2.zero, TextAnchor.MiddleRight, 16, true);
 
             // Card 3: Launch Action Banner
-            var cardAction = CreateNativeCard(_preIpoContainer.transform, "CardAction", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -366f), new Vector2(0f, 100f));
-            CreateText(cardAction.transform, "Desc", new Vector2(0.03f, 0.20f), new Vector2(0.65f, 0.85f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 13, false, StockMarketLabels.IpoDesc);
+            var cardAction = CreateNativeCard(_preIpoContainer.transform, "CardAction", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -366f), new Vector2(0f, 90f));
+            CreateText(cardAction.transform, "Desc", new Vector2(0.02f, 0.15f), new Vector2(0.68f, 0.85f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 13, false, StockMarketLabels.IpoDesc);
 
-            _launchIpoBtn = CreateNativeButton(cardAction.transform, "LaunchIpoBtn", new Vector2(-20f, 0f), new Vector2(250f, 48f), OnLaunchIpoClicked, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f)).GetComponent<Button>();
+            _launchIpoBtn = CreateNativeButton(cardAction.transform, "LaunchIpoBtn", new Vector2(-20f, 0f), new Vector2(280f, 48f), OnLaunchIpoClicked, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f)).GetComponent<Button>();
             _launchIpoBtn.GetComponent<Image>().color = new Color(0.18f, 0.65f, 0.35f, 1f); // Vibrant native green
             var launchTxt = _launchIpoBtn.GetComponentInChildren<Text>();
             launchTxt.text = StockMarketLabels.LaunchIpo;
@@ -761,15 +766,17 @@ namespace MGT2Mod.StockMarket
             return t;
         }
 
-        private GameObject CreateNativeButton(Transform parent, string name, Vector2 anchoredPos, Vector2 size, UnityEngine.Events.UnityAction onClick, Vector2? anchorMin = null, Vector2? anchorMax = null)
+        private GameObject CreateNativeButton(Transform parent, string name, Vector2 anchoredPos, Vector2 size, UnityEngine.Events.UnityAction onClick, Vector2? anchorMin = null, Vector2? anchorMax = null, Vector2? pivot = null)
         {
             var go = new GameObject(name, typeof(RectTransform), typeof(Image), typeof(Button));
             go.transform.SetParent(parent, false);
 
+            var aMin = anchorMin ?? new Vector2(0f, 1f);
+            var aMax = anchorMax ?? new Vector2(0f, 1f);
             var rt = (RectTransform)go.transform;
-            rt.anchorMin = anchorMin ?? new Vector2(0f, 1f);
-            rt.anchorMax = anchorMax ?? new Vector2(0f, 1f);
-            rt.pivot = new Vector2(0.5f, 0.5f);
+            rt.anchorMin = aMin;
+            rt.anchorMax = aMax;
+            rt.pivot = pivot ?? ((aMin == aMax) ? aMin : new Vector2(0.5f, 0.5f));
             rt.anchoredPosition = anchoredPos;
             rt.sizeDelta = size;
 
@@ -798,9 +805,11 @@ namespace MGT2Mod.StockMarket
 
             var txt = txtGo.GetComponent<Text>();
             txt.font = GetGameFont();
-            txt.fontSize = 14;
+            txt.fontSize = 13;
             txt.color = Color.white;
             txt.alignment = TextAnchor.MiddleCenter;
+            txt.horizontalOverflow = HorizontalWrapMode.Overflow;
+            txt.verticalOverflow = VerticalWrapMode.Overflow;
 
             return go;
         }
@@ -954,13 +963,13 @@ namespace MGT2Mod.StockMarket
             lRt.anchorMin = new Vector2(0f, 0.5f);
             lRt.anchorMax = new Vector2(0f, 0.5f);
             lRt.pivot = new Vector2(0f, 0.5f);
-            lRt.anchoredPosition = new Vector2(8f, 0f);
+            lRt.anchoredPosition = new Vector2(10f, 0f);
             lRt.sizeDelta = new Vector2(46f, 46f);
             logoGo.GetComponent<Image>().sprite = pub.GetLogo();
 
             // Name & Developer/Publisher
-            var nameGo = CreateText(row.transform, "Name", new Vector2(0.08f, 0.48f), new Vector2(0.35f, 0.92f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 15, true, pub.GetName());
-            var typeGo = CreateText(row.transform, "Type", new Vector2(0.08f, 0.08f), new Vector2(0.35f, 0.48f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false, pub.GetDeveloperPublisherString());
+            var nameGo = CreateText(row.transform, "Name", new Vector2(0.07f, 0.50f), new Vector2(0.30f, 0.92f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 14, true, pub.GetName());
+            var typeGo = CreateText(row.transform, "Type", new Vector2(0.07f, 0.08f), new Vector2(0.30f, 0.48f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false, pub.GetDeveloperPublisherString());
             typeGo.color = new Color(0.45f, 0.48f, 0.52f, 1f);
 
             // Valuation & Share Price
@@ -969,21 +978,24 @@ namespace MGT2Mod.StockMarket
             string trendStr = pctChange > 0.05 ? $"+{pctChange:F1}%" : (pctChange < -0.05 ? $"{pctChange:F1}%" : "0.0%");
             string trendCol = pctChange > 0.05 ? "#1E8C3A" : (pctChange < -0.05 ? "#C0392B" : "#7F8C8D");
 
-            CreateText(row.transform, "Valuation", new Vector2(0.35f, 0.48f), new Vector2(0.55f, 0.92f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 14, true, $"<color=#1E8C3A>{_ms.GetMoney(marketCap, true)}</color>");
-            CreateText(row.transform, "SharePrice", new Vector2(0.35f, 0.08f), new Vector2(0.55f, 0.48f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 12, false, $"${sharePrice:F2}  <color={trendCol}><b>{trendStr}</b></color>");
+            // Col 2: Valuation (Market Cap)
+            CreateText(row.transform, "Valuation", new Vector2(0.30f, 0.10f), new Vector2(0.48f, 0.90f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 14, true, $"<b><color=#1E8C3A>{_ms.GetMoney(marketCap, true)}</color></b>");
 
-            // Player Stake
+            // Col 3: Share Price & Trend
+            CreateText(row.transform, "SharePrice", new Vector2(0.48f, 0.10f), new Vector2(0.66f, 0.90f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, false, $"<b>${sharePrice:F2}</b>   <color={trendCol}><b>{trendStr}</b></color>");
+
+            // Col 4: Player Stake
             string stakeColor = stock.playerShare >= 51f ? "#1E8C3A" : stock.playerShare > 0f ? "#1E6FB8" : "#666666";
-            CreateText(row.transform, "Stake", new Vector2(0.55f, 0.08f), new Vector2(0.72f, 0.92f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 15, true, $"<color={stakeColor}>{stock.playerShare:F1}%</color>");
+            CreateText(row.transform, "Stake", new Vector2(0.66f, 0.10f), new Vector2(0.78f, 0.90f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 15, true, $"<b><color={stakeColor}>{stock.playerShare:F1}%</color></b>");
 
-            // Action Buttons
+            // Col 5: Action Buttons (78% - 98%)
             if (stock.absorbedAsSubsidiary || pub.IsMyTochterfirma())
             {
-                var absBadge = CreateText(row.transform, "AbsorbedBadge", new Vector2(0.72f, 0f), new Vector2(0.98f, 1f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 14, true, $"<b><color=#1E8C3A>{StockMarketLabels.Subsidiary}</color></b>");
+                var absBadge = CreateText(row.transform, "AbsorbedBadge", new Vector2(0.78f, 0f), new Vector2(0.98f, 1f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 14, true, $"<b><color=#1E8C3A>{StockMarketLabels.Subsidiary}</color></b>");
             }
             else if (stock.playerShare >= 100f)
             {
-                var absBtn = CreateNativeButton(row.transform, "AbsorbBtn", new Vector2(-60f, 0f), new Vector2(170f, 34f), () =>
+                var absBtn = CreateNativeButton(row.transform, "AbsorbBtn", new Vector2(-16f, 0f), new Vector2(175f, 36f), () =>
                 {
                     MajorityControlManager.AbsorbAsSubsidiary(_ms, pub, _guiMain);
                     RefreshActiveTab();
@@ -992,13 +1004,16 @@ namespace MGT2Mod.StockMarket
                 var absTxt = absBtn.GetComponentInChildren<Text>();
                 absTxt.text = StockMarketLabels.Subsidiary;
                 absTxt.fontSize = 12;
+                absTxt.fontStyle = FontStyle.Bold;
             }
             else
             {
-                float btnX = -15f;
+                float btnW = 82f;
+                float btnSpacing = 8f;
+                float rightOffset = -14f;
 
-                // Sell 5% Button
-                var sellBtnGo = CreateNativeButton(row.transform, "Sell5Btn", new Vector2(btnX, 0f), new Vector2(74f, 34f), () =>
+                // Sell 5% Button (on the RIGHT)
+                var sellBtnGo = CreateNativeButton(row.transform, "Sell5Btn", new Vector2(rightOffset, 0f), new Vector2(btnW, 34f), () =>
                 {
                     ShareTransactionDialogs.ShowSellDialog(pub, _ms, _guiMain);
                 }, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
@@ -1006,11 +1021,12 @@ namespace MGT2Mod.StockMarket
                 var sellTxt = sellBtnGo.GetComponentInChildren<Text>();
                 sellTxt.text = StockMarketLabels.Sell5;
                 sellTxt.fontSize = 12;
+                sellTxt.fontStyle = FontStyle.Bold;
                 sellBtnGo.GetComponent<Button>().interactable = stock.playerShare > 0f;
-                btnX -= 80f;
 
-                // Buy 5% Button
-                var buyBtnGo = CreateNativeButton(row.transform, "Buy5Btn", new Vector2(btnX, 0f), new Vector2(74f, 34f), () =>
+                // Buy 5% Button (on the LEFT of Sell)
+                float buyOffset = rightOffset - (btnW + btnSpacing);
+                var buyBtnGo = CreateNativeButton(row.transform, "Buy5Btn", new Vector2(buyOffset, 0f), new Vector2(btnW, 34f), () =>
                 {
                     ShareTransactionDialogs.ShowBuyDialog(pub, _ms, _guiMain);
                 }, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
@@ -1018,12 +1034,13 @@ namespace MGT2Mod.StockMarket
                 var buyTxt = buyBtnGo.GetComponentInChildren<Text>();
                 buyTxt.text = StockMarketLabels.Buy5;
                 buyTxt.fontSize = 12;
-                btnX -= 80f;
+                buyTxt.fontStyle = FontStyle.Bold;
 
                 // Majority Directives Button (51%+)
                 if (stock.playerShare >= 51f)
                 {
-                    var dirBtnGo = CreateNativeButton(row.transform, "DirectivesBtn", new Vector2(btnX, 0f), new Vector2(80f, 34f), () =>
+                    float dirOffset = buyOffset - (84f + btnSpacing);
+                    var dirBtnGo = CreateNativeButton(row.transform, "DirectivesBtn", new Vector2(dirOffset, 0f), new Vector2(84f, 34f), () =>
                     {
                         ShowDirectivesDialog(pub);
                     }, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
@@ -1031,20 +1048,21 @@ namespace MGT2Mod.StockMarket
                     var dirTxt = dirBtnGo.GetComponentInChildren<Text>();
                     dirTxt.text = StockMarketLabels.MajorityControl;
                     dirTxt.fontSize = 11;
-                    btnX -= 86f;
+                    dirTxt.fontStyle = FontStyle.Bold;
                 }
                 // Secret Intel Button (25%+)
                 else if (stock.playerShare >= 25f)
                 {
-                    var intelBtnGo = CreateNativeButton(row.transform, "IntelBtn", new Vector2(btnX, 0f), new Vector2(80f, 34f), () =>
+                    float intelOffset = buyOffset - (84f + btnSpacing);
+                    var intelBtnGo = CreateNativeButton(row.transform, "IntelBtn", new Vector2(intelOffset, 0f), new Vector2(84f, 34f), () =>
                     {
                         ShowIntelDialog(pub);
                     }, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
-                    intelBtnGo.GetComponent<Image>().color = new Color(0.85f, 0.65f, 0.15f, 1f);
-                    var inTxt = intelBtnGo.GetComponentInChildren<Text>();
-                    inTxt.text = StockMarketLabels.SecretIntel;
-                    inTxt.fontSize = 11;
-                    btnX -= 86f;
+                    intelBtnGo.GetComponent<Image>().color = new Color(0.55f, 0.35f, 0.65f, 1f);
+                    var intelTxt = intelBtnGo.GetComponentInChildren<Text>();
+                    intelTxt.text = StockMarketLabels.SecretIntel;
+                    intelTxt.fontSize = 11;
+                    intelTxt.fontStyle = FontStyle.Bold;
                 }
             }
 
@@ -1267,14 +1285,16 @@ namespace MGT2Mod.StockMarket
 
             if (_ipoBreakdownText != null)
             {
-                _ipoBreakdownText.text = $"{StockMarketLabels.GrossCapital} <b>{_ms.GetMoney(grossProceeds, true)}</b>\n" +
-                                         $"{StockMarketLabels.UnderwritingFee} <color=#A40000>-{_ms.GetMoney(fee, true)}</color>\n" +
-                                         $"{StockMarketLabels.SharePrice} ${sharePrice:F2}";
+                _ipoBreakdownText.text = $"{StockMarketLabels.GrossCapital}  <b><color=#1E8C3A>{_ms.GetMoney(grossProceeds, true)}</color></b>\n" +
+                                         $"{StockMarketLabels.UnderwritingFee}  <color=#C0392B>-{_ms.GetMoney(fee, true)}</color>\n" +
+                                         $"{StockMarketLabels.InitialSharePrice}  <b>${sharePrice:F2}</b>";
             }
 
             if (_netProceedsText != null)
             {
-                _netProceedsText.text = $"{StockMarketLabels.NetProceeds}\n<b><color=#1E8C3A>{_ms.GetMoney(netProceeds, true)}</color></b>";
+                _netProceedsText.text = $"{StockMarketLabels.NetProceedsReceived}\n" +
+                                        $"<b><size=22><color=#1E8C3A>{_ms.GetMoney(netProceeds, true)}</color></size></b>\n" +
+                                        $"<size=11><color=#666666>{StockMarketLabels.DepositNotice}</color></size>";
             }
         }
 
