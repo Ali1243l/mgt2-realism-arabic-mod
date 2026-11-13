@@ -599,8 +599,13 @@ namespace MGT2Mod.StockMarket
                 _offeringButtonTexts[i].text = $"{Mathf.RoundToInt(pct * 100f)}%";
             }
 
-            _ipoBreakdownText = CreateText(cardConfig.transform, "Breakdown", new Vector2(0.03f, 0.16f), new Vector2(0.60f, 0.52f), Vector2.zero, Vector2.zero, TextAnchor.UpperLeft, 14, false);
-            _netProceedsText = CreateText(cardConfig.transform, "NetProceeds", new Vector2(0.60f, 0.16f), new Vector2(0.97f, 0.52f), Vector2.zero, Vector2.zero, TextAnchor.MiddleRight, 16, true);
+            // Inner Financial Ledger Box
+            var ledgerBox = CreateNativeCard(cardConfig.transform, "LedgerBox", new Vector2(0.02f, 0.08f), new Vector2(0.98f, 0.58f), new Vector2(0.5f, 0.5f), Vector2.zero, Vector2.zero);
+            var ledgerImg = ledgerBox.GetComponent<Image>();
+            ledgerImg.color = new Color(0.96f, 0.97f, 0.99f, 0.95f);
+
+            _ipoBreakdownText = CreateText(ledgerBox.transform, "Breakdown", new Vector2(0.03f, 0.10f), new Vector2(0.58f, 0.90f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 14, false);
+            _netProceedsText = CreateText(ledgerBox.transform, "NetProceeds", new Vector2(0.60f, 0.10f), new Vector2(0.97f, 0.90f), Vector2.zero, Vector2.zero, TextAnchor.MiddleRight, 16, true);
 
             // Card 3: Launch Action Banner
             var cardAction = CreateNativeCard(_preIpoContainer.transform, "CardAction", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -366f), new Vector2(0f, 100f));

@@ -101,6 +101,7 @@ namespace MGT2Mod.PublishingDeals
         {
             FindScripts();
             UpdateLanguage();
+            PublishingManager.GeneratePitchesIfNeeded(_ms);
 
             if (_windowRoot == null)
             {
