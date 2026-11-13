@@ -95,65 +95,44 @@ user's in-game test. Point 2 (Stock Market) implemented and ready for testing on
 **Plugin:** `mod/plugin/StockMarket/` (7 files, builds to StockMarket.dll)
 
 ### What's Implemented:
-1. **Tiered Ownership System:**
-   - 5%: Dividend rights (quarterly payouts)
-   - 25%: Board seat (see competitor's secret projects)
-   - 51%: Controlling interest (influence decisions)
-   - 100%: Full acquisition (becomes subsidiary)
+1. **Studio IPO & Board of Directors (Player Studio):**
+   - Studio Valuation Formula: Cash + 12-month net revenue + IP library value + fans + studio rating level.
+   - Public Equity Offering: User selects 10%, 20%, 30%, or 40% offering size.
+   - Financial Underwriting: 3% banking underwriting fee deducted, net capital instantly credited to cash reserves.
+   - Board Governance: Dynamic board sentiment (Satisfied, Cautious, Demanding, Hostile), discontent meter (0-100%), investor confidence (0-100%).
+   - Quarterly Revenue Targets: Evaluated every 3 months; meeting targets improves board satisfaction, missing increases discontent.
+   - Dividends System: Discretionary dividends and emergency dividend mechanism (calms hostile board when discontent >= 75%).
+   - Capital Restrictions: Hostile board enforces spending cap blocks on aggressive expenditures.
 
-2. **Stock Market Window:**
-   - F8 hotkey to open
-   - Lists all AI companies with logo, name, value
-   - Shows your current stake (% and tier)
-   - Buy/Sell/Info buttons per company
+2. **Tiered Ownership & Majority Control (Competitor Studios):**
+   - 5%-15%: Dividend rights (quarterly cash payouts from competitor revenues).
+   - 25%: Secret Project Intel (inspect competitor's games in development, progress %, genre, hype).
+   - 51%: Majority Control Directives (mandate game genre and/or mandate exclusive publishing through player studio).
+   - 100%: Full Acquisition & Subsidiary Absorption (converts competitor to player's official subsidiary via SetAsTochterfirma).
+   - 40%-49%: Hostile Creeping Takeover Defense (AI board Poison Pill activates to dilute hostile stakes).
 
-3. **Buy/Sell Dialogs:**
-   - Tiered purchase options (5%, 25%, 51%, 100%)
-   - Real-time price calculation based on firmenwert + revenue
-   - Color-coded UI matching game style
+3. **100% Native Game UI Overhaul:**
+   - Window styling clones authentic MGT2 assets: `window1_Border`, `window1_FillVerlauf`, `titleLeiste`, `whiteSimple`, and `uiSquareVerlauf`.
+   - Typography: 100% bound to `ms.fonts[0]`.
+   - Localization: Full Arabic localization generated via `arabic_game.to_game()` shaped/reversed unicode presentation forms.
+   - Sound & Lifecycle: Game pauses on window open (`guiMain.OpenMenu()`) and unpauses on close, triggering native `sfxScript` audio cues.
+   - Menu Integration: Clean button in Management dropdown (`GUI_MainButtons.uiObjects[9]`), ugly floating button removed.
+   - Multi-Screenshot Capture: F7 captures timestamped screenshots (`screenshot_mgt2_YYYYMMDD_HHmmss.png`).
+   - Save/Load Persistence: Hooks `savegameScript.Save` and `savegameScript.Load`.
 
-4. **Advanced Mechanics:**
-   - Quarterly dividends (10% of revenue × ownership %)
-   - Hostile takeover defense (Poison Pill: 50% price increase for 1 year)
-   - Board intelligence notifications (see their games in development)
-   - Save/load persistence (JSON file per save slot)
-
-5. **Integration:**
-   - 100% ownership converts to Tochterfirma (subsidiary)
-   - Weekly tick for dividends and mechanics
-   - Compatible with existing buy/sell system
-   - Disabled in multiplayer
-
-### Files Created:
-- `StockMarket.cs` - Core plugin, data structures, save/load
-- `StockMarketWindow.cs` - Main UI (company list, scrollable)
-- `ShareTransactions.cs` - Buy/sell dialogs with tier options
-- `AdvancedMechanics.cs` - Dividends, hostile takeover, board seat
-- `ManagementIntegration.cs` - F8 hotkey and menu button
-- `StockMarket.csproj` - Build config
-- `README.md` - Full documentation
-
-### Testing Needed:
-1. Press F8 to open stock market
-2. Buy shares (5%, 25%, 51%, 100%) - verify tier benefits
-3. Wait 3 months (game time) - check dividend payout
-4. Buy 25%+ of successful company - check for poison pill
-5. Buy 25% - verify board intelligence notifications
-6. Sell shares - verify money received
-7. Save/load - verify ownership persists
-8. Buy 100% - verify company becomes subsidiary
-
-### Known Limitations:
-- UI text: English only (Arabic translation pending)
-- Button position: temporary top-right (needs proper menu integration)
-- Poison pill: fixed 50% multiplier (could be dynamic)
-- Board seat: notification only (no detailed financial stats yet)
+### Files Created/Updated:
+- `StockMarket.cs` - Core plugin, data models, company valuation, savegame hooks
+- `StockMarketWindow.cs` - Complete native UI (tabs, competitor rows, IPO dashboard, directives/intel modals)
+- `PlayerIpoManager.cs` - Valuation formula, IPO execution, quarterly meetings, dividends, spending caps
+- `MajorityControlManager.cs` - 25% intel, 51% genre/publishing mandates, 100% subsidiary absorption, poison pill defenses
+- `ShareTransactions.cs` - Buy/sell transactions and dialogs
+- `ManagementIntegration.cs` - Management dropdown button injection, F8 shortcut, F7 timestamped capture
+- `Labels.cs` - Arabic & English localization dictionaries (generated by `make_labels.py StockMarket`)
+- `StockMarket.csproj` - Build configuration
 
 ## Next Steps
-1. User tests Stock Market system in-game (F8 to open)
-2. User tests Live Ops v2 if not done yet
-3. Merge feature/stock-market → main after tests pass
-4. GDD point 3 or beyond (MMO seasons, real licence names, etc.)
+1. User tests Stock Market & IPO system in-game (Management dropdown or F8).
+2. Begin GDD Point 3: Dynamic Publishing & Exclusivity Deals.
 
 ## Completion Timestamp
 (open)

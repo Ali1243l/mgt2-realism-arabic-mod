@@ -21,6 +21,8 @@
     <Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(Managed)\UnityEngine.JSONSerializeModule.dll" Private="false" />
     <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(Managed)\UnityEngine.TextRenderingModule.dll" Private="false" />
     <Reference Include="UnityEngine.UI" HintPath="$(Managed)\UnityEngine.UI.dll" Private="false" />
+    <Reference Include="UnityEngine.UIModule" HintPath="$(Managed)\UnityEngine.UIModule.dll" Private="false" />
+    <Reference Include="UnityEngine.ScreenCaptureModule" HintPath="$(Managed)\UnityEngine.ScreenCaptureModule.dll" Private="false" />
     <Reference Include="BepInEx" HintPath="$(GameDir)\BepInEx\core\BepInEx.dll" Private="false" />
     <Reference Include="0Harmony" HintPath="$(GameDir)\BepInEx\core\0Harmony.dll" Private="false" />
   </ItemGroup>

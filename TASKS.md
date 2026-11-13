@@ -6,24 +6,25 @@ The plan is `docs/GDD.md` (35 points). Details of finished work: `IMPORTANT_PROJ
 ## In progress
 | Task | Owner | Branch |
 |------|-------|--------|
-| GDD Point 2: Stock market, shares, hostile takeover | Ali | feature/stock-market |
+| GDD Point 3: Publishing & exclusivity deals | Ali | feature/stock-market |
 
 ## Pending (not GDD)
 | Task | Notes |
 |------|-------|
 | User in-game test of Live Ops v2 | own F2P game: update menu campaign, wizard in-app page, sales window |
+| User in-game test of Stock Market | Management dropdown, IPO, Board, 25% intel, 51% directives, 100% absorption |
 | MMO seasons through MMO add-ons | Live Ops covers F2P updates only |
 | Real names for parody licences (licence_EN) | realism pass, data only |
 
 ## GDD progress
-Order agreed with the user: one point at a time, data first, then code. Next up: point 2.
+Order agreed with the user: one point at a time, data first, then code. Next up: point 3.
 The GDD repeats points 19-22 (lines 350-480) and 29 (two versions), and has no point 23: read both copies.
 
 | # | Point | Status | Owner / branch |
 |---|-------|--------|----------------|
 | 1 | Live service & seasons | Done (v2), waiting for user test | Ali |
-| 2 | Stock market, shares, hostile takeover | Next | |
-| 3 | Publishing & exclusivity deals | Pending | |
+| 2 | Stock market, shares, hostile takeover | Done, waiting for user test | Ali / feature/stock-market |
+| 3 | Publishing & exclusivity deals | In Progress | Ali / feature/stock-market |
 | 4 | Social media, hype, review bombing | Pending | |
 | 5 | Smart automation & analytics | Pending | |
 | 6 | Custom silicon & hardware R&D | Pending | |

@@ -28,6 +28,9 @@ namespace MGT2Mod.StockMarket
         public Dictionary<int, float> otherOwners = new Dictionary<int, float>(); // AI shareholders
         public bool poisonPillActive;   // defense against hostile takeover
         public int poisonPillExpiry;    // date when it expires
+        public bool mandateExclusivePublishing; // 51% majority directive: publish through player
+        public int mandateGenre = -1;           // 51% majority directive: -1 = free choice, >= 0 = forced genre
+        public bool absorbedAsSubsidiary;       // 100% full acquisition: converted to official subsidiary
     }
 
     [Serializable]
@@ -36,6 +39,7 @@ namespace MGT2Mod.StockMarket
         public List<StockOwnership> ownerships = new List<StockOwnership>();
         public bool playerIsPublic;     // player went IPO
         public float playerPublicShare; // % of player company on market
+        public PlayerIpoState ipoState = new PlayerIpoState();
     }
 
     [BepInPlugin("ali.mgt2.stockmarket", "Stock Market & Hostile Takeover", "1.0.0")]
@@ -108,6 +112,12 @@ namespace MGT2Mod.StockMarket
             return Math.Max(marketCap, 100000L);
         }
 
+        internal static double CalculateSharePrice(publisherScript pub, mainScript ms)
+        {
+            long cap = CalculateCompanyValue(pub, ms);
+            return Math.Round((double)cap / 1000000.0, 2);
+        }
+
         internal static string GetShareTierName(float share)
         {
             if (share >= 100f) return "Full Ownership";
@@ -138,9 +148,10 @@ namespace MGT2Mod.StockMarket
             try
             {
                 if (ms.multiplayer) return;
+                StockData.Data.ipoState = PlayerIpoManager.State;
                 string json = JsonUtility.ToJson(StockData.Data, true);
                 File.WriteAllText(SavePath(ms, slot), json);
-                StockMarketPlugin.Log.LogInfo($"Stock market saved: {StockData.Data.ownerships.Count} companies");
+                StockMarketPlugin.Log.LogInfo($"Stock market saved: {StockData.Data.ownerships.Count} companies, IPO: {StockData.Data.playerIsPublic}");
             }
             catch (Exception ex)
             {
@@ -155,6 +166,7 @@ namespace MGT2Mod.StockMarket
                 if (ms.multiplayer)
                 {
                     StockData.Data = new StockMarketSave();
+                    PlayerIpoManager.ResetState();
                     return;
                 }
 
@@ -163,11 +175,13 @@ namespace MGT2Mod.StockMarket
                 {
                     string json = File.ReadAllText(path);
                     StockData.Data = JsonUtility.FromJson<StockMarketSave>(json) ?? new StockMarketSave();
-                    StockMarketPlugin.Log.LogInfo($"Stock market loaded: {StockData.Data.ownerships.Count} companies");
+                    PlayerIpoManager.State = StockData.Data.ipoState;
+                    StockMarketPlugin.Log.LogInfo($"Stock market loaded: {StockData.Data.ownerships.Count} companies, IPO: {StockData.Data.playerIsPublic}");
                 }
                 else
                 {
                     StockData.Data = new StockMarketSave();
+                    PlayerIpoManager.ResetState();
                     StockMarketPlugin.Log.LogInfo("New stock market initialized");
                 }
             }
@@ -175,25 +189,28 @@ namespace MGT2Mod.StockMarket
             {
                 StockMarketPlugin.Log.LogError($"Load failed: {ex.Message}");
                 StockData.Data = new StockMarketSave();
+                PlayerIpoManager.ResetState();
             }
         }
     }
 
-    [HarmonyPatch(typeof(mainScript), "SaveGame")]
+    [HarmonyPatch(typeof(savegameScript), nameof(savegameScript.Save))]
     internal static class SavePatch
     {
-        static void Postfix(mainScript __instance, int ___saveSlot)
+        private static void Postfix(savegameScript __instance, int i)
         {
-            Persistence.Save(__instance, ___saveSlot);
+            var ms = Traverse.Create(__instance).Field("mS_").GetValue<mainScript>();
+            if (ms != null && !ms.multiplayer) Persistence.Save(ms, i);
         }
     }
 
-    [HarmonyPatch(typeof(mainScript), "LoadGame")]
+    [HarmonyPatch(typeof(savegameScript), nameof(savegameScript.Load))]
     internal static class LoadPatch
     {
-        static void Postfix(mainScript __instance, int ___slot)
+        private static void Postfix(savegameScript __instance, int i)
         {
-            Persistence.Load(__instance, ___slot);
+            var ms = Traverse.Create(__instance).Field("mS_").GetValue<mainScript>();
+            if (ms != null && !ms.multiplayer) Persistence.Load(ms, i);
         }
     }
 
@@ -203,6 +220,7 @@ namespace MGT2Mod.StockMarket
         static void Postfix()
         {
             StockData.Data = new StockMarketSave();
+            PlayerIpoManager.ResetState();
             StockMarketPlugin.Log.LogInfo("Stock market reset for new game");
         }
     }

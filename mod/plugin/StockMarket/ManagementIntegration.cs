@@ -6,86 +6,158 @@ using UnityEngine.UI;
 namespace MGT2Mod.StockMarket
 {
     /// <summary>
-    /// Adds "Stock Market" button to the Management menu (bottom menu bar).
-    /// Positioned after the existing buttons in a consistent style.
+    /// Adds "Stock Market" button to the Management dropdown menu (GUI_MainButtons.uiObjects[9]).
+    /// Inherits native styling, fonts, and sound effects from the game.
     /// </summary>
-    [HarmonyPatch(typeof(GUI_Main), "Start")]
+    [HarmonyPatch(typeof(GUI_MainButtons), nameof(GUI_MainButtons.BUTTON_Management))]
     internal static class ManagementMenuPatch
     {
-        private static GameObject stockMarketButton;
+        private static GameObject _stockMarketButton;
 
-        static void Postfix(GUI_Main __instance)
+        static void Postfix(GUI_MainButtons __instance)
         {
             try
             {
-                // Find the management menu buttons container
-                var canvas = GameObject.Find("CanvasInGameMenu");
-                if (canvas == null) return;
+                if (__instance == null || __instance.uiObjects == null || __instance.uiObjects.Length <= 9) return;
+                var dropdownPanel = __instance.uiObjects[9];
+                if (dropdownPanel == null) return;
 
-                var main = GameObject.Find("Main");
-                if (main == null) return;
-
-                var ms = main.GetComponent<mainScript>();
-                if (ms == null) return;
-
-                // Create button in management bar (we'll add it via the game's button system later)
-                // For now, create a floating button for testing
-                CreateStockMarketButton(canvas, ms, __instance);
-
-                StockMarketPlugin.Log.LogInfo("Stock Market button added to Management menu");
+                if (_stockMarketButton == null || _stockMarketButton.transform.parent != dropdownPanel.transform)
+                {
+                    InjectDropdownButton(__instance, dropdownPanel);
+                }
+                else
+                {
+                    UpdateText();
+                }
             }
             catch (Exception ex)
             {
-                StockMarketPlugin.Log.LogError($"Failed to add management button: {ex.Message}");
+                StockMarketPlugin.Log.LogError($"Failed to inject stock market button into Management menu: {ex.Message}");
             }
         }
 
-        private static void CreateStockMarketButton(GameObject canvas, mainScript ms, GUI_Main guiMain)
+        private static void InjectDropdownButton(GUI_MainButtons mainButtons, GameObject panel)
         {
-            // Create a button that opens the stock market window
-            // Position it in a visible location for testing (top-right corner)
-            stockMarketButton = new GameObject("StockMarketButton");
-            stockMarketButton.transform.SetParent(canvas.transform, false);
-
-            var rt = stockMarketButton.AddComponent<RectTransform>();
-            rt.sizeDelta = new Vector2(150, 40);
-            rt.anchoredPosition = new Vector2(-100, 350); // Top-right area
-
-            var img = stockMarketButton.AddComponent<Image>();
-            img.color = new Color(0.2f, 0.4f, 0.6f, 0.95f);
-
-            var btn = stockMarketButton.AddComponent<Button>();
-            btn.targetGraphic = img;
-            btn.onClick.AddListener(() =>
+            // Find a reference button in the dropdown
+            Button refBtn = null;
+            for (int i = 0; i < panel.transform.childCount; i++)
             {
-                StockMarketWindow.Show(ms, guiMain);
-            });
+                refBtn = panel.transform.GetChild(i).GetComponent<Button>();
+                if (refBtn != null) break;
+            }
 
-            // Button text
-            var txtObj = new GameObject("Text");
-            txtObj.transform.SetParent(stockMarketButton.transform, false);
+            if (refBtn == null)
+            {
+                StockMarketPlugin.Log.LogWarning("No reference button found in Management dropdown");
+                return;
+            }
 
-            var txtRt = txtObj.AddComponent<RectTransform>();
-            txtRt.sizeDelta = new Vector2(150, 40);
-            txtRt.anchoredPosition = Vector2.zero;
+            _stockMarketButton = UnityEngine.Object.Instantiate(refBtn.gameObject, panel.transform);
+            _stockMarketButton.name = "Button_StockMarket";
+            _stockMarketButton.SetActive(true);
 
-            var txt = txtObj.AddComponent<Text>();
-            txt.text = "Stock Market";
-            txt.font = ms.fonts[0];
-            txt.fontSize = 14;
-            txt.alignment = TextAnchor.MiddleCenter;
-            txt.color = Color.white;
+            // Strip any setText or tooltip that would override our custom text
+            foreach (var st in _stockMarketButton.GetComponentsInChildren<setText>(true)) UnityEngine.Object.DestroyImmediate(st);
+            foreach (var tt in _stockMarketButton.GetComponentsInChildren<tooltip>(true)) UnityEngine.Object.DestroyImmediate(tt);
+
+            var btn = _stockMarketButton.GetComponent<Button>();
+            if (btn != null)
+            {
+                btn.onClick = new Button.ButtonClickedEvent();
+                btn.onClick.AddListener(() =>
+                {
+                    mainButtons.CloseAllDropdowns();
+                    var main = GameObject.Find("Main");
+                    var ms = main != null ? main.GetComponent<mainScript>() : null;
+                    var guiMain = GameObject.Find("CanvasInGameMenu")?.GetComponent<GUI_Main>();
+                    StockMarketWindow.Show(ms, guiMain);
+                });
+            }
+
+            UpdateText();
+
+            // Handle layout
+            var layout = panel.GetComponent<LayoutGroup>();
+            if (layout == null)
+            {
+                // No LayoutGroup: compute manual positioning below the lowest sibling
+                float lowestY = float.MaxValue;
+                RectTransform refRt = refBtn.GetComponent<RectTransform>();
+                float btnHeight = refRt.sizeDelta.y;
+
+                for (int i = 0; i < panel.transform.childCount; i++)
+                {
+                    var child = panel.transform.GetChild(i) as RectTransform;
+                    if (child != null && child != _stockMarketButton.transform && child.gameObject.activeSelf)
+                    {
+                        if (child.anchoredPosition.y < lowestY)
+                        {
+                            lowestY = child.anchoredPosition.y;
+                        }
+                    }
+                }
+
+                var myRt = _stockMarketButton.GetComponent<RectTransform>();
+                if (lowestY < float.MaxValue)
+                {
+                    myRt.anchoredPosition = new Vector2(refRt.anchoredPosition.x, lowestY - btnHeight - 2f);
+                }
+
+                var panelRt = panel.GetComponent<RectTransform>();
+                if (panelRt != null)
+                {
+                    panelRt.sizeDelta = new Vector2(panelRt.sizeDelta.x, panelRt.sizeDelta.y + btnHeight + 4f);
+                }
+            }
+
+            StockMarketPlugin.Log.LogInfo("Stock Market button successfully integrated into Management dropdown!");
+        }
+
+        private static void UpdateText()
+        {
+            if (_stockMarketButton == null) return;
+            var ms = GameObject.Find("Main")?.GetComponent<mainScript>();
+            var settings = ms != null ? ms.GetComponent<settingsScript>() : null;
+            StockMarketLabels.Arabic = settings != null && settings.language == 13;
+
+            var txt = _stockMarketButton.GetComponentInChildren<Text>(true);
+            if (txt != null)
+            {
+                txt.text = StockMarketLabels.DropdownButton;
+                if (ms != null && ms.fonts != null && ms.fonts.Length > 0)
+                {
+                    txt.font = ms.fonts[0];
+                }
+            }
         }
     }
 
     /// <summary>
-    /// Keyboard shortcut: F8 opens the stock market window
+    /// Keyboard shortcut: F8 opens the stock market window, F7 captures timestamped in-game screenshot
     /// </summary>
     [HarmonyPatch(typeof(GUI_Main), "Update")]
     internal static class KeyboardShortcutPatch
     {
         static void Postfix(GUI_Main __instance)
         {
+            // F7 takes in-game screenshot with timestamp
+            if (Input.GetKeyDown(KeyCode.F7))
+            {
+                try
+                {
+                    string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                    string filename = $"screenshot_mgt2_{timestamp}.png";
+                    string path = System.IO.Path.Combine(Application.dataPath, "../" + filename);
+                    ScreenCapture.CaptureScreenshot(path);
+                    StockMarketPlugin.Log.LogInfo("Screenshot captured to " + path);
+                }
+                catch (Exception ex)
+                {
+                    StockMarketPlugin.Log.LogError("Failed to capture screenshot: " + ex.Message);
+                }
+            }
+
             // F8 opens stock market
             if (Input.GetKeyDown(KeyCode.F8))
             {

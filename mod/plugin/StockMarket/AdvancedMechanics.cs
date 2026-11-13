@@ -211,7 +211,7 @@ namespace MGT2Mod.StockMarket
         /// <summary>
         /// Weekly tick hook to trigger all mechanics
         /// </summary>
-        [HarmonyPatch(typeof(mainScript), "Update_Woche")]
+        [HarmonyPatch(typeof(mainScript), nameof(mainScript.WochenUpdates))]
         internal static class WeeklyTickPatch
         {
             static void Postfix(mainScript __instance)
