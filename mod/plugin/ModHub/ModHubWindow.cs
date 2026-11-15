@@ -311,6 +311,26 @@ namespace MGT2Mod
                     AssemblyName = "SalesWishlists",
                     WindowClassName = "MGT2Mod.SalesWishlistWindow",
                     ToggleMethodName = "Toggle"
+                },
+                new ModSystemInfo {
+                    Title = "14. الأحداث والأزمات العالمية (Dynamic Real-World Events)",
+                    Description = "أزمة نقص كروت الشاشة والتعدين، إغلاقات الحجر الصحي الشامل (+200% مبيعات)، وتسريبات السورس كود الكبرى.",
+                    InGameLocation = "مكتب التسويق (Marketing Main) وقائمة أبحاث السوق",
+                    Hotkey = "Ctrl+4",
+                    HeaderColor = new Color(0.35f, 0.45f, 0.9f),
+                    AssemblyName = "WorldEvents",
+                    WindowClassName = "MGT2Mod.WorldEventsWindow",
+                    ToggleMethodName = "Toggle"
+                },
+                new ModSystemInfo {
+                    Title = "15. جوائز لعبة السنة وإصدارات الديلوكس (The Game Awards & GOTY Edition)",
+                    Description = "حفل جوائز ديسمبر السنوي، إرسال نسخ المراجعين ولجان التحكيم ($85k)، وفوز GOTY وإطلاق نسخة الديلوكس.",
+                    InGameLocation = "قائمة الجوائز السنوية (Menu_Awards) وقائمة GOTY",
+                    Hotkey = "Ctrl+5",
+                    HeaderColor = new Color(0.95f, 0.75f, 0.2f),
+                    AssemblyName = "GameAwardsGoty",
+                    WindowClassName = "MGT2Mod.GameAwardsWindow",
+                    ToggleMethodName = "Toggle"
                 }
             };
 

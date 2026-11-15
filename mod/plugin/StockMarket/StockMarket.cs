@@ -230,9 +230,10 @@ namespace MGT2Mod.StockMarket
         }
     }
 
-    [HarmonyPatch(typeof(mainScript), "Start_NewGame")]
+    [HarmonyPatch(typeof(mainScript), nameof(mainScript.InitNewGame))]
     internal static class NewGamePatch
     {
+        [HarmonyPostfix]
         static void Postfix()
         {
             StockData.Data = new StockMarketSave();

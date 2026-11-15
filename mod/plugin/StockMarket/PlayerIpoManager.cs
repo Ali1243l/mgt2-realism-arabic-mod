@@ -1045,8 +1045,8 @@ namespace MGT2Mod.StockMarket
             _reflectionInitialized = true;
 
             Type msType = typeof(mainScript);
-            _miGetCompanyValuation = AccessTools.Method(msType, "GetCompanyValuation");
-            _fiFans = AccessTools.Field(msType, "fans") ?? AccessTools.Field(msType, "fans_b");
+            _miGetCompanyValuation = AccessTools.Method(msType, "GetCompanyValuation") ?? AccessTools.Method(msType, "GetFirmenwert");
+            _fiFans = AccessTools.Field(msType, "fans_b");
             _fiStudioRating = AccessTools.Field(msType, "studio_bewertung") ?? AccessTools.Field(msType, "reputation");
             _fiGamesScript = AccessTools.Field(msType, "games_");
             _fiGuiMain = AccessTools.Field(msType, "guiMain_");
@@ -1122,7 +1122,7 @@ namespace MGT2Mod.StockMarket
 
                     Type gType = gameScript.GetType();
                     bool isPlayerOwner = ReadIntField(gType, gameScript, "ownerID", -1) == 0 ||
-                                         ReadBoolField(gType, gameScript, "inBesitz", false);
+                                         (gameScript is gameScript gs && gs.IsMyGame());
                     if (!isPlayerOwner)
                     {
                         continue;

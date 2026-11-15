@@ -480,94 +480,166 @@ namespace Ali.Mgt2.Shared
 
         public static string GetRealPublisherName(int id, string currentName = null)
         {
-            if (RealPublisherNamesById.TryGetValue(id, out var realById) && !string.IsNullOrEmpty(realById))
+            if (id >= 0 && RealPublisherNamesById.TryGetValue(id, out var realById) && !string.IsNullOrEmpty(realById))
                 return realById;
 
-            if (!string.IsNullOrEmpty(currentName) && RealPublisherNamesByParody.TryGetValue(currentName, out var realByParody))
-                return realByParody;
+            if (!string.IsNullOrEmpty(currentName))
+            {
+                string trimmed = currentName.Trim();
+                if (RealPublisherNamesByParody.TryGetValue(trimmed, out var realByParody))
+                    return realByParody;
+            }
 
             return currentName ?? "";
         }
 
         public static string GetRealPlatformName(int id, string currentName = null)
         {
-            if (RealPlatformNamesById.TryGetValue(id, out var realById) && !string.IsNullOrEmpty(realById))
+            if (id >= 0 && RealPlatformNamesById.TryGetValue(id, out var realById) && !string.IsNullOrEmpty(realById))
                 return realById;
 
-            if (!string.IsNullOrEmpty(currentName) && RealPlatformNamesByParody.TryGetValue(currentName, out var realByParody))
-                return realByParody;
+            if (!string.IsNullOrEmpty(currentName))
+            {
+                string trimmed = currentName.Trim();
+                if (RealPlatformNamesByParody.TryGetValue(trimmed, out var realByParody))
+                    return realByParody;
+            }
 
             return currentName ?? "";
         }
 
         public static void Enforce(mainScript ms)
         {
-            if (ms == null) return;
-
-            // 1. Enforce Publishers
-            if (ms.arrayPublisherScripts != null)
+            try
             {
-                for (int i = 0; i < ms.arrayPublisherScripts.Length; i++)
+                // 1. Enforce Publishers (both all active GameObjects in scene and ms arrays)
+                var pubGos = GameObject.FindGameObjectsWithTag("Publisher");
+                if (pubGos != null)
                 {
-                    var pub = ms.arrayPublisherScripts[i];
-                    if (pub == null) continue;
-
-                    string real = GetRealPublisherName(pub.myID, pub.name_EN);
-                    if (!string.IsNullOrEmpty(real))
+                    for (int i = 0; i < pubGos.Length; i++)
                     {
-                        pub.name_EN = real;
-                        pub.name_GE = real;
-                        pub.name_TU = real;
-                        pub.name_CH = real;
-                        pub.name_FR = real;
-                        pub.name_JA = real;
-                        pub.name_UA = real;
-                        pub.name_TH = real;
+                        var pub = pubGos[i] != null ? pubGos[i].GetComponent<publisherScript>() : null;
+                        if (pub == null) continue;
+
+                        string real = GetRealPublisherName(pub.myID, pub.name_EN);
+                        if (!string.IsNullOrEmpty(real))
+                        {
+                            pub.name_EN = real;
+                            pub.name_GE = real;
+                            pub.name_TU = real;
+                            pub.name_CH = real;
+                            pub.name_FR = real;
+                            pub.name_JA = real;
+                            pub.name_UA = real;
+                            pub.name_TH = real;
+                        }
+                    }
+                }
+
+                if (ms != null && ms.arrayPublisherScripts != null)
+                {
+                    for (int i = 0; i < ms.arrayPublisherScripts.Length; i++)
+                    {
+                        var pub = ms.arrayPublisherScripts[i];
+                        if (pub == null) continue;
+
+                        string real = GetRealPublisherName(pub.myID, pub.name_EN);
+                        if (!string.IsNullOrEmpty(real))
+                        {
+                            pub.name_EN = real;
+                            pub.name_GE = real;
+                            pub.name_TU = real;
+                            pub.name_CH = real;
+                            pub.name_FR = real;
+                            pub.name_JA = real;
+                            pub.name_UA = real;
+                            pub.name_TH = real;
+                        }
+                    }
+                }
+
+                // 2. Enforce Platforms (both all active GameObjects in scene and ms arrays)
+                var platGos = GameObject.FindGameObjectsWithTag("Platform");
+                if (platGos != null)
+                {
+                    for (int i = 0; i < platGos.Length; i++)
+                    {
+                        var plat = platGos[i] != null ? platGos[i].GetComponent<platformScript>() : null;
+                        if (plat == null) continue;
+
+                        string real = GetRealPlatformName(plat.myID, plat.name_EN);
+                        if (!string.IsNullOrEmpty(real))
+                        {
+                            plat.name_EN = real;
+                            plat.name_GE = real;
+                            plat.name_TU = real;
+                            plat.name_CH = real;
+                            plat.name_FR = real;
+                            plat.name_JA = real;
+                            plat.name_UA = real;
+                            plat.name_TH = real;
+                        }
+
+                        if (!string.IsNullOrEmpty(plat.manufacturer_EN) && RealPublisherNamesByParody.TryGetValue(plat.manufacturer_EN.Trim(), out var realMan))
+                        {
+                            plat.manufacturer_EN = realMan;
+                            plat.manufacturer_GE = realMan;
+                            plat.manufacturer_TU = realMan;
+                            plat.manufacturer_CH = realMan;
+                            plat.manufacturer_FR = realMan;
+                            plat.manufacturer_JA = realMan;
+                            plat.manufacturer_UA = realMan;
+                            plat.manufacturer_TH = realMan;
+                        }
+                    }
+                }
+
+                if (ms != null && ms.arrayPlatformsScripts != null)
+                {
+                    for (int i = 0; i < ms.arrayPlatformsScripts.Length; i++)
+                    {
+                        var plat = ms.arrayPlatformsScripts[i];
+                        if (plat == null) continue;
+
+                        string real = GetRealPlatformName(plat.myID, plat.name_EN);
+                        if (!string.IsNullOrEmpty(real))
+                        {
+                            plat.name_EN = real;
+                            plat.name_GE = real;
+                            plat.name_TU = real;
+                            plat.name_CH = real;
+                            plat.name_FR = real;
+                            plat.name_JA = real;
+                            plat.name_UA = real;
+                            plat.name_TH = real;
+                        }
+
+                        if (!string.IsNullOrEmpty(plat.manufacturer_EN) && RealPublisherNamesByParody.TryGetValue(plat.manufacturer_EN.Trim(), out var realMan))
+                        {
+                            plat.manufacturer_EN = realMan;
+                            plat.manufacturer_GE = realMan;
+                            plat.manufacturer_TU = realMan;
+                            plat.manufacturer_CH = realMan;
+                            plat.manufacturer_FR = realMan;
+                            plat.manufacturer_JA = realMan;
+                            plat.manufacturer_UA = realMan;
+                            plat.manufacturer_TH = realMan;
+                        }
                     }
                 }
             }
-
-            // 2. Enforce Platforms
-            if (ms.arrayPlatformsScripts != null)
+            catch (Exception ex)
             {
-                for (int i = 0; i < ms.arrayPlatformsScripts.Length; i++)
-                {
-                    var plat = ms.arrayPlatformsScripts[i];
-                    if (plat == null) continue;
-
-                    string real = GetRealPlatformName(plat.myID, plat.name_EN);
-                    if (!string.IsNullOrEmpty(real))
-                    {
-                        plat.name_EN = real;
-                        plat.name_GE = real;
-                        plat.name_TU = real;
-                        plat.name_CH = real;
-                        plat.name_FR = real;
-                        plat.name_JA = real;
-                        plat.name_UA = real;
-                        plat.name_TH = real;
-                    }
-
-                    if (!string.IsNullOrEmpty(plat.manufacturer_EN) && RealPublisherNamesByParody.TryGetValue(plat.manufacturer_EN, out var realMan))
-                    {
-                        plat.manufacturer_EN = realMan;
-                        plat.manufacturer_GE = realMan;
-                        plat.manufacturer_TU = realMan;
-                        plat.manufacturer_CH = realMan;
-                        plat.manufacturer_FR = realMan;
-                        plat.manufacturer_JA = realMan;
-                        plat.manufacturer_UA = realMan;
-                        plat.manufacturer_TH = realMan;
-                    }
-                }
+                Debug.LogWarning("[RealismLicenseEnforcer] Enforce warning: " + ex.Message);
             }
         }
     }
 
-    [HarmonyPatch(typeof(publisherScript), "GetName")]
-    internal static class Patch_PublisherScript_GetName
+    [HarmonyPatch(typeof(publisherScript), nameof(publisherScript.GetName))]
+    public static class Patch_PublisherScript_GetName
     {
-        private static void Postfix(publisherScript __instance, ref string __result)
+        [HarmonyPostfix]
+        public static void Postfix(publisherScript __instance, ref string __result)
         {
             if (__instance == null) return;
             string real = RealismLicenseEnforcer.GetRealPublisherName(__instance.myID, __result);
@@ -578,10 +650,11 @@ namespace Ali.Mgt2.Shared
         }
     }
 
-    [HarmonyPatch(typeof(platformScript), "GetName")]
-    internal static class Patch_PlatformsScript_GetName
+    [HarmonyPatch(typeof(platformScript), nameof(platformScript.GetName))]
+    public static class Patch_PlatformsScript_GetName
     {
-        private static void Postfix(platformScript __instance, ref string __result)
+        [HarmonyPostfix]
+        public static void Postfix(platformScript __instance, ref string __result)
         {
             if (__instance == null) return;
             string real = RealismLicenseEnforcer.GetRealPlatformName(__instance.myID, __result);
@@ -592,10 +665,11 @@ namespace Ali.Mgt2.Shared
         }
     }
 
-    [HarmonyPatch(typeof(savegameScript), "LoadPublisher")]
-    internal static class Patch_SavegameScript_LoadPublisher
+    [HarmonyPatch(typeof(savegameScript), nameof(savegameScript.Load))]
+    public static class Patch_SavegameScript_Load_Realism
     {
-        private static void Postfix(savegameScript __instance)
+        [HarmonyPostfix]
+        public static void Postfix(savegameScript __instance)
         {
             var ms = Traverse.Create(__instance).Field("mS_").GetValue<mainScript>() ?? UnityEngine.Object.FindObjectOfType<mainScript>();
             if (ms != null)
@@ -605,15 +679,28 @@ namespace Ali.Mgt2.Shared
         }
     }
 
-    [HarmonyPatch(typeof(savegameScript), "LoadPlatforms")]
-    internal static class Patch_SavegameScript_LoadPlatforms
+    [HarmonyPatch(typeof(mainScript), nameof(mainScript.InitNewGame))]
+    public static class Patch_MainScript_InitNewGame_Realism
     {
-        private static void Postfix(savegameScript __instance)
+        [HarmonyPostfix]
+        public static void Postfix(mainScript __instance)
         {
-            var ms = Traverse.Create(__instance).Field("mS_").GetValue<mainScript>() ?? UnityEngine.Object.FindObjectOfType<mainScript>();
-            if (ms != null)
+            if (__instance != null)
             {
-                RealismLicenseEnforcer.Enforce(ms);
+                RealismLicenseEnforcer.Enforce(__instance);
+            }
+        }
+    }
+
+    [HarmonyPatch(typeof(mainScript), nameof(mainScript.WochenUpdates))]
+    public static class Patch_MainScript_WochenUpdates_Realism
+    {
+        [HarmonyPostfix]
+        public static void Postfix(mainScript __instance)
+        {
+            if (__instance != null)
+            {
+                RealismLicenseEnforcer.Enforce(__instance);
             }
         }
     }

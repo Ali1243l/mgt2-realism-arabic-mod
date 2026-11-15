@@ -921,15 +921,15 @@ namespace MGT2Mod.PublishingDeals
                 }
                 else if (pitch.agreementReached)
                 {
-                    dialogText = $"<color=#1E8C3A><b>{PublishingDealsLabels.StudioAcceptMsg}</b>\n{PublishingDealsLabels.PublisherCut} {pitch.currentPubCutOffer:F0}%  |  {PublishingDealsLabels.DeveloperCut} {pitch.currentDevCutOffer:F0}%</color>";
+                    dialogText = $"<color=#1E8C3A><b>{PublishingDealsLabels.StudioAcceptMsg}</b>\n<b>{PublishingDealsLabels.PublisherCut} {pitch.currentPubCutOffer:F0}%  |  {PublishingDealsLabels.DeveloperCut} {pitch.currentDevCutOffer:F0}%</b></color>";
                 }
                 else if (pitch.hasCounterOffer)
                 {
-                    dialogText = $"{pitch.lastCounterReason}\n<b><color=#D9822B>{PublishingDealsLabels.CounterOfferBox}</color> {PublishingDealsLabels.PublisherCut} {pitch.currentPubCutOffer:F0}%  |  {PublishingDealsLabels.DeveloperCut} {pitch.currentDevCutOffer:F0}%</b>";
+                    dialogText = $"{pitch.lastCounterReason}\n<color=#D9822B><b>{PublishingDealsLabels.CounterOfferBox}</b> {PublishingDealsLabels.PublisherCut} {pitch.currentPubCutOffer:F0}%  |  {PublishingDealsLabels.DeveloperCut} {pitch.currentDevCutOffer:F0}%</color>";
                 }
                 else
                 {
-                    dialogText = $"{PublishingDealsLabels.StudioWelcoming}\n<b>{PublishingDealsLabels.DeveloperCut} {pitch.proposedRoyaltySplit:F0}%  |  {PublishingDealsLabels.PublisherCut} {100f - pitch.proposedRoyaltySplit:F0}%</b>";
+                    dialogText = $"{PublishingDealsLabels.StudioWelcoming}\n<color=#1E6FB8><b>{PublishingDealsLabels.DeveloperCut} {pitch.proposedRoyaltySplit:F0}%  |  {PublishingDealsLabels.PublisherCut} {100f - pitch.proposedRoyaltySplit:F0}%</b></color>";
                 }
 
                 CreateText(dialogBox.transform, "DialogText", new Vector2(0.04f, 0.05f), new Vector2(0.96f, 0.95f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, false, dialogText);
@@ -957,7 +957,7 @@ namespace MGT2Mod.PublishingDeals
 
                 // Term 1: Publisher Royalty Share
                 CreateText(contentContainer.transform, "CutTitle", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(4f, startY), new Vector2(-4f, startY + 22f), TextAnchor.MiddleLeft, 13, true,
-                    $"<b><color=#1E6FB8>{PublishingDealsLabels.PlayerOfferBox}</color>  {PublishingDealsLabels.PublisherCut} {selectedPlayerCut:F0}%  |  {PublishingDealsLabels.DeveloperCut} {100f - selectedPlayerCut:F0}%</b>");
+                    $"<b><color=#1E6FB8>{PublishingDealsLabels.PlayerOfferBox}</color>  <color=#0E4D8A>{PublishingDealsLabels.PublisherCut} {selectedPlayerCut:F0}%  |  {PublishingDealsLabels.DeveloperCut} {100f - selectedPlayerCut:F0}%</color></b>");
 
                 float[] cuts = { 15f, 25f, 35f, 50f, 65f };
                 float cutBtnW = 118f;

@@ -223,6 +223,7 @@ namespace Ali.Mgt2.Simulation
         public double HistoricalHitRatio { get; set; }
         public double ConsoleMarketSharePercent { get; set; }
         public double Reputation { get; set; }
+        public int Year { get; set; } = 1976;
     }
 
     public sealed class TargetStudioProfile
@@ -361,9 +362,10 @@ namespace Ali.Mgt2.Simulation
                 prestige *= 1.35;
             }
 
-            if (archetype == StudioArchetype.CorporateGiant && publisher.TotalFans < 100000)
+            int targetFans = publisher.Year >= 2000 ? 100000 : (publisher.Year >= 1990 ? 50000 : (publisher.Year >= 1982 ? 15000 : 3000));
+            if (archetype == StudioArchetype.CorporateGiant && publisher.TotalFans < targetFans)
             {
-                prestige -= (100000 - publisher.TotalFans) / 5000.0;
+                prestige -= Math.Min(12.0, (targetFans - publisher.TotalFans) / (double)(Math.Max(1, targetFans / 4)));
             }
 
             double pride = (studio.Stars * 4.5) + Math.Min(studio.AgeYears * 0.6, 10.0) + Math.Min(studio.PastAwards * 1.4, 14.0);
@@ -391,6 +393,20 @@ namespace Ali.Mgt2.Simulation
 
             double marketingBonus = Math.Min(marketingRatio * 18.0, 14.0);
             double rawScore = sBase + (deltaRoyalty * wR) + (effectiveBudgetMod * wB) - exclPenalty + prestige - pride + marketingBonus + synergyBonus;
+
+            // Generous dev royalty bonus: if publisher asks for <= 35% cut (meaning dev gets >= 65%)
+            if (offeredPubCut <= 20.0)
+            {
+                rawScore += 22.0; // Extremely generous deal (e.g. 15% cut)
+            }
+            else if (offeredPubCut <= 30.0)
+            {
+                rawScore += 14.0;
+            }
+            else if (offeredPubCut <= 40.0)
+            {
+                rawScore += 6.0;
+            }
 
             if (archetype == StudioArchetype.StarvingIndie && offeredPubCut <= 45.0 && budgetRatio >= 0.0)
             {
@@ -458,25 +474,30 @@ namespace Ali.Mgt2.Simulation
         {
             if (ownedEquity >= 51.0) return 4.0; // Majority owner preserves patience
 
+            // If publisher is offering generous terms (e.g. asking for <= 25% cut or extra funding)
+            if (offeredPubCut <= 25.0 || budgetRatio >= 0.25)
+            {
+                return 6.0; // Minimal loss on generous offer
+            }
+
             double deficit = Math.Max(0.0, acceptThreshold - score);
-            // Scaled so 1 round normally consumes ~20 patience (1 pip out of 5)
-            double baseLoss = 16.0 + (deficit * 0.15);
+            // Scaled so 1 round consumes ~8-14 patience (allows 4-5 rounds of negotiation)
+            double baseLoss = 8.0 + (deficit * 0.10);
 
             if (archetype == StudioArchetype.VeteranAuteur && offeredPubCut > 40.0)
             {
-                baseLoss += 8.0;
+                baseLoss += 5.0;
             }
             if (archetype == StudioArchetype.StarvingIndie && budgetRatio < -0.20)
             {
-                baseLoss += 6.0;
+                baseLoss += 4.0;
             }
             if (offer.RequireConsoleExclusivity && budgetRatio < 0.15)
             {
-                baseLoss += 5.0;
+                baseLoss += 4.0;
             }
 
-            // Cap at 30.0 so no studio ever walks out instantly on round 1 with full patience
-            return MathUtil.Clamp(baseLoss, 10.0, 30.0);
+            return MathUtil.Clamp(baseLoss, 6.0, 20.0);
         }
 
         private static DealOffer BuildCounterOffer(
@@ -540,7 +561,8 @@ namespace Ali.Mgt2.Simulation
         {
             if (archetype == StudioArchetype.VeteranAuteur && offeredPubCut > 35.0) return "PUBLISHER_CUT_TOO_GREEDY";
             if (offer.RequireConsoleExclusivity && budgetRatio < 0.30 && archetype == StudioArchetype.VeteranAuteur) return "EXCLUSIVITY_REQUIRES_BUDGET_PREMIUM";
-            if (archetype == StudioArchetype.CorporateGiant && publisher.TotalFans < 100000) return "INSUFFICIENT_FAN_REACH";
+            int targetFans = publisher.Year >= 2000 ? 100000 : (publisher.Year >= 1990 ? 50000 : (publisher.Year >= 1982 ? 15000 : 3000));
+            if (archetype == StudioArchetype.CorporateGiant && publisher.TotalFans < targetFans) return "INSUFFICIENT_FAN_REACH";
             if (budgetRatio < 0.0) return "UPFRONT_BUDGET_TOO_LOW";
             return "ROI_TERMS_MISMATCH";
         }

@@ -12,9 +12,9 @@ How we use this file:
 
 | GDD # | System | Owner | Branch | Notes |
 |------:|--------|-------|--------|-------|
-| 16 | Dynamic Real-World Events (Mining Boom, Quarantine, Leaks, Memes) | Ali | `feature/world-events` | Next up in Batch 7 |
-| 17 | The Game Awards (GOTY), Review Codes & GOTY Edition | Ali | `feature/game-awards` | Next up in Batch 7 |
-| 18 | Collector's Editions & Physical Warehouse Logistics | Ali | `feature/collectors-logistics` | Next up in Batch 7 |
+| 18 | Collector's Editions & Physical Warehouse Logistics | Ali | `feature/collectors-logistics` | Next up in Batch 8 |
+| 19 | Digital Store Wars (Steam 30% vs Epic 12% vs GOG DRM-Free) | Ali | `feature/digital-store-wars` | Next up in Batch 8 |
+| 20 | Studio Culture, Office Perks & Remote Work | Ali | `feature/studio-perks` | Next up in Batch 8 |
 
 ---
 
@@ -30,6 +30,7 @@ How we use this file:
 | Arabic localization | ~1,190 lines shaped and reversed, Latin/number order fixed, genres/themes/menus/events/countries translated | `mod/arabic_game.py`, `mod/build.py`, `mod/future.py` |
 | GDD 8 — Future up to 2100 | 18 future platforms, 9 studios, 16 engine features, 7 hardware topics, 32 news events (2030–2095) | `mod/future.py` |
 | Central Mod Hub & HUD | Unified Mod Systems Hub on bottom bar (`GUI_MainButtons`) + F12 hotkey | `mod/plugin/ModHub/` |
+| UI — Native MGT2 UI Skin Patch | Auto-reskins all mod windows to match MGT2's exact Silver-White (`#EBEBED`) & Cerulean-Blue (`#1C7DC2`) native UI, injects into "طوّر لعبة" (`Menu_DevGameMain`) and adds `F1` Unified Hub | `mod/plugin/Mgt2NativeUiPatch/` |
 | GDD 34 — Golden Auto-Tune | Injected inside Game Development (`Menu_DevGame`): auto-tunes optimal sliders for chosen genres | `mod/plugin/GoldenAutoTune/` |
 | GDD 1 — Live-Service & GaaS | Battle Pass card in in-app page, Season / Event / Collab / 2.0 Relaunch in F2P updates & MMO add-ons | `mod/plugin/LiveOps/` |
 | GDD 2 — Stock Market & IPO | Injected inside City Bank (`Menu_Bank`) & Management Dropdown: IPO, 5/25/51/100% stakes, Poison Pill (`F8`) | `mod/plugin/StockMarket/` |
@@ -45,3 +46,5 @@ How we use this file:
 | GDD 13 — Crunch Culture, Burnout & Unions | Injected inside Staff Overview (`Menu_MitarbeiterUebersicht`): Mandatory crunch, Burnout index, Union strikes & CBA, Golden Handcuffs (`Ctrl+1`) | `mod/plugin/CrunchUnions/` |
 | GDD 14 — DRM (Denuvo), Piracy & Anti-Cheat | Injected inside Buy CopyProtect (`Menu_BuyCopyProtect`) & AntiCheat (`Menu_BuyAntiCheat`): Fortress Denuvo-VM, post-launch DRM removal, Kernel Anti-Cheat (`Ctrl+2`) | `mod/plugin/DrmAntiCheat/` |
 | GDD 15 — Dynamic Sales Festivals & Wishlists | Injected inside Marketing Office (`Menu_Marketing_Main`): Pre-launch wishlist pool, Summer/Black Friday sales (1.65x conversion), tactical discounts (`Ctrl+3`) | `mod/plugin/SalesWishlists/` |
+| GDD 16 — Dynamic Real-World Events & Crises | Injected inside Marketing Office (`Menu_Marketing_Main`): Crypto/AI GPU shortage, Global Quarantine Lockdown (+200% sales), AAA Source-Code Leak crisis (`Ctrl+4`) | `mod/plugin/WorldEvents/` |
+| GDD 17 — The Game Awards (GOTY) & Deluxe Edition | Injected inside Annual Awards Ceremony (`Menu_Awards`): December ceremony, 'For Your Consideration' review kits ($85k), GOTY trophy, GOTY Deluxe Edition (+30% units) (`Ctrl+5`) | `mod/plugin/GameAwardsGoty/` |

@@ -171,7 +171,8 @@ namespace MGT2Mod.PublishingDeals
                 AwardCount = playerAwards,
                 HistoricalHitRatio = 0.75,
                 ConsoleMarketSharePercent = consoleMarketShare,
-                Reputation = pub != null ? (double)pub.relation : 50.0
+                Reputation = pub != null ? (double)pub.relation : 50.0,
+                Year = ms.year
             };
 
             var studio = new TargetStudioProfile

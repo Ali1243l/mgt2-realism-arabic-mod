@@ -1483,12 +1483,12 @@ namespace MGT2Mod.StockMarket
                 if (rivalStake > 0.5f)
                 {
                     string rivalName = state.hostileRivalName;
-                    if (!string.IsNullOrEmpty(rivalName) && Ali.Mgt2.Shared.RealismLicenseEnforcer.RealPublisherNamesByParody.TryGetValue(rivalName, out var realRival))
+                    if (!string.IsNullOrEmpty(rivalName))
                     {
-                        rivalName = realRival;
+                        rivalName = Ali.Mgt2.Shared.RealismLicenseEnforcer.GetRealPublisherName(state.hostileRivalCompanyId, rivalName);
                     }
                     string rCol = rivalStake >= 20f ? "#C0392B" : "#D35400";
-                    text += $"\n<color={rCol}><b>{rivalName}: {rivalStake:F1}%</b>  ({StockMarketLabels.HostileWarning})</color>";
+                    text += $"\n<color={rCol}><b>{StockMarketLabels.HostileWarning}: {rivalName} ({rivalStake:F1}%)</b></color>";
                 }
                 _sharesDistributionText.text = text;
             }
