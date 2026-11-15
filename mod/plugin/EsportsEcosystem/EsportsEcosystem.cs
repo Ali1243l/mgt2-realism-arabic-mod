@@ -1,3 +1,4 @@
+using System.Linq;
 // GDD Point 9: Esports & Competitive Ecosystem (Pro Leagues, World Cups, Broadcast Rights & Meta Balancing).
 // Built for MGT2Mod namespace, netstandard2.1, 32-bit Mono x86 safe.
 using System;
@@ -214,4 +215,48 @@ namespace MGT2Mod
             catch (Exception e) { EsportsEcosystemPlugin.Log.LogError(e); }
         }
     }
+
+    [HarmonyPatch(typeof(Menu_InAppVerwalten), "Init")]
+    internal static class Patch_Menu_InApp_Esports
+    {
+        private const string ButtonName = "Btn_EsportsEcosystem";
+
+        private static void Postfix(Menu_InAppVerwalten __instance)
+        {
+            try
+            {
+                if (__instance == null) return;
+                var btn = __instance.GetComponentsInChildren<UnityEngine.UI.Button>(true)
+                    .FirstOrDefault(b => b.name.Contains("Close") || b.name.Contains("Search"));
+                if (btn == null) return;
+                if (btn.transform.parent.Find(ButtonName) != null) return;
+
+                var go = UnityEngine.Object.Instantiate(btn.gameObject, btn.transform.parent);
+                go.name = ButtonName;
+                var rt = (RectTransform)go.transform;
+                var src = (RectTransform)btn.transform;
+                rt.anchoredPosition = src.anchoredPosition + new Vector2(-(src.rect.width + 10f), 0f);
+
+                var b = go.GetComponent<UnityEngine.UI.Button>();
+                if (b != null)
+                {
+                    for (int i = 0; i < b.onClick.GetPersistentEventCount(); i++)
+                        b.onClick.SetPersistentListenerState(i, UnityEngine.Events.UnityEventCallState.Off);
+                    b.onClick.RemoveAllListeners();
+                    b.onClick.AddListener(() => EsportsWindow.Toggle());
+                }
+
+                var clr = new Color(0.85f, 0.35f, 0.85f);
+                foreach (var img in go.GetComponentsInChildren<UnityEngine.UI.Image>(true))
+                    img.color = clr;
+
+                var settings = UnityEngine.Object.FindObjectOfType<settingsScript>();
+                bool ar = settings != null && settings.language == 13;
+                foreach (var text in go.GetComponentsInChildren<UnityEngine.UI.Text>(true))
+                    text.text = ar ? EsportsLabels.Title : "Esports & Tournaments";
+            }
+            catch (Exception e) { EsportsEcosystemPlugin.Log.LogError(e); }
+        }
+    }
+
 }

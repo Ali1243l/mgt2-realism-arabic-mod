@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using HarmonyLib;
 using UnityEngine;
@@ -156,4 +157,54 @@ namespace MGT2Mod.PublishingDeals
             }
         }
     }
+
+    [HarmonyPatch(typeof(Menu_Dev_SelectPublisher), "Init")]
+    internal static class Patch_Menu_SelectPublisher_Deals
+    {
+        private const string ButtonName = "Btn_PublishingDeals";
+
+        private static void Postfix(Menu_Dev_SelectPublisher __instance)
+        {
+            try
+            {
+                if (__instance == null) return;
+                var btn = __instance.GetComponentsInChildren<UnityEngine.UI.Button>(true)
+                    .FirstOrDefault(b => b.name.Contains("Close") || b.name.Contains("Search") || b.name.Contains("Abbrechen"));
+                if (btn == null) return;
+                if (btn.transform.parent.Find(ButtonName) != null) return;
+
+                var go = UnityEngine.Object.Instantiate(btn.gameObject, btn.transform.parent);
+                go.name = ButtonName;
+                var rt = (RectTransform)go.transform;
+                var src = (RectTransform)btn.transform;
+                rt.anchoredPosition = src.anchoredPosition + new Vector2(-(src.rect.width + 10f), 0f);
+
+                var b = go.GetComponent<UnityEngine.UI.Button>();
+                if (b != null)
+                {
+                    for (int i = 0; i < b.onClick.GetPersistentEventCount(); i++)
+                        b.onClick.SetPersistentListenerState(i, UnityEngine.Events.UnityEventCallState.Off);
+                    b.onClick.RemoveAllListeners();
+                    b.onClick.AddListener(() =>
+                    {
+                        var main = GameObject.Find("Main");
+                        var ms = main != null ? main.GetComponent<mainScript>() : null;
+                        var guiMain = GameObject.Find("CanvasInGameMenu")?.GetComponent<GUI_Main>();
+                        PublishingDealsWindow.Show(ms, guiMain);
+                    });
+                }
+
+                var clr = new Color(0.2f, 0.8f, 0.5f);
+                foreach (var img in go.GetComponentsInChildren<UnityEngine.UI.Image>(true))
+                    img.color = clr;
+
+                var settings = UnityEngine.Object.FindObjectOfType<settingsScript>();
+                bool ar = settings != null && settings.language == 13;
+                foreach (var txt in go.GetComponentsInChildren<UnityEngine.UI.Text>(true))
+                    txt.text = ar ? PublishingDealsLabels.Title : "Studio Publishing Deals";
+            }
+            catch (Exception e) { PublishingDealsPlugin.Log.LogError(e); }
+        }
+    }
+
 }

@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using HarmonyLib;
 using UnityEngine;
@@ -101,4 +102,54 @@ namespace MGT2Mod.CommunityDynamics
             }
         }
     }
+
+    [HarmonyPatch(typeof(Menu_Marketing_Main), "Init")]
+    internal static class Patch_Menu_Marketing_Community
+    {
+        private const string ButtonName = "Btn_Marketing_Community";
+
+        private static void Postfix(Menu_Marketing_Main __instance)
+        {
+            try
+            {
+                if (__instance == null) return;
+                var btn = __instance.GetComponentsInChildren<Button>(true)
+                    .FirstOrDefault(b => b.name.Contains("Game") || b.name.Contains("Abbrechen") || b.name.Contains("Konsole"));
+                if (btn == null) return;
+                if (btn.transform.parent.Find(ButtonName) != null) return;
+
+                var go = UnityEngine.Object.Instantiate(btn.gameObject, btn.transform.parent);
+                go.name = ButtonName;
+                var rt = (RectTransform)go.transform;
+                var src = (RectTransform)btn.transform;
+                rt.anchoredPosition = src.anchoredPosition + new Vector2(0f, 48f);
+
+                var b = go.GetComponent<Button>();
+                if (b != null)
+                {
+                    for (int i = 0; i < b.onClick.GetPersistentEventCount(); i++)
+                        b.onClick.SetPersistentListenerState(i, UnityEngine.Events.UnityEventCallState.Off);
+                    b.onClick.RemoveAllListeners();
+                    b.onClick.AddListener(() =>
+                    {
+                        var main = GameObject.Find("Main");
+                        var ms = main != null ? main.GetComponent<mainScript>() : null;
+                        var guiMain = GameObject.Find("CanvasInGameMenu")?.GetComponent<GUI_Main>();
+                        CommunityWindow.Show(ms, guiMain);
+                    });
+                }
+
+                var clr = new Color(0.2f, 0.6f, 0.9f);
+                foreach (var img in go.GetComponentsInChildren<Image>(true))
+                    img.color = clr;
+
+                var settings = UnityEngine.Object.FindObjectOfType<settingsScript>();
+                bool ar = settings != null && settings.language == 13;
+                foreach (var txt in go.GetComponentsInChildren<Text>(true))
+                    txt.text = ar ? CommunityDynamicsLabels.Title : "Community & Social Hub";
+            }
+            catch (Exception e) { CommunityDynamicsPlugin.Log.LogError(e); }
+        }
+    }
+
 }

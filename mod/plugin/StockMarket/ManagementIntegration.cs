@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using HarmonyLib;
 using UnityEngine;
@@ -241,4 +242,54 @@ namespace MGT2Mod.StockMarket
             }
         }
     }
+
+    [HarmonyPatch(typeof(Menu_Bank), "Init")]
+    internal static class Patch_Menu_Bank_StockMarket
+    {
+        private const string ButtonName = "Button_Bank_StockMarket";
+
+        private static void Postfix(Menu_Bank __instance)
+        {
+            try
+            {
+                if (__instance == null) return;
+                var btn = __instance.GetComponentsInChildren<Button>(true)
+                    .FirstOrDefault(b => b.name.Contains("Kredit") || b.name.Contains("Abbrechen"));
+                if (btn == null) return;
+                if (btn.transform.parent.Find(ButtonName) != null) return;
+
+                var go = UnityEngine.Object.Instantiate(btn.gameObject, btn.transform.parent);
+                go.name = ButtonName;
+                var rt = (RectTransform)go.transform;
+                var src = (RectTransform)btn.transform;
+                rt.anchoredPosition = src.anchoredPosition + new Vector2(0f, 48f);
+
+                var b = go.GetComponent<Button>();
+                if (b != null)
+                {
+                    for (int i = 0; i < b.onClick.GetPersistentEventCount(); i++)
+                        b.onClick.SetPersistentListenerState(i, UnityEngine.Events.UnityEventCallState.Off);
+                    b.onClick.RemoveAllListeners();
+                    b.onClick.AddListener(() =>
+                    {
+                        var main = GameObject.Find("Main");
+                        var ms = main != null ? main.GetComponent<mainScript>() : null;
+                        var guiMain = GameObject.Find("CanvasInGameMenu")?.GetComponent<GUI_Main>();
+                        StockMarketWindow.Show(ms, guiMain);
+                    });
+                }
+
+                var clr = new Color(0.18f, 0.8f, 0.44f);
+                foreach (var img in go.GetComponentsInChildren<Image>(true))
+                    img.color = clr;
+
+                var settings = UnityEngine.Object.FindObjectOfType<settingsScript>();
+                bool ar = settings != null && settings.language == 13;
+                foreach (var txt in go.GetComponentsInChildren<Text>(true))
+                    txt.text = ar ? StockMarketLabels.Title : "Stock Market & IPO";
+            }
+            catch (Exception e) { StockMarketPlugin.Log.LogError(e); }
+        }
+    }
+
 }

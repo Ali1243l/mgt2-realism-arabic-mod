@@ -321,4 +321,48 @@ namespace MGT2Mod
             return b;
         }
     }
+
+    [HarmonyPatch(typeof(Menu_MitarbeiterUebersicht), "Init")]
+    internal static class Patch_Menu_Staff_SmartAutomation
+    {
+        private const string ButtonName = "Btn_SmartAutomation";
+
+        private static void Postfix(Menu_MitarbeiterUebersicht __instance)
+        {
+            try
+            {
+                if (__instance == null) return;
+                var btn = __instance.GetComponentsInChildren<UnityEngine.UI.Button>(true)
+                    .FirstOrDefault(b => b.name.Contains("Search") || b.name.Contains("Close"));
+                if (btn == null) return;
+                if (btn.transform.parent.Find(ButtonName) != null) return;
+
+                var go = UnityEngine.Object.Instantiate(btn.gameObject, btn.transform.parent);
+                go.name = ButtonName;
+                var rt = (RectTransform)go.transform;
+                var src = (RectTransform)btn.transform;
+                rt.anchoredPosition = src.anchoredPosition + new Vector2(-(src.rect.width + 10f), 0f);
+
+                var b = go.GetComponent<UnityEngine.UI.Button>();
+                if (b != null)
+                {
+                    for (int i = 0; i < b.onClick.GetPersistentEventCount(); i++)
+                        b.onClick.SetPersistentListenerState(i, UnityEngine.Events.UnityEventCallState.Off);
+                    b.onClick.RemoveAllListeners();
+                    b.onClick.AddListener(() => SmartDashboardWindow.Toggle());
+                }
+
+                var clr = new Color(0.95f, 0.7f, 0.15f);
+                foreach (var img in go.GetComponentsInChildren<UnityEngine.UI.Image>(true))
+                    img.color = clr;
+
+                var settings = UnityEngine.Object.FindObjectOfType<settingsScript>();
+                bool ar = settings != null && settings.language == 13;
+                foreach (var text in go.GetComponentsInChildren<UnityEngine.UI.Text>(true))
+                    text.text = ar ? AutoLabels.WindowTitle : "Smart HR & ROI";
+            }
+            catch (Exception e) { SmartAutomationPlugin.Log.LogError(e); }
+        }
+    }
+
 }

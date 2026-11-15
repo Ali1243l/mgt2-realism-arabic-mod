@@ -236,4 +236,48 @@ namespace MGT2Mod
             catch (Exception e) { TechDebtPlugin.Log.LogError(e); }
         }
     }
+
+    [HarmonyPatch(typeof(Menu_Dev_EngineMain), "Init")]
+    internal static class Patch_Menu_Engine_TechDebt
+    {
+        private const string ButtonName = "Btn_TechDebtCompilers";
+
+        private static void Postfix(Menu_Dev_EngineMain __instance)
+        {
+            try
+            {
+                if (__instance == null) return;
+                var btn = __instance.GetComponentsInChildren<UnityEngine.UI.Button>(true)
+                    .FirstOrDefault(b => b.name.Contains("NewEngine") || b.name.Contains("Abbrechen"));
+                if (btn == null) return;
+                if (btn.transform.parent.Find(ButtonName) != null) return;
+
+                var go = UnityEngine.Object.Instantiate(btn.gameObject, btn.transform.parent);
+                go.name = ButtonName;
+                var rt = (RectTransform)go.transform;
+                var src = (RectTransform)btn.transform;
+                rt.anchoredPosition = src.anchoredPosition + new Vector2(0f, 48f);
+
+                var b = go.GetComponent<UnityEngine.UI.Button>();
+                if (b != null)
+                {
+                    for (int i = 0; i < b.onClick.GetPersistentEventCount(); i++)
+                        b.onClick.SetPersistentListenerState(i, UnityEngine.Events.UnityEventCallState.Off);
+                    b.onClick.RemoveAllListeners();
+                    b.onClick.AddListener(() => TechDebtWindow.Toggle());
+                }
+
+                var clr = new Color(0.9f, 0.35f, 0.25f);
+                foreach (var img in go.GetComponentsInChildren<UnityEngine.UI.Image>(true))
+                    img.color = clr;
+
+                var settings = UnityEngine.Object.FindObjectOfType<settingsScript>();
+                bool ar = settings != null && settings.language == 13;
+                foreach (var text in go.GetComponentsInChildren<UnityEngine.UI.Text>(true))
+                    text.text = ar ? TechLabels.Title : "Compilers & Tech Debt";
+            }
+            catch (Exception e) { TechDebtPlugin.Log.LogError(e); }
+        }
+    }
+
 }

@@ -1,3 +1,4 @@
+using System.Linq;
 // GDD Point 6: Custom Silicon R&D Lab, Wafer Foundry Yield, Discrete PC GPUs & Thermal Cooling Engineering.
 // Built for MGT2Mod namespace, netstandard2.1, 32-bit Mono x86 safe (no Harmony patches on Int64-returning methods).
 using System;
@@ -319,4 +320,48 @@ namespace MGT2Mod
             catch (Exception e) { CustomSiliconPlugin.Log.LogError(e); }
         }
     }
+
+    [HarmonyPatch(typeof(Menu_Dev_KonsoleMain), "Init")]
+    internal static class Patch_Menu_Konsole_CustomSilicon
+    {
+        private const string ButtonName = "Btn_CustomSilicon";
+
+        private static void Postfix(Menu_Dev_KonsoleMain __instance)
+        {
+            try
+            {
+                if (__instance == null) return;
+                var btn = __instance.GetComponentsInChildren<UnityEngine.UI.Button>(true)
+                    .FirstOrDefault(b => b.name.Contains("NewKonsole") || b.name.Contains("Abbrechen"));
+                if (btn == null) return;
+                if (btn.transform.parent.Find(ButtonName) != null) return;
+
+                var go = UnityEngine.Object.Instantiate(btn.gameObject, btn.transform.parent);
+                go.name = ButtonName;
+                var rt = (RectTransform)go.transform;
+                var src = (RectTransform)btn.transform;
+                rt.anchoredPosition = src.anchoredPosition + new Vector2(0f, 48f);
+
+                var b = go.GetComponent<UnityEngine.UI.Button>();
+                if (b != null)
+                {
+                    for (int i = 0; i < b.onClick.GetPersistentEventCount(); i++)
+                        b.onClick.SetPersistentListenerState(i, UnityEngine.Events.UnityEventCallState.Off);
+                    b.onClick.RemoveAllListeners();
+                    b.onClick.AddListener(() => SiliconWindow.Toggle());
+                }
+
+                var clr = new Color(0.15f, 0.65f, 0.8f);
+                foreach (var img in go.GetComponentsInChildren<UnityEngine.UI.Image>(true))
+                    img.color = clr;
+
+                var settings = UnityEngine.Object.FindObjectOfType<settingsScript>();
+                bool ar = settings != null && settings.language == 13;
+                foreach (var text in go.GetComponentsInChildren<UnityEngine.UI.Text>(true))
+                    text.text = ar ? SiliconLabels.Title : "Custom Silicon & GPUs";
+            }
+            catch (Exception e) { CustomSiliconPlugin.Log.LogError(e); }
+        }
+    }
+
 }
