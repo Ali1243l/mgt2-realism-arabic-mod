@@ -30,7 +30,7 @@ namespace MGT2Mod
         }
         private static string Pick(string en, string ar) => Arabic ? ar : en;
 
-        internal static string WindowTitle => Pick("Smart Automation & Executive Analytics (F10)", "(F10) \ufe94\ufef3\ufeac\ufef4\ufed4\ufee8\ufe98\ufedf\ufe8d \ufe95\ufefc\ufef4\ufee0\ufea4\ufe98\ufedf\ufe8d \ufe94\ufea3\ufeee\ufedf\ufeed \ufe94\ufef4\ufedb\ufeac\ufedf\ufe8d \ufe94\ufe98\ufee4\ufe97\ufef7\ufe8d");
+        internal static string WindowTitle => Pick("Smart Automation & Executive Analytics (F9)", "(F9) \ufe94\ufef3\ufeac\ufef4\ufed4\ufee8\ufe98\ufedf\ufe8d \ufe95\ufefc\ufef4\ufee0\ufea4\ufe98\ufedf\ufe8d \ufe94\ufea3\ufeee\ufedf\ufeed \ufe94\ufef4\ufedb\ufeac\ufedf\ufe8d \ufe94\ufe98\ufee4\ufe97\ufef7\ufe8d");
         internal static string BtnAutoAssign => Pick("Smart Auto-Assign All Staff", "\ufe93\ufead\ufe8e\ufeec\ufee4\ufedf\ufe8d \ufe90\ufeb4\ufea3 \ufee6\ufef4\ufed4\ufec7\ufeee\ufee4\ufee0\ufedf \ufede\ufee3\ufe8e\ufeb7 \ufef2\ufedb\ufeab \ufeca\ufef3\ufeaf\ufeee\ufe97");
         internal static string BtnAutoRest => Pick("Swap & Rest Exhausted Staff", "\ufe8e\ufef4\ufe8b\ufe8e\ufed8\ufee0\ufe97 \ufee6\ufef4\ufedc\ufeec\ufee8\ufee4\ufedf\ufe8d \ufee6\ufef4\ufed4\ufec7\ufeee\ufee4\ufedf\ufe8d \ufe94\ufea3\ufe8d\ufead\ufe87");
         internal static string BtnBulkTrain => Pick("Boost Staff Morale & Training", "\ufee6\ufef4\ufea3\ufe8e\ufe98\ufee4\ufedf\ufe8d \ufee6\ufef4\ufed4\ufec7\ufeee\ufee4\ufee0\ufedf \ufef2\ufecb\ufe8e\ufee4\ufe9f \ufe90\ufef3\ufead\ufeaa\ufe97");
@@ -51,7 +51,7 @@ namespace MGT2Mod
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.F10))
+            if (Input.GetKeyDown(KeyCode.F9))
                 SmartDashboardWindow.Toggle();
         }
     }

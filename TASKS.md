@@ -1,72 +1,40 @@
-# Tasks
+# Tasks & Progress (Ali1243l/mgt2-realism-arabic-mod)
 
-Claim a task before starting: put your name and branch in the row, push the branch, then move the row when done.
-The plan is `docs/GDD.md` (35 points). Details of finished work: `IMPORTANT_PROJECT_STATUS.md`.
+How we use this file:
 
-## In progress
-| Task | Owner | Branch |
-|------|-------|--------|
-| GDD Point 4: Social media, hype, review bombing | Ali | feature/stock-market |
+1. Before starting a task, create a branch (`feature/<short-name>`), add your name and branch to the table below,
+   commit and push the branch so the other person sees it immediately.
+2. When the task is finished, move it to **Done** in the same pull request as the code.
 
-## Pending (not GDD)
-| Task | Notes |
-|------|-------|
-| User in-game test of Live Ops v2 | own F2P game: update menu campaign, wizard in-app page, sales window |
-| User in-game test of Stock Market | Management dropdown, IPO, Board, 25% intel, 51% directives, 100% absorption |
-| User in-game test of Publishing Deals | Publishing dropdown, F6, studio pitches, exclusivity, bidding wars |
-| MMO seasons through MMO add-ons | Live Ops covers F2P updates only |
-| Real names for parody licences (licence_EN) | realism pass, data only |
+---
 
-## GDD progress
-Order agreed with the user: one point at a time, data first, then code. Next up: point 4.
-The GDD repeats points 19-22 (lines 350-480) and 29 (two versions), and has no point 23: read both copies.
+## Currently in progress
 
-| # | Point | Status | Owner / branch |
-|---|-------|--------|----------------|
-| 1 | Live service & seasons | Done (v2), waiting for user test | Ali |
-| 2 | Stock market, shares, hostile takeover | Done, waiting for user test | Ali / feature/stock-market |
-| 3 | Publishing & exclusivity deals | Done, waiting for user test | Ali / feature/stock-market |
-| 4 | Social media, hype, review bombing | Done, waiting for user test | Ali / feature/stock-market |
-| 5 | Smart automation & analytics | Done, waiting for user test | Ali / feature/stock-market |
-| 6 | Custom silicon & hardware R&D | Pending | |
-| 7 | Programming languages & tech debt | Pending | |
-| 8 | Timeline to 2100 | Mostly done: platforms, engine/gameplay features, hardware 2030-2100 (`mod/future.py`) | Ali |
-| 9 | Esports & tournaments | Pending | |
-| 10 | Transmedia & merchandising | Pending | |
-| 11 | Early access & crowdfunding | Pending | |
-| 12 | Mod support & UGC | Pending | |
-| 13 | Crunch, burnout, unions | Pending | |
-| 14 | DRM, piracy, anti-cheat | Pending | |
-| 15 | Dynamic sales & wishlists | Pending | |
-| 16 | Real-world random events | Pending | |
-| 17 | Game awards & GOTY | Pending | |
-| 18 | Collector's editions & physical logistics | Pending | |
-| 19 | Store wars (Steam / Epic / GOG) | Pending | |
-| 20 | Community trading market | Pending | |
-| 21 | Remakes, remasters, nostalgia | Pending | |
-| 22 | Digital directs & shadow drops | Pending | |
-| 24 | Advanced world setup | Pending | |
-| 25 | Mobile F2P & gacha | Pending (overlaps point 1) | |
-| 26 | Engine licensing wars | Pending | |
-| 27 | Investigative journalism & leaks | Pending | |
-| 28 | CEO archetypes | Pending | |
-| 29 | Real estate / mega-campus | Pending | |
-| 30 | HUD & menus overhaul | Pending | |
-| 31 | Game creation wizard overhaul | Pending | |
-| 32 | Modern monetization & budgets | Pending (overlaps point 1) | |
-| 33 | Dev room submenus overhaul | Pending | |
-| 34 | Golden auto-tune (optimal sliders) | Done, confirmed by user | Ali |
-| 35 | Research tree & 2100 tech | Partly: future features exist; tree itself pending | |
+| GDD # | System | Owner | Branch | Notes |
+|------:|--------|-------|--------|-------|
+| 10 | Transmedia (Hollywood Movies, Anime Series) & Merchandising | Ali | `feature/transmedia-merch` | Next up in Batch 5 |
+| 11 | Early Access & Crowdfunding Campaigns | Ali | `feature/early-access` | Next up in Batch 5 |
+| 12 | Official Modding SDK & UGC Workshop | Ali | `feature/mod-ugc` | Next up in Batch 5 |
+
+---
 
 ## Done
-| Task | Date |
-|------|------|
-| Handoff docs: GDD in docs/, friend prompt, status + TASKS refresh (PR #2) | 2026-10-21 |
-| Team workflow: private repo, CLAUDE.md, TASKS.md, hooks blocking main (PR #1) | 2026-10-21 |
-| Audit + realism: 133 platforms, 100 publishers, real dates, developer legends, hardware brands | 2026-10-21 |
-| Arabic: shaping/BiDi converter, ~1,190 lines translated, Review/Quotes alignment, glossary | 2026-10-21 |
-| Logos (64 px) and platform photos (128 px) | 2026-10-21 |
-| Future content 2030-2100 (platforms, features, hardware) | 2026-10-21 |
-| BepInEx 5 + plugin toolchain | 2026-10-21 |
-| GDD point 34: golden auto-tune button | 2026-10-21 |
-| GDD point 1: Live Ops v2 (battle pass, seasons/events/collabs/relaunch, live stats) | 2026-10-21 |
+
+| Area / GDD # | What was done | Main files |
+|--------------|---------------|------------|
+| Data — Platforms | 133 platforms: real names, dates, types, prices, tech, market share, Internet/handheld/stationary flags, devkit costs | `mod/build.py`, `mod/future.py` |
+| Data — Publishers | 100 publishers/developers: real names, dates, stars, fan counts, platform relations, speed, genre focus | `mod/build.py`, `mod/future.py` |
+| Data — Logos | 100 publisher logos + 133 platform photos mapped and cropped | `mod/build.py`, `logos/`, `platform_pics/` |
+| Data — Hardware brands | Real CPU/GPU/RAM/sound/disc/controller/case/monitor component names | `mod/build.py` |
+| Data — Game & NPC names | Famous game names and industry personalities | `mod/build.py` |
+| Arabic localization | ~1,190 lines shaped and reversed, Latin/number order fixed, genres/themes/menus/events/countries translated | `mod/arabic_game.py`, `mod/build.py`, `mod/future.py` |
+| GDD 8 — Future up to 2100 | 18 future platforms, 9 studios, 16 engine features, 7 hardware topics, 32 news events (2030–2095) | `mod/future.py` |
+| GDD 34 — Golden Auto-Tune | Button in `Menu_DevGame` sets optimal focus, alignment, AP split and age rating for main + sub genre | `mod/plugin/GoldenAutoTune/` |
+| GDD 1 — Live-Service & GaaS | Battle Pass card in in-app page, Season / Event / Collab / 2.0 Relaunch in F2P updates & MMO add-ons, live stats (DAU, MAU, retention, sentiment, season) in sales window, save/load | `mod/plugin/LiveOps/` |
+| GDD 2 — Stock Market & IPO | Weekly GBM share drift, release shockwave, 4-year macro cycle, 5%/25%/51%/100% tiered stakes, Poison Pill & White Knight defense, Player IPO (10%-40% float) & Board meetings, native `UiKit` tabbed window (`F8`) | `mod/plugin/StockMarket/` |
+| GDD 3 — Publishing Deals & Bidding Wars | Studio behavioral archetypes, offer evaluation score S in [0,100], patience concession counter-offers, AI rival bidding war escalation, native UI window (`F6`) | `mod/plugin/PublishingDeals/` |
+| GDD 4 — Community, Hype Trap & Review Bombing | Expectation debt, logistic review-bomb severity, Pareto streamer viral multiplier, apology & roadmap recovery, native UI window (`F7`) | `mod/plugin/CommunityDynamics/` |
+| GDD 5 — Smart Automation & Executive ROI | One-click smart role assignment, exhausted staff break rotation, Executive Game & Engine ROI dashboard (`F9`) | `mod/plugin/SmartAutomation/` |
+| GDD 6 — Custom Silicon, Foundries & PC GPUs | Lithography node R&D (90nm to 1nm), Murphy wafer yield model, Tier-1 vs Budget foundries, discrete PC GPU product lines, Arrhenius thermal failure & RRoD recall campaign (`F10`) | `mod/plugin/CustomSilicon/` |
+| GDD 7 — Programming Languages & Tech Debt | Assembly/C, C++/C#, and AI Neural compilers, engine Spaghetti Code tech debt accumulation, dev speed decay & quadratic bug multiplier, full Engine Core Refactoring (`F11`) | `mod/plugin/TechDebt/` |
+| GDD 9 — Esports & Competitive Ecosystem | Competitive readiness & netcode scoring, Major & World Cup tournament hosting, broadcast & franchise slot deals, Meta balance entropy & patches (`F5`) | `mod/plugin/EsportsEcosystem/` |

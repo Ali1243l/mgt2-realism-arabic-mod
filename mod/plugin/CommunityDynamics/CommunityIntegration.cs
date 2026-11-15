@@ -94,18 +94,10 @@ namespace MGT2Mod.CommunityDynamics
             var ms = GameObject.Find("Main")?.GetComponent<mainScript>();
             if (ms == null || ms.multiplayer) return;
 
-            // F5 Hotkey to toggle Community Dynamics Window
-            if (Input.GetKeyDown(KeyCode.F5))
+            // F7 Hotkey to toggle Community Dynamics Window
+            if (Input.GetKeyDown(KeyCode.F7))
             {
                 CommunityWindow.Toggle(ms, __instance);
-            }
-
-            // F9 Hotkey for Mod Testing & Sandbox Boost
-            if (Input.GetKeyDown(KeyCode.F9))
-            {
-                ms.money += 25000000L;
-                CommunityManager.EnsureSeedPosts(ms);
-                __instance.CreateTopNewsInfo("Test Scenario Activated: +$25M Cash & Community Buzz Ready!");
             }
         }
     }
