@@ -717,13 +717,16 @@ namespace MGT2Mod.StockMarket
                         State.hostileRivalCompanyId = rival.myID;
                         State.hostileRivalName = rival.GetName();
                         State.hostileRivalSharePercent = UnityEngine.Random.Range(2.0f, 5.0f);
+                        // Float absorbs the difference so total equals 100%
+                        float floatPct = Mathf.Max(0f, 100f - State.founderSharePercent - State.hostileRivalSharePercent);
+                        StockData.Data.playerPublicShare = floatPct / 100f;
                     }
                 }
             }
             else
             {
                 // Active rival attempts creeping accumulation if public float has room
-                float maxRivalCap = 100f - State.founderSharePercent;
+                float maxRivalCap = Mathf.Max(0f, 100f - State.founderSharePercent);
                 if (State.hostileRivalSharePercent < maxRivalCap - 1f && !State.poisonPillActive)
                 {
                     // Rival buys 1.0% to 2.5% every few weeks
@@ -732,20 +735,20 @@ namespace MGT2Mod.StockMarket
                         float increment = UnityEngine.Random.Range(1.0f, 2.5f);
                         float oldShare = State.hostileRivalSharePercent;
                         State.hostileRivalSharePercent = Mathf.Clamp(State.hostileRivalSharePercent + increment, 0f, maxRivalCap);
+                        // Strict total = 100%
+                        float floatPct = Mathf.Max(0f, 100f - State.founderSharePercent - State.hostileRivalSharePercent);
+                        StockData.Data.playerPublicShare = floatPct / 100f;
 
                         // If rival crossed 20% threshold, trigger emergency alert
                         if (oldShare < 20f && State.hostileRivalSharePercent >= 20f)
                         {
                             State.boardDiscontent = Mathf.Clamp(State.boardDiscontent + 20f, 0f, 100f);
-                            string alert = $"<color=red><b>{StockMarketLabels.TakeoverThreatTitle}</b></color>\n\n" +
-                                $"{State.hostileRivalName} has acquired {State.hostileRivalSharePercent:F1}% of studio shares!\n" +
-                                "The Board of Directors strongly urges activating the Poison Pill Defense immediately.";
-
+                            string alert = StockMarketLabels.TakeoverThreatDesc;
                             var guiMain = GameObject.Find("CanvasInGameMenu")?.GetComponent<GUI_Main>();
                             guiMain?.MessageBox(alert, false);
 
                             Ali.Mgt2.Simulation.CrossSystemBridge.EnqueueEvent("CORPORATE_EVENT",
-                                $"@MarketInsider: عاجل: شركة {State.hostileRivalName} تستحوذ على أكثر من 20% من أسهم استوديوهاتنا في خطوة عدائية مقلقة! #TakeoverDefense");
+                                $"@MarketInsider: Alert! {State.hostileRivalName} has acquired over 20% of our studio shares in aggressive market push!");
                         }
                     }
                 }
@@ -780,26 +783,38 @@ namespace MGT2Mod.StockMarket
             ms.Pay(buybackCost, FinanceCategory);
             State.financialAdjustmentThisTick -= buybackCost;
 
-            State.founderSharePercent = Mathf.Clamp(State.founderSharePercent + 5f, 0f, 100f);
-            StockData.Data.playerPublicShare = Mathf.Clamp(StockData.Data.playerPublicShare - 0.05f, 0f, 1f);
+            // Strict invariant: Founder buys back exactly 5% (e.g. 80.0% -> 85.0%)
+            float buybackPct = 5.0f;
+            State.founderSharePercent = Mathf.Clamp(State.founderSharePercent + buybackPct, 51f, 100f);
 
+            // Repurchase from hostile rival first to defuse takeover
             if (State.hostileRivalSharePercent > 0f)
             {
-                State.hostileRivalSharePercent = Mathf.Max(0f, State.hostileRivalSharePercent - 2.5f);
+                float rivalReduction = Mathf.Min(State.hostileRivalSharePercent, buybackPct);
+                State.hostileRivalSharePercent -= rivalReduction;
+                if (State.hostileRivalSharePercent <= 0.05f)
+                {
+                    State.hostileRivalSharePercent = 0f;
+                    State.hostileRivalCompanyId = -1;
+                    State.hostileRivalName = "";
+                }
             }
 
-            State.investorConfidence = Mathf.Clamp(State.investorConfidence + 6f, 0f, 100f);
-            State.boardDiscontent = Mathf.Clamp(State.boardDiscontent - 8f, 0f, 100f);
+            // Public float absorbs remainder so total is ALWAYS 100%
+            float remainingFloat = Mathf.Max(0f, 100f - State.founderSharePercent - State.hostileRivalSharePercent);
+            StockData.Data.playerPublicShare = remainingFloat / 100f;
+
+            State.investorConfidence = Mathf.Clamp(State.investorConfidence + 8f, 0f, 100f);
+            State.boardDiscontent = Mathf.Clamp(State.boardDiscontent - 10f, 0f, 100f);
             State.currentSharePrice = Math.Round(State.currentSharePrice * 1.04, 2);
             State.marketValuation = (long)Math.Round(State.currentSharePrice * State.totalShares);
 
             message = StockMarketLabels.BuybackSuccess;
-            guiMain?.MessageBox($"<color=#1E8C3A><b>{StockMarketLabels.BuybackSuccess}</b></color>\n\n" +
-                $"{StockMarketLabels.FounderStake} {State.founderSharePercent:F1}%\n" +
-                $"{StockMarketLabels.BuybackCost} {ms.GetMoney(buybackCost, true)}", false);
+            string buybackDetail = string.Format(StockMarketLabels.BuybackSuccessDetail, $"{State.founderSharePercent:F1}", ms.GetMoney(buybackCost, true));
+            guiMain?.MessageBox(buybackDetail, false);
 
             Ali.Mgt2.Simulation.CrossSystemBridge.EnqueueEvent("CORPORATE_EVENT",
-                $"@WallStreetHerald: الاستوديو ينفذ بنجاح برنامج إعادة شراء أسهم بقيمة {ms.GetMoney(buybackCost, true)} لتعزيز سيطرة المؤسس وطمأنة المستثمرين!");
+                $"@WallStreetHerald: Studio completed a 5% share buyback for {ms.GetMoney(buybackCost, true)}, increasing founder ownership and reassuring investors!");
 
             return true;
         }
@@ -812,9 +827,9 @@ namespace MGT2Mod.StockMarket
                 return false;
             }
 
-            if (State.hostileRivalSharePercent < 20f)
+            if (State.hostileRivalSharePercent < 10f)
             {
-                message = "Poison Pill requires a hostile acquirer owning at least 20%.";
+                message = "Poison Pill requires an active hostile threat (at least 10% rival stake).";
                 guiMain?.MessageBox(message, false);
                 return false;
             }
@@ -841,22 +856,24 @@ namespace MGT2Mod.StockMarket
             State.poisonPillExpiryMonth = (ms.year * 12 + ms.month) + 12;
 
             float oldRivalShare = State.hostileRivalSharePercent;
-            State.hostileRivalSharePercent = (float)defense.PostDilutionPlayerOwnershipPercent;
+            State.hostileRivalSharePercent = Mathf.Max(3f, oldRivalShare * 0.5f);
             State.totalShares = defense.NewTotalShares;
             State.currentSharePrice = targetStock.SharePrice;
             State.marketValuation = (long)Math.Round(State.currentSharePrice * State.totalShares);
 
-            State.founderSharePercent = Mathf.Clamp(State.founderSharePercent * 1.08f, 51f, 95f);
-            StockData.Data.playerPublicShare = Mathf.Clamp((100f - State.founderSharePercent) / 100f, 0.05f, 0.49f);
-            State.boardDiscontent = Mathf.Clamp(State.boardDiscontent - 20f, 0f, 100f);
+            State.founderSharePercent = Mathf.Clamp(State.founderSharePercent, 60f, 95f);
+            float remainingFloat = Mathf.Max(0.02f, 100f - State.founderSharePercent - State.hostileRivalSharePercent);
+            StockData.Data.playerPublicShare = remainingFloat / 100f;
+
+            State.boardDiscontent = Mathf.Clamp(State.boardDiscontent - 25f, 0f, 100f);
+            State.investorConfidence = Mathf.Clamp(State.investorConfidence + 15f, 0f, 100f);
 
             message = StockMarketLabels.PoisonPillSuccess;
-            guiMain?.MessageBox($"<color=#1E8C3A><b>{StockMarketLabels.PoisonPillSuccess}</b></color>\n\n" +
-                $"{State.hostileRivalName} stake diluted from {oldRivalShare:F1}% down to {State.hostileRivalSharePercent:F1}%!\n" +
-                $"Hostile takeover averted for 12 months.", false);
+            string poisonPillDetail = string.Format(StockMarketLabels.PoisonPillSuccessDetail, $"{oldRivalShare:F1}", $"{State.hostileRivalSharePercent:F1}");
+            guiMain?.MessageBox(poisonPillDetail, false);
 
             Ali.Mgt2.Simulation.CrossSystemBridge.EnqueueEvent("CORPORATE_EVENT",
-                $"@FinancialTimes: مجلس إدارة الاستوديو يفعل بنجاح خطة حقوق المساهمين (حبة السم) لإحباط محاولة استحواذ عدائية من {State.hostileRivalName}!");
+                $"@FinancialTimes: Studio board successfully activated shareholder rights poison pill, diluting {State.hostileRivalName} hostile takeover!");
 
             return true;
         }

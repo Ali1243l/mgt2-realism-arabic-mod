@@ -54,9 +54,20 @@ namespace MGT2Mod.PublishingDeals
             foreach (var st in _pubDealsButton.GetComponentsInChildren<setText>(true)) UnityEngine.Object.DestroyImmediate(st);
             foreach (var tt in _pubDealsButton.GetComponentsInChildren<tooltip>(true)) UnityEngine.Object.DestroyImmediate(tt);
 
+            // Destroy all non-Text child objects (such as padlock sprites / Schloss icons inherited from locked buttons)
+            for (int i = _pubDealsButton.transform.childCount - 1; i >= 0; i--)
+            {
+                var child = _pubDealsButton.transform.GetChild(i);
+                if (child.GetComponent<Text>() == null)
+                {
+                    UnityEngine.Object.DestroyImmediate(child.gameObject);
+                }
+            }
+
             var btn = _pubDealsButton.GetComponent<Button>();
             if (btn != null)
             {
+                btn.interactable = true;
                 btn.onClick = new Button.ButtonClickedEvent();
                 btn.onClick.AddListener(() =>
                 {

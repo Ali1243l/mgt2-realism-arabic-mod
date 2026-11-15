@@ -508,15 +508,32 @@ namespace MGT2Mod.PublishingDeals
             CreateText(card.transform, "Time", new Vector2(0.40f, 0.08f), new Vector2(0.68f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false, $"{PublishingDealsLabels.DevTime} {pitch.devWeeks} {PublishingDealsLabels.Weeks}  |  {PublishingDealsLabels.DeveloperCut} {Mathf.RoundToInt(pitch.proposedRoyaltySplit)}%");
 
             // Start Negotiation Button
-            var fundBtn = CreateNativeButton(card.transform, "FundBtn", new Vector2(-16f, 0f), new Vector2(185f, 40f), () =>
+            var fundBtn = CreateNativeButton(card.transform, "FundBtn", new Vector2(-16f, 0f), new Vector2(175f, 38f), () =>
             {
-                ShowDealNegotiationModal(pitch);
-            }, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
-            fundBtn.GetComponent<Image>().color = new Color(0.161f, 0.502f, 0.725f, 1f);
+                if (!pitch.negotiationFailed)
+                    ShowDealNegotiationModal(pitch);
+            }, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
+
+            var fBtn = fundBtn.GetComponent<Button>();
+            var fImg = fundBtn.GetComponent<Image>();
             var fTxt = fundBtn.GetComponentInChildren<Text>();
-            fTxt.text = PublishingDealsLabels.StartNegotiation;
-            fTxt.fontSize = 13;
+            fTxt.fontSize = 12;
             fTxt.fontStyle = FontStyle.Bold;
+
+            if (pitch.negotiationFailed)
+            {
+                fBtn.interactable = false;
+                fImg.color = new Color(0.72f, 0.74f, 0.78f, 0.40f);
+                fTxt.color = new Color(0.45f, 0.48f, 0.52f, 0.75f);
+                fTxt.text = PublishingDealsLabels.PitchRejected;
+            }
+            else
+            {
+                fBtn.interactable = true;
+                fImg.color = new Color(0.161f, 0.502f, 0.725f, 1f);
+                fTxt.color = Color.white;
+                fTxt.text = PublishingDealsLabels.StartNegotiation;
+            }
 
             return card;
         }
@@ -623,12 +640,28 @@ namespace MGT2Mod.PublishingDeals
             {
                 bool success = PublishingManager.PlaceCounterBid(_ms, war, counterBidAmount, _guiMain);
                 if (success) RefreshActiveTab();
-            }, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
-            bidBtn.GetComponent<Image>().color = new Color(0.85f, 0.55f, 0.15f, 1f);
+            }, new Vector2(1f, 0.5f), new Vector2(1f, 0.5f), new Vector2(1f, 0.5f));
+
+            var bBtn = bidBtn.GetComponent<Button>();
+            var bImg = bidBtn.GetComponent<Image>();
             var bTxt = bidBtn.GetComponentInChildren<Text>();
-            bTxt.text = $"{PublishingDealsLabels.CounterBid} (+{_ms.GetMoney(250000L, true)})";
-            bTxt.fontSize = 12;
+            bTxt.fontSize = 11;
             bTxt.fontStyle = FontStyle.Bold;
+
+            if (war.leadingBidderId == -1)
+            {
+                bBtn.interactable = false;
+                bImg.color = new Color(0.72f, 0.74f, 0.78f, 0.40f);
+                bTxt.color = new Color(0.45f, 0.48f, 0.52f, 0.75f);
+                bTxt.text = PublishingDealsLabels.SelfBiddingNotice;
+            }
+            else
+            {
+                bBtn.interactable = _ms.money >= counterBidAmount;
+                bImg.color = new Color(0.85f, 0.55f, 0.15f, 1f);
+                bTxt.color = Color.white;
+                bTxt.text = $"{PublishingDealsLabels.CounterBid} (+{_ms.GetMoney(250000L, true)})";
+            }
 
             return card;
         }
@@ -752,26 +785,22 @@ namespace MGT2Mod.PublishingDeals
                 // Patience Indicator
                 string patienceDesc;
                 Color patienceColor;
+                float patienceRatio = (float)pitch.studioPatience / Mathf.Max(1f, (float)pitch.maxPatience);
 
-                if (pitch.negotiationFailed)
+                if (pitch.negotiationFailed || pitch.studioPatience <= 0)
                 {
                     patienceDesc = PublishingDealsLabels.PatienceWalkout;
                     patienceColor = new Color(0.75f, 0.20f, 0.20f, 1f);
                 }
-                else if (pitch.studioPatience >= 4)
+                else if (patienceRatio >= 0.70f)
                 {
                     patienceDesc = PublishingDealsLabels.PatienceCalm;
                     patienceColor = new Color(0.12f, 0.55f, 0.22f, 1f);
                 }
-                else if (pitch.studioPatience == 3)
+                else if (patienceRatio >= 0.40f)
                 {
                     patienceDesc = PublishingDealsLabels.PatienceTense;
-                    patienceColor = new Color(0.85f, 0.55f, 0.15f, 1f);
-                }
-                else if (pitch.studioPatience == 2)
-                {
-                    patienceDesc = PublishingDealsLabels.PatienceTense;
-                    patienceColor = new Color(0.85f, 0.40f, 0.15f, 1f);
+                    patienceColor = new Color(0.85f, 0.50f, 0.15f, 1f);
                 }
                 else
                 {

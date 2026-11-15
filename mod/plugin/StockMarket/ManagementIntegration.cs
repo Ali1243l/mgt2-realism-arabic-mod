@@ -198,20 +198,30 @@ namespace MGT2Mod.StockMarket
                 if (!StockData.Data.playerIsPublic)
                 {
                     StockData.Data.playerIsPublic = true;
-                    StockData.Data.playerPublicShare = 0.20f;
                     PlayerIpoManager.State.totalShares = 1000000L;
                     PlayerIpoManager.State.currentSharePrice = 5.50;
                     PlayerIpoManager.State.marketValuation = 5500000L;
-                    PlayerIpoManager.State.founderSharePercent = 80f;
-                    PlayerIpoManager.State.boardDiscontent = 25f;
+                    PlayerIpoManager.State.founderSharePercent = 80.0f;
+                    PlayerIpoManager.State.boardDiscontent = 35f;
                     PlayerIpoManager.State.investorConfidence = 75f;
+                    PlayerIpoManager.State.quarterlyRevenueTarget = Math.Max(500000L, (long)(PlayerIpoManager.State.marketValuation * 0.12));
+                    PlayerIpoManager.State.currentQuarterRevenue = 180000L;
+                    PlayerIpoManager.State.consecutiveTargetsMet = 1;
+                    PlayerIpoManager.State.consecutiveTargetsMissed = 0;
                 }
 
-                // 3. Setup Hostile Takeover challenge (Mintendu at 22%)
+                // 3. Setup Hostile Takeover challenge (Mintendu owns 15%, public float has remaining 5%)
+                // Strict invariant: Founder (80%) + Hostile (15%) + Public Float (5%) = 100%!
+                PlayerIpoManager.State.founderSharePercent = 80.0f;
                 PlayerIpoManager.State.hostileRivalCompanyId = 1;
                 PlayerIpoManager.State.hostileRivalName = "Mintendu";
-                PlayerIpoManager.State.hostileRivalSharePercent = 22.0f;
-                PlayerIpoManager.State.boardDiscontent = 45f;
+                PlayerIpoManager.State.hostileRivalSharePercent = 15.0f;
+                StockData.Data.playerPublicShare = 0.05f; // Remaining float from market
+                PlayerIpoManager.State.boardDiscontent = 40f;
+                if (PlayerIpoManager.State.quarterlyRevenueTarget <= 0)
+                {
+                    PlayerIpoManager.State.quarterlyRevenueTarget = Math.Max(500000L, (long)(PlayerIpoManager.State.marketValuation * 0.12));
+                }
 
                 // 4. Broadcast simulated game release hit (92%) to test synergies
                 Ali.Mgt2.Simulation.CrossSystemBridge.EnqueueEvent("GAME_RELEASED",
@@ -219,15 +229,10 @@ namespace MGT2Mod.StockMarket
 
                 // 5. Broadcast corporate event
                 Ali.Mgt2.Simulation.CrossSystemBridge.EnqueueEvent("CORPORATE_EVENT",
-                    "@WallStreetGames: طفرة هائلة في نشاط التداول على أسهم استوديوهاتنا بعد توالي النجاحات النقدية والتجارية!");
+                    "@WallStreetGames: Record surge in trading activity for studio shares after consecutive commercial successes!");
 
-                string testSummary = "<color=#1E8C3A><b>تم تفعيل حزمة الاختبار الشاملة (F4)</b></color>\n\n" +
-                    "• تم إيداع <b>$25,000,000</b> في خزينة الشركة.\n" +
-                    "• تم تفعيل الاكتتاب (IPO) مع استهداف عدائي من Mintendu (22%) لتجربة حبة السم وإعادة الشراء.\n" +
-                    "• تم بث إطلاق لعبة 92% لتفعيل تريندات السوشيال (F5) وقفزة الأسهم (F8).\n\n" +
-                    "الاختصارات: <b>F8</b> سوق الأسهم | <b>F6</b> صفقات النشر | <b>F5</b> السوشيال";
-
-                guiMain?.MessageBox(testSummary, false);
+                // 6. Display perfectly shaped, authentic Arabic test suite summary notice
+                guiMain?.MessageBox(StockMarketLabels.TestSuiteNotice, false);
                 StockMarketPlugin.Log.LogInfo("Mod Test Suite (F4) triggered successfully.");
             }
             catch (Exception ex)

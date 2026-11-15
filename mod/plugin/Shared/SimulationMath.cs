@@ -274,7 +274,7 @@ namespace Ali.Mgt2.Simulation
                 };
             }
 
-            if (remainingPatience <= 0.0 || finalScore < 18.0)
+            if (remainingPatience <= 0.0)
             {
                 return new NegotiationEvaluationResult
                 {
@@ -285,7 +285,7 @@ namespace Ali.Mgt2.Simulation
                     PatienceDelta = -patienceLoss,
                     RemainingPatience = 0.0,
                     CounterOffer = null,
-                    DominantReasonCode = offeredPubCut > 35.0 && archetype == StudioArchetype.VeteranAuteur ? "AUTEUR_GREED_WALKOUT" : "PATIENCE_EXHAUSTED"
+                    DominantReasonCode = "PATIENCE_EXHAUSTED"
                 };
             }
 
@@ -313,25 +313,27 @@ namespace Ali.Mgt2.Simulation
             double budgetRatio,
             double ownedEquity)
         {
-            if (ownedEquity >= 51.0) return 2.0;
+            if (ownedEquity >= 51.0) return 4.0; // Majority owner preserves patience
 
             double deficit = Math.Max(0.0, acceptThreshold - score);
-            double baseLoss = 10.0 + (deficit * 0.45);
+            // Scaled so 1 round normally consumes ~20 patience (1 pip out of 5)
+            double baseLoss = 16.0 + (deficit * 0.15);
 
-            if (archetype == StudioArchetype.VeteranAuteur && offeredPubCut > 35.0)
-            {
-                baseLoss *= 2.0;
-            }
-            if (archetype == StudioArchetype.StarvingIndie && budgetRatio < -0.20)
-            {
-                baseLoss *= 1.35;
-            }
-            if (offer.RequireConsoleExclusivity && budgetRatio < 0.15)
+            if (archetype == StudioArchetype.VeteranAuteur && offeredPubCut > 40.0)
             {
                 baseLoss += 8.0;
             }
+            if (archetype == StudioArchetype.StarvingIndie && budgetRatio < -0.20)
+            {
+                baseLoss += 6.0;
+            }
+            if (offer.RequireConsoleExclusivity && budgetRatio < 0.15)
+            {
+                baseLoss += 5.0;
+            }
 
-            return MathUtil.Clamp(baseLoss, 4.0, 65.0);
+            // Cap at 30.0 so no studio ever walks out instantly on round 1 with full patience
+            return MathUtil.Clamp(baseLoss, 10.0, 30.0);
         }
 
         private static DealOffer BuildCounterOffer(

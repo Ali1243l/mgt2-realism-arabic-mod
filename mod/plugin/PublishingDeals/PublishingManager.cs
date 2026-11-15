@@ -496,18 +496,22 @@ namespace MGT2Mod.PublishingDeals
                     }
                 }
 
-                if (bidding.weeksLeft <= 0 && !bidding.resolved)
+                if (bidding.weeksLeft <= 0)
                 {
-                    bidding.resolved = true;
-                    if (bidding.leadingBidderId == -1) // Player won!
+                    if (!bidding.resolved)
                     {
-                        ms.Pay(bidding.currentHighestBid, 25);
-                        ms.guiMain_?.MessageBox(PublishingDealsLabels.BiddingWonNotice, false);
+                        bidding.resolved = true;
+                        if (bidding.leadingBidderId == -1) // Player won!
+                        {
+                            ms.Pay(bidding.currentHighestBid, 25);
+                            ms.guiMain_?.MessageBox(PublishingDealsLabels.BiddingWonNotice, false);
+                        }
+                        else
+                        {
+                            ms.guiMain_?.CreateTopNewsInfo($"{bidding.leadingBidderName} won the bidding war for {bidding.gameTitle}!");
+                        }
                     }
-                    else
-                    {
-                        ms.guiMain_?.CreateTopNewsInfo($"{bidding.leadingBidderName} won the bidding war for {bidding.gameTitle}!");
-                    }
+                    Data.activeBiddingWars.RemoveAt(bIdx);
                 }
             }
         }

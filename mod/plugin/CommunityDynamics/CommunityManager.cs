@@ -192,12 +192,12 @@ namespace MGT2Mod.CommunityDynamics
             int y = ms != null ? ms.year : 2028;
             int w = ms != null ? ms.week : 1;
 
-            AddPost(new SocialPost { authorHandle = "@PixelGuru", content = "Gaming conventions are heating up! Expecting massive announcements this season.", category = 0, sentiment = 1, likes = 1450, retweets = 320, year = y, week = w });
-            AddPost(new SocialPost { authorHandle = "@GameTrader", content = "Mintendu and competitor share prices showing strong momentum this quarter.", category = 2, sentiment = 2, likes = 2300, retweets = 680, year = y, week = w });
-            AddPost(new SocialPost { authorHandle = "u/RetroGamer", content = "Honestly just hoping for great polished gameplay with zero game-breaking bugs.", category = 0, sentiment = 0, likes = 890, retweets = 140, year = y, week = w });
-            AddPost(new SocialPost { authorHandle = "@SpeedySam", content = "Going live with a marathon stream tonight! Checking out the latest titles on market!", category = 2, sentiment = 1, likes = 3400, retweets = 910, year = y, week = w });
-            AddPost(new SocialPost { authorHandle = "@TechRadar", content = "New silicon chip architectures are advancing rapidly. Exciting times for gaming hardware.", category = 0, sentiment = 2, likes = 1200, retweets = 290, year = y, week = w });
-            AddPost(new SocialPost { authorHandle = "@IndiePulse", content = "Small development studios are pushing the most innovative ideas in the industry right now.", category = 1, sentiment = 1, likes = 1800, retweets = 450, year = y, week = w });
+            AddPost(new SocialPost { authorHandle = "@PixelGuru", content = CommunityDynamicsLabels.SeedPost1, category = 0, sentiment = 1, likes = 1450, retweets = 320, year = y, week = w });
+            AddPost(new SocialPost { authorHandle = "@GameTrader", content = CommunityDynamicsLabels.SeedPost2, category = 2, sentiment = 2, likes = 2300, retweets = 680, year = y, week = w });
+            AddPost(new SocialPost { authorHandle = "u/RetroGamer", content = CommunityDynamicsLabels.SeedPost3, category = 0, sentiment = 0, likes = 890, retweets = 140, year = y, week = w });
+            AddPost(new SocialPost { authorHandle = "@SpeedySam", content = CommunityDynamicsLabels.SeedPost4, category = 2, sentiment = 1, likes = 3400, retweets = 910, year = y, week = w });
+            AddPost(new SocialPost { authorHandle = "@TechRadar", content = CommunityDynamicsLabels.SeedPost5, category = 0, sentiment = 2, likes = 1200, retweets = 290, year = y, week = w });
+            AddPost(new SocialPost { authorHandle = "@IndiePulse", content = CommunityDynamicsLabels.SeedPost6, category = 1, sentiment = 1, likes = 1800, retweets = 450, year = y, week = w });
         }
 
         public static void LaunchBullshotCampaign(gameScript game, int strategy, mainScript ms)
@@ -542,11 +542,12 @@ namespace MGT2Mod.CommunityDynamics
 
             string[] thoughts =
             {
-                "What game is everyone playing this weekend? The backlog is getting insane!",
-                "Still hoping for a proper sequel to our favorite classic franchises.",
-                "The industry moves so fast, but great gameplay never goes out of style.",
-                "Graphics are getting wild, but story and mechanics will always be king.",
-                "Patiently waiting for the next big game convention announcements!"
+                CommunityDynamicsLabels.SeedPost1,
+                CommunityDynamicsLabels.SeedPost2,
+                CommunityDynamicsLabels.SeedPost3,
+                CommunityDynamicsLabels.SeedPost4,
+                CommunityDynamicsLabels.SeedPost5,
+                CommunityDynamicsLabels.SeedPost6
             };
 
             AddPost(new SocialPost

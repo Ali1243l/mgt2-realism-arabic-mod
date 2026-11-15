@@ -689,7 +689,7 @@ namespace MGT2Mod.CommunityDynamics
             bodyTxt.font = GetGameFont();
             bodyTxt.fontSize = 12;
             bodyTxt.color = Color.white;
-            bodyTxt.text = post.content;
+            bodyTxt.text = CommunityDynamicsLabels.Arabic ? Ali.Mgt2.Shared.ArabicFixer.Fix(post.content) : post.content;
 
             // Footer
             var footObj = new GameObject("Footer", typeof(RectTransform), typeof(Text));
