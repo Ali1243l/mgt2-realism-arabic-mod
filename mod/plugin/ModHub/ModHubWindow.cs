@@ -281,6 +281,36 @@ namespace MGT2Mod
                     AssemblyName = "ModWorkshop",
                     WindowClassName = "MGT2Mod.ModWorkshopWindow",
                     ToggleMethodName = "Toggle"
+                },
+                new ModSystemInfo {
+                    Title = "11. ضغط العمل والنقابات العمالية (Crunch Culture, Burnout & Unions)",
+                    Description = "كرنش إجباري (+50% سرعة)، مؤشر الاحتراق، إضراب النقابات العمالية، وحوافز الأصفاد الذهبية.",
+                    InGameLocation = "نظرة عامة على الموظفين (Staff Overview) وقائمة Personal",
+                    Hotkey = "Ctrl+1",
+                    HeaderColor = new Color(0.85f, 0.35f, 0.25f),
+                    AssemblyName = "CrunchUnions",
+                    WindowClassName = "MGT2Mod.CrunchWindow",
+                    ToggleMethodName = "Toggle"
+                },
+                new ModSystemInfo {
+                    Title = "12. حماية الدنوفو ومكافحة الغش (DRM, Denuvo & Kernel Anti-Cheat)",
+                    Description = "درع دنوفو الحصين (96% منع قرصنة)، تحديث إزالة الـ DRM، ومكافحة غش Ring-0 Kernel مع حملات الحظر.",
+                    InGameLocation = "قائمة حماية النسخ (Buy CopyProtect) وقائمة مكافحة الغش (Buy AntiCheat)",
+                    Hotkey = "Ctrl+2",
+                    HeaderColor = new Color(0.2f, 0.55f, 0.85f),
+                    AssemblyName = "DrmAntiCheat",
+                    WindowClassName = "MGT2Mod.DrmWindow",
+                    ToggleMethodName = "Toggle"
+                },
+                new ModSystemInfo {
+                    Title = "13. مهرجانات التخفيضات والأمنيات (Dynamic Sales & Wishlist Economy)",
+                    Description = "مهرجانات الصيف والجمعة السوداء (تحويل 1.65x للأمنيات)، تخفيضات تكتيكية (-50%)، وباقات السلاسل الكاملة.",
+                    InGameLocation = "مكتب التسويق (Marketing Main) وقائمة ألعابي (My Games)",
+                    Hotkey = "Ctrl+3",
+                    HeaderColor = new Color(0.95f, 0.45f, 0.2f),
+                    AssemblyName = "SalesWishlists",
+                    WindowClassName = "MGT2Mod.SalesWishlistWindow",
+                    ToggleMethodName = "Toggle"
                 }
             };
 

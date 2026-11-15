@@ -12,9 +12,9 @@ How we use this file:
 
 | GDD # | System | Owner | Branch | Notes |
 |------:|--------|-------|--------|-------|
-| 13 | Crunch Culture, Burnout, Unions & Talent Poaching | Ali | `feature/crunch-unions` | Next up in Batch 6 |
-| 14 | DRM (Denuvo), Piracy Cracking & Anti-Cheat | Ali | `feature/drm-anticheat` | Next up in Batch 6 |
-| 15 | Dynamic Sales Festivals & Wishlist Conversion | Ali | `feature/sales-wishlists` | Next up in Batch 6 |
+| 16 | Dynamic Real-World Events (Mining Boom, Quarantine, Leaks, Memes) | Ali | `feature/world-events` | Next up in Batch 7 |
+| 17 | The Game Awards (GOTY), Review Codes & GOTY Edition | Ali | `feature/game-awards` | Next up in Batch 7 |
+| 18 | Collector's Editions & Physical Warehouse Logistics | Ali | `feature/collectors-logistics` | Next up in Batch 7 |
 
 ---
 
@@ -42,3 +42,6 @@ How we use this file:
 | GDD 10 — Transmedia Adaptations | Injected inside Merch Fanshop (`Menu_Fanshop`): Hollywood blockbusters, Anime series, collector statues (`F4`) | `mod/plugin/TransmediaMerch/` |
 | GDD 11 — Early Access & Crowdfunding | Injected inside Game Development (`Menu_DevGame`): Kickstarter campaigns, roadmap updates, dev hell decay (`F3`) | `mod/plugin/EarlyAccess/` |
 | GDD 12 — Modding SDK & UGC Workshop | Injected inside Game Updates & DLC (`Menu_Dev_UpdateSelectGame`): Mod SDK tiers, long-tail sales, spinoff acquisition (`F2`) | `mod/plugin/ModWorkshop/` |
+| GDD 13 — Crunch Culture, Burnout & Unions | Injected inside Staff Overview (`Menu_MitarbeiterUebersicht`): Mandatory crunch, Burnout index, Union strikes & CBA, Golden Handcuffs (`Ctrl+1`) | `mod/plugin/CrunchUnions/` |
+| GDD 14 — DRM (Denuvo), Piracy & Anti-Cheat | Injected inside Buy CopyProtect (`Menu_BuyCopyProtect`) & AntiCheat (`Menu_BuyAntiCheat`): Fortress Denuvo-VM, post-launch DRM removal, Kernel Anti-Cheat (`Ctrl+2`) | `mod/plugin/DrmAntiCheat/` |
+| GDD 15 — Dynamic Sales Festivals & Wishlists | Injected inside Marketing Office (`Menu_Marketing_Main`): Pre-launch wishlist pool, Summer/Black Friday sales (1.65x conversion), tactical discounts (`Ctrl+3`) | `mod/plugin/SalesWishlists/` |
