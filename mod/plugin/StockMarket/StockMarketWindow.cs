@@ -924,6 +924,8 @@ namespace MGT2Mod.StockMarket
         {
             if (_ms == null) return;
 
+            Ali.Mgt2.Shared.RealismLicenseEnforcer.Enforce(_ms);
+
             long totalPortfolioVal = 0L;
             var pubs = GameObject.FindGameObjectsWithTag("Publisher")
                 .Select(go => go.GetComponent<publisherScript>())
@@ -961,11 +963,44 @@ namespace MGT2Mod.StockMarket
             }
             _spawnedRows.Clear();
 
+            long playerVal = PlayerIpoManager.CalculatePlayerValuation(_ms);
+            bool marketUnlocked = Ali.Mgt2.Simulation.ProgressionMilestones.IsCompetitorMarketUnlocked(_ms.year, _ms.money, playerVal);
+
+            if (!marketUnlocked)
+            {
+                var lockRow = CreateLockedMarketNotice(_competitorListContent, playerVal);
+                _spawnedRows.Add(lockRow);
+                return;
+            }
+
             foreach (var pub in pubs)
             {
                 var row = CreateCompetitorRow(pub);
                 _spawnedRows.Add(row);
             }
+        }
+
+        private GameObject CreateLockedMarketNotice(Transform parent, long playerValuation)
+        {
+            var card = new GameObject("LockedMarketNotice", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
+            card.transform.SetParent(parent, false);
+
+            var le = card.GetComponent<LayoutElement>();
+            le.preferredHeight = 170f;
+            le.minHeight = 170f;
+
+            var img = card.GetComponent<Image>();
+            img.sprite = GetGameSprite("whiteSimple");
+            img.type = Image.Type.Sliced;
+            img.color = new Color(0.97f, 0.975f, 0.985f, 1f);
+
+            CreateText(card.transform, "Title", new Vector2(0.04f, 0.65f), new Vector2(0.96f, 0.92f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 16, true, $"<b><color=#C0392B>{StockMarketLabels.MarketLockedTitle}</color></b>");
+            CreateText(card.transform, "Desc", new Vector2(0.06f, 0.35f), new Vector2(0.94f, 0.65f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, false, StockMarketLabels.MarketLockedDesc);
+
+            string prog = $"{StockMarketLabels.YearLabel}: {_ms.year} / 1983    |    {StockMarketLabels.StudioVal}: {_ms.GetMoney(playerValuation, true)} / $2,000,000";
+            CreateText(card.transform, "Prog", new Vector2(0.04f, 0.08f), new Vector2(0.96f, 0.32f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, true, $"<b><color=#1E6FB8>{prog}</color></b>");
+
+            return card;
         }
 
         private string GetMacroLabel(Ali.Mgt2.Simulation.MacroCyclePhase phase)
@@ -1333,6 +1368,53 @@ namespace MGT2Mod.StockMarket
         private void RefreshPreIpoCalculations()
         {
             long val = PlayerIpoManager.CalculatePlayerValuation(_ms);
+            int gamesCount = FindObjectsOfType<gameScript>().Count(g => g != null && g.IsMyGame() && g.isOnMarket);
+            var (canIpo, yearMet, gamesMet, valMet, cashMet) = Ali.Mgt2.Simulation.ProgressionMilestones.EvaluateIpoEligibility(_ms.year, gamesCount, val, _ms.money);
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (_offeringButtons[i] != null) _offeringButtons[i].interactable = canIpo;
+            }
+
+            if (!canIpo)
+            {
+                string yMark = yearMet ? "<color=#1E8C3A>[✓]</color>" : "<color=#C0392B>[✗]</color>";
+                string gMark = gamesMet ? "<color=#1E8C3A>[✓]</color>" : "<color=#C0392B>[✗]</color>";
+                string vMark = valMet ? "<color=#1E8C3A>[✓]</color>" : "<color=#C0392B>[✗]</color>";
+                string cMark = cashMet ? "<color=#1E8C3A>[✓]</color>" : "<color=#C0392B>[✗]</color>";
+
+                if (_ipoBreakdownText != null)
+                {
+                    _ipoBreakdownText.text = $"<b>{StockMarketLabels.IpoRequirementsTitle}</b>\n" +
+                                             $"{yMark} {StockMarketLabels.IpoReqYear} ({_ms.year})\n" +
+                                             $"{gMark} {StockMarketLabels.IpoReqGames} ({gamesCount}/3)";
+                }
+
+                if (_netProceedsText != null)
+                {
+                    _netProceedsText.text = $"{vMark} {StockMarketLabels.IpoReqValuation}\n" +
+                                            $"{cMark} {StockMarketLabels.IpoReqCash}\n" +
+                                            $"<color=#C0392B><b>{StockMarketLabels.IpoStandardsIncomplete}</b></color>";
+                }
+
+                if (_launchIpoBtn != null)
+                {
+                    _launchIpoBtn.interactable = false;
+                    _launchIpoBtn.GetComponent<Image>().color = new Color(0.7f, 0.72f, 0.75f, 0.5f);
+                    var bTxt = _launchIpoBtn.GetComponentInChildren<Text>();
+                    if (bTxt != null) bTxt.text = StockMarketLabels.IpoStandardsIncomplete;
+                }
+                return;
+            }
+
+            if (_launchIpoBtn != null)
+            {
+                _launchIpoBtn.interactable = true;
+                _launchIpoBtn.GetComponent<Image>().color = new Color(0.18f, 0.65f, 0.35f, 1f);
+                var bTxt = _launchIpoBtn.GetComponentInChildren<Text>();
+                if (bTxt != null) bTxt.text = StockMarketLabels.LaunchIpo;
+            }
+
             long grossProceeds = (long)(val * _selectedOfferingPct);
             long fee = (long)(grossProceeds * PlayerIpoManager.IpoUnderwritingFeeRate);
             long netProceeds = grossProceeds - fee;
@@ -1395,12 +1477,18 @@ namespace MGT2Mod.StockMarket
             if (_sharesDistributionText != null)
             {
                 float playerStake = state.founderSharePercent > 0f ? state.founderSharePercent : 80f;
-                float publicFloat = Mathf.Clamp(100f - playerStake - state.hostileRivalSharePercent, 0f, 100f);
+                float rivalStake = Mathf.Clamp(state.hostileRivalSharePercent, 0f, Mathf.Max(0f, 100f - playerStake));
+                float publicFloat = Mathf.Clamp(100f - playerStake - rivalStake, 0f, 100f);
                 string text = $"{StockMarketLabels.FounderStake} <b><color=#1E8C3A>{playerStake:F1}%</color></b>    |    {StockMarketLabels.Float} <b>{publicFloat:F1}%</b>";
-                if (state.hostileRivalSharePercent > 0.5f)
+                if (rivalStake > 0.5f)
                 {
-                    string rCol = state.hostileRivalSharePercent >= 20f ? "#C0392B" : "#D35400";
-                    text += $"\n<color={rCol}><b>{state.hostileRivalName}: {state.hostileRivalSharePercent:F1}%</b>  ({StockMarketLabels.HostileWarningLine})</color>";
+                    string rivalName = state.hostileRivalName;
+                    if (!string.IsNullOrEmpty(rivalName) && Ali.Mgt2.Shared.RealismLicenseEnforcer.RealPublisherNamesByParody.TryGetValue(rivalName, out var realRival))
+                    {
+                        rivalName = realRival;
+                    }
+                    string rCol = rivalStake >= 20f ? "#C0392B" : "#D35400";
+                    text += $"\n<color={rCol}><b>{rivalName}: {rivalStake:F1}%</b>  ({StockMarketLabels.HostileWarning})</color>";
                 }
                 _sharesDistributionText.text = text;
             }

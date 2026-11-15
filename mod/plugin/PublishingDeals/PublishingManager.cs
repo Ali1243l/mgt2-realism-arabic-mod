@@ -63,7 +63,23 @@ namespace MGT2Mod.PublishingDeals
         private static StudioPitch CreateRandomPitch(mainScript ms, publisherScript pub)
         {
             _nextId++;
-            DealTier tier = (DealTier)UnityEngine.Random.Range(0, 3);
+
+            int year = ms != null ? ms.year : 1980;
+            int fans = ms != null && ms.genres_ != null ? ms.genres_.GetAmountFans() : 0;
+            long money = ms != null ? ms.money : 0L;
+
+            bool allowMid = Ali.Mgt2.Simulation.ProgressionMilestones.IsMidTierPitchesUnlocked(year, money, fans);
+            bool allowAaa = Ali.Mgt2.Simulation.ProgressionMilestones.IsAaaPitchesUnlocked(year, money, fans);
+
+            var eligibleTiers = new List<DealTier> { DealTier.IndiePrototype };
+            if (allowMid) eligibleTiers.Add(DealTier.MidTierProject);
+            if (allowAaa) eligibleTiers.Add(DealTier.MajorBlockbuster);
+
+            DealTier tier = eligibleTiers[UnityEngine.Random.Range(0, eligibleTiers.Count)];
+
+            var era = Ali.Mgt2.Simulation.EraEngine.GetEraForYear(year);
+            double eraBudgetMult = Ali.Mgt2.Simulation.EraEngine.GetBudgetScaleMultiplier(era);
+
             long budget;
             int devWeeks;
             float quality;
@@ -72,19 +88,19 @@ namespace MGT2Mod.PublishingDeals
             switch (tier)
             {
                 case DealTier.IndiePrototype:
-                    budget = (long)UnityEngine.Random.Range(80000f, 250000f);
+                    budget = (long)(UnityEngine.Random.Range(40000f, 150000f) * eraBudgetMult);
                     devWeeks = UnityEngine.Random.Range(16, 26);
                     quality = UnityEngine.Random.Range(55f, 75f);
                     devCut = 70f;
                     break;
                 case DealTier.MidTierProject:
-                    budget = (long)UnityEngine.Random.Range(400000f, 1200000f);
+                    budget = (long)(UnityEngine.Random.Range(200000f, 600000f) * eraBudgetMult);
                     devWeeks = UnityEngine.Random.Range(28, 42);
                     quality = UnityEngine.Random.Range(65f, 85f);
                     devCut = 50f;
                     break;
                 default:
-                    budget = (long)UnityEngine.Random.Range(2000000f, 6000000f);
+                    budget = (long)(UnityEngine.Random.Range(1000000f, 3500000f) * eraBudgetMult);
                     devWeeks = UnityEngine.Random.Range(48, 68);
                     quality = UnityEngine.Random.Range(75f, 92f);
                     devCut = 35f;
@@ -235,14 +251,16 @@ namespace MGT2Mod.PublishingDeals
                 pitch.agreementReached = false;
                 if (result.CounterOffer != null)
                 {
-                    pitch.currentDevCutOffer = (float)result.CounterOffer.OfferedDevRoyaltyPercent;
-                    pitch.currentPubCutOffer = (float)(100.0 - result.CounterOffer.OfferedDevRoyaltyPercent);
+                    int devCut = Mathf.Clamp((int)Math.Round(result.CounterOffer.OfferedDevRoyaltyPercent), 15, 85);
+                    pitch.currentDevCutOffer = devCut;
+                    pitch.currentPubCutOffer = 100 - devCut;
                     pitch.currentBudgetOffer = (long)result.CounterOffer.OfferedBudget;
                 }
                 else
                 {
-                    pitch.currentPubCutOffer = Mathf.Clamp(demandedPubCut - 10f, 100f - pitch.proposedRoyaltySplit, demandedPubCut);
-                    pitch.currentDevCutOffer = 100f - pitch.currentPubCutOffer;
+                    int pubCut = Mathf.Clamp((int)Math.Round(demandedPubCut - 10f), (int)Math.Round(100f - pitch.proposedRoyaltySplit), (int)Math.Round(demandedPubCut));
+                    pitch.currentPubCutOffer = pubCut;
+                    pitch.currentDevCutOffer = 100 - pubCut;
                 }
 
                 pitch.lastCounterReason = MapReasonCodeToMessage(result.DominantReasonCode);

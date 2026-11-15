@@ -274,7 +274,7 @@ namespace MGT2Mod.StockMarket
             pTxt.fontStyle = FontStyle.Bold;
             pTxt.color = new Color(0.12f, 0.55f, 0.22f);
             pTxt.alignment = TextAnchor.MiddleLeft;
-            pTxt.text = $"{StockMarketLabels.Cash} ${cost:N0} ({sharePercent:F1}%)";
+            pTxt.text = $"{StockMarketLabels.PurchaseCost} ${cost:N0} ({sharePercent:F1}%)";
 
             // Buy Button
             var buyBtn = CreateNativeButton(card.transform, "BuyBtn", StockMarketLabels.BuyBtn, new Color(0.18f, 0.65f, 0.35f), 13, () =>

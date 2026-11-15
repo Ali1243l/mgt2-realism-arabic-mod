@@ -210,11 +210,11 @@ namespace MGT2Mod.StockMarket
                     PlayerIpoManager.State.consecutiveTargetsMissed = 0;
                 }
 
-                // 3. Setup Hostile Takeover challenge (Mintendu owns 15%, public float has remaining 5%)
+                // 3. Setup Hostile Takeover challenge (Nintendo owns 15%, public float has remaining 5%)
                 // Strict invariant: Founder (80%) + Hostile (15%) + Public Float (5%) = 100%!
                 PlayerIpoManager.State.founderSharePercent = 80.0f;
                 PlayerIpoManager.State.hostileRivalCompanyId = 1;
-                PlayerIpoManager.State.hostileRivalName = "Mintendu";
+                PlayerIpoManager.State.hostileRivalName = "Nintendo";
                 PlayerIpoManager.State.hostileRivalSharePercent = 15.0f;
                 StockData.Data.playerPublicShare = 0.05f; // Remaining float from market
                 PlayerIpoManager.State.boardDiscontent = 40f;

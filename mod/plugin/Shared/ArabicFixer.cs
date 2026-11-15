@@ -76,13 +76,24 @@ namespace Ali.Mgt2.Shared
             { 'ي', new GlyphForms(0xFEF1, 0xFEF2, 0xFEF3, 0xFEF4, true) }
         };
 
+        public static bool IsAlreadyVisualArabic(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return false;
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
+                if (c >= 0xFE70 && c <= 0xFEFF) return true;
+            }
+            return false;
+        }
+
         public static bool HasLogicalArabic(string text)
         {
             if (string.IsNullOrEmpty(text)) return false;
             for (int i = 0; i < text.Length; i++)
             {
                 char c = text[i];
-                if (c >= 0x0600 && c <= 0x06FF) return true;
+                if (c >= 0x0621 && c <= 0x064A) return true;
             }
             return false;
         }
@@ -90,6 +101,7 @@ namespace Ali.Mgt2.Shared
         public static string Fix(string input)
         {
             if (string.IsNullOrEmpty(input)) return input;
+            if (IsAlreadyVisualArabic(input)) return input;
             if (!HasLogicalArabic(input)) return input;
 
             // Split into lines to preserve line breaks

@@ -715,8 +715,9 @@ namespace MGT2Mod.StockMarket
                     {
                         var rival = pubs[UnityEngine.Random.Range(0, Math.Min(3, pubs.Count))];
                         State.hostileRivalCompanyId = rival.myID;
-                        State.hostileRivalName = rival.GetName();
-                        State.hostileRivalSharePercent = UnityEngine.Random.Range(2.0f, 5.0f);
+                        State.hostileRivalName = Ali.Mgt2.Shared.RealismLicenseEnforcer.GetRealPublisherName(rival.myID, rival.GetName());
+                        float maxInitial = Mathf.Min(5.0f, Mathf.Max(0f, 100f - State.founderSharePercent));
+                        State.hostileRivalSharePercent = UnityEngine.Random.Range(Mathf.Min(2.0f, maxInitial), maxInitial);
                         // Float absorbs the difference so total equals 100%
                         float floatPct = Mathf.Max(0f, 100f - State.founderSharePercent - State.hostileRivalSharePercent);
                         StockData.Data.playerPublicShare = floatPct / 100f;

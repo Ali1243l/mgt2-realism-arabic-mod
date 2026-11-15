@@ -179,6 +179,19 @@ namespace MGT2Mod.StockMarket
                     string json = File.ReadAllText(path);
                     StockData.Data = JsonUtility.FromJson<StockMarketSave>(json) ?? new StockMarketSave();
                     PlayerIpoManager.State = StockData.Data.ipoState;
+                    if (PlayerIpoManager.State != null)
+                    {
+                        if (!string.IsNullOrEmpty(PlayerIpoManager.State.hostileRivalName) &&
+                            Ali.Mgt2.Shared.RealismLicenseEnforcer.RealPublisherNamesByParody.TryGetValue(PlayerIpoManager.State.hostileRivalName, out var realRival))
+                        {
+                            PlayerIpoManager.State.hostileRivalName = realRival;
+                        }
+                        float maxRival = Mathf.Max(0f, 100f - PlayerIpoManager.State.founderSharePercent);
+                        if (PlayerIpoManager.State.hostileRivalSharePercent > maxRival)
+                        {
+                            PlayerIpoManager.State.hostileRivalSharePercent = maxRival;
+                        }
+                    }
                     StockMarketPlugin.Log.LogInfo($"Stock market loaded: {StockData.Data.ownerships.Count} companies, IPO: {StockData.Data.playerIsPublic}");
                 }
                 else

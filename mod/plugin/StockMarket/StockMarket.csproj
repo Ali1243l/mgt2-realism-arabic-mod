@@ -30,6 +30,7 @@
   <ItemGroup>
     <Compile Include="..\Shared\SimulationMath.cs" Link="SimulationMath.cs" />
     <Compile Include="..\Shared\ArabicFixer.cs" Link="ArabicFixer.cs" />
+    <Compile Include="..\Shared\RealismLicenseEnforcer.cs" Link="RealismLicenseEnforcer.cs" />
   </ItemGroup>
 
 </Project>

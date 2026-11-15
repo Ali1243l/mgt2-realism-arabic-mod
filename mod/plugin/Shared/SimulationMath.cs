@@ -41,6 +41,146 @@ namespace Ali.Mgt2.Simulation
         BearMarket = 3
     }
 
+    public enum IndustryEra
+    {
+        PioneeringAndCrash = 0, // 1976 - 1984: 8-bit, Atari, 1983 crash, high volatility, fanzines
+        ConsoleWars16Bit   = 1, // 1985 - 1994: NES/Sega, early IPOs, exclusivity battles, magazine hype
+        Revolution3D       = 2, // 1995 - 2004: PS1/N64, 3D boom, studio acquisitions, web forums
+        OnlineConglomerates= 3, // 2005 - 2014: HD, Steam, mega-publishers, YouTube/streamers dawn
+        ViralMetaverse     = 4  // 2015+: Twitch, viral review bombing, microtransactions, trillion $ tech giants
+    }
+
+    public static class EraEngine
+    {
+        public static IndustryEra GetEraForYear(int year)
+        {
+            if (year < 1985) return IndustryEra.PioneeringAndCrash;
+            if (year < 1995) return IndustryEra.ConsoleWars16Bit;
+            if (year < 2005) return IndustryEra.Revolution3D;
+            if (year < 2015) return IndustryEra.OnlineConglomerates;
+            return IndustryEra.ViralMetaverse;
+        }
+
+        public static string GetEraNameArabic(IndustryEra era)
+        {
+            switch (era)
+            {
+                case IndustryEra.PioneeringAndCrash:
+                    return "عصر الرواد وأزمة 1983 (1976 - 1984)";
+                case IndustryEra.ConsoleWars16Bit:
+                    return "عصر حرب المنصات الذهبي (1985 - 1994)";
+                case IndustryEra.Revolution3D:
+                    return "عصر ثورة الأبعاد الثلاثية والـ CD (1995 - 2004)";
+                case IndustryEra.OnlineConglomerates:
+                    return "عصر الأونلاين وتكتلات الشركات (2005 - 2014)";
+                default:
+                    return "عصر البثوث وخوارزميات السوشيال الحديثة (2015+)";
+            }
+        }
+
+        public static double GetBudgetScaleMultiplier(IndustryEra era)
+        {
+            switch (era)
+            {
+                case IndustryEra.PioneeringAndCrash: return 0.35; // Primitive garage budgets
+                case IndustryEra.ConsoleWars16Bit:   return 0.70;
+                case IndustryEra.Revolution3D:       return 1.30; // 3D explosion
+                case IndustryEra.OnlineConglomerates:return 2.20; // Multi-million AAA
+                default:                             return 3.50; // Modern mega-budgets
+            }
+        }
+
+        public static double GetStockMarketLiquidity(IndustryEra era)
+        {
+            switch (era)
+            {
+                case IndustryEra.PioneeringAndCrash: return 0.55;
+                case IndustryEra.ConsoleWars16Bit:   return 0.85;
+                case IndustryEra.Revolution3D:       return 1.20;
+                case IndustryEra.OnlineConglomerates:return 1.55;
+                default:                             return 2.25;
+            }
+        }
+
+        public static double GetViralContagionSpeed(IndustryEra era)
+        {
+            switch (era)
+            {
+                case IndustryEra.PioneeringAndCrash: return 0.25; // Slow mail & arcade word-of-mouth
+                case IndustryEra.ConsoleWars16Bit:   return 0.50; // Monthly magazines
+                case IndustryEra.Revolution3D:       return 0.85; // Early web forums
+                case IndustryEra.OnlineConglomerates:return 1.45; // YouTube & social media
+                default:                             return 2.40; // Instant viral TikTok/Twitch
+            }
+        }
+
+        public static double GetExclusivityPenaltyMultiplier(IndustryEra era)
+        {
+            switch (era)
+            {
+                case IndustryEra.PioneeringAndCrash: return 0.80;
+                case IndustryEra.ConsoleWars16Bit:   return 1.45; // NES vs Sega fierce exclusivity
+                case IndustryEra.Revolution3D:       return 1.25;
+                case IndustryEra.OnlineConglomerates:return 1.10;
+                default:                             return 1.00;
+            }
+        }
+    }
+
+    public static class ProgressionMilestones
+    {
+        public static bool IsCompetitorMarketUnlocked(int year, long money, long valuation)
+        {
+            return year >= 1983 || money >= 1500000L || valuation >= 2000000L;
+        }
+
+        public static (bool canIpo, bool yearMet, bool gamesMet, bool valMet, bool cashMet) EvaluateIpoEligibility(
+            int year, int gamesCount, long valuation, long cash)
+        {
+            bool yearMet = year >= 1986;
+            bool gamesMet = gamesCount >= 3;
+            bool valMet = valuation >= 3000000L;
+            bool cashMet = cash >= 750000L;
+            bool canIpo = (yearMet || valuation >= 6000000L) && gamesMet && valMet && cashMet;
+            return (canIpo, yearMet, gamesMet, valMet, cashMet);
+        }
+
+        public static bool IsPublishingDealsUnlocked(int year, long money, int gamesCount)
+        {
+            return year >= 1980 || money >= 250000L || gamesCount >= 2;
+        }
+
+        public static bool IsMidTierPitchesUnlocked(int year, long money, int fans)
+        {
+            return year >= 1986 || money >= 1000000L || fans >= 50000;
+        }
+
+        public static bool IsAaaPitchesUnlocked(int year, long money, int fans)
+        {
+            return year >= 1993 || money >= 4000000L || fans >= 150000;
+        }
+
+        public static bool IsBiddingWarsUnlocked(int year, long money, int fans)
+        {
+            return year >= 1992 || fans >= 100000 || money >= 3000000L;
+        }
+
+        public static bool IsBullshotMarketingUnlocked(int year, int gamesCount)
+        {
+            return year >= 1981 || gamesCount >= 1;
+        }
+
+        public static bool IsStreamersUnlocked(int year)
+        {
+            return year >= 2005;
+        }
+
+        public static bool IsCrisisManagementUnlocked(int gamesCount)
+        {
+            return gamesCount >= 1;
+        }
+    }
+
     public sealed class CrossSystemSynergyContext
     {
         public double OwnedEquityPercent { get; set; }
@@ -48,6 +188,9 @@ namespace Ali.Mgt2.Simulation
         public double StudioTrustMetric { get; set; } = 50.0;
         public MacroCyclePhase MacroPhase { get; set; } = MacroCyclePhase.Expansion;
         public double MacroLiquidityMultiplier { get; set; } = 1.0;
+        public int GameYear { get; set; } = 1980;
+        public IndustryEra CurrentEra { get; set; } = IndustryEra.PioneeringAndCrash;
+        public int GamesReleasedCount { get; set; } = 0;
     }
 
     public enum StudioArchetype

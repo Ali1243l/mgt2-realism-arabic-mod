@@ -466,6 +466,19 @@ namespace MGT2Mod.PublishingDeals
 
         private void RefreshPitches()
         {
+            Ali.Mgt2.Shared.RealismLicenseEnforcer.Enforce(_ms);
+
+            int fans = _ms != null && _ms.genres_ != null ? _ms.genres_.GetAmountFans() : 0;
+            bool midUnlocked = Ali.Mgt2.Simulation.ProgressionMilestones.IsMidTierPitchesUnlocked(_ms.year, _ms.money, fans);
+            bool aaaUnlocked = Ali.Mgt2.Simulation.ProgressionMilestones.IsAaaPitchesUnlocked(_ms.year, _ms.money, fans);
+
+            string tiersStatus = $"{PublishingDealsLabels.TierIndie} [✓]   |   " +
+                                 (midUnlocked ? $"{PublishingDealsLabels.TierMid} [✓]" : PublishingDealsLabels.TierMidUnlockNotice) + "   |   " +
+                                 (aaaUnlocked ? $"{PublishingDealsLabels.TierAAA} [✓]" : PublishingDealsLabels.TierAaaUnlockNotice);
+
+            var statusBanner = CreateStatusBanner(_pitchesContent, $"{PublishingDealsLabels.TierAvailable}  {tiersStatus}");
+            _spawnedItems.Add(statusBanner);
+
             var pitches = PublishingManager.Data.currentPitches;
             if (pitches.Count == 0)
             {
@@ -479,6 +492,24 @@ namespace MGT2Mod.PublishingDeals
                 var card = CreatePitchCard(pitch);
                 _spawnedItems.Add(card);
             }
+        }
+
+        private GameObject CreateStatusBanner(Transform parent, string text)
+        {
+            var banner = new GameObject("StatusBanner", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
+            banner.transform.SetParent(parent, false);
+
+            var le = banner.GetComponent<LayoutElement>();
+            le.preferredHeight = 32f;
+            le.minHeight = 32f;
+
+            var img = banner.GetComponent<Image>();
+            img.sprite = GetGameSprite("whiteSimple");
+            img.type = Image.Type.Sliced;
+            img.color = new Color(0.92f, 0.94f, 0.97f, 1f);
+
+            CreateText(banner.transform, "StatusTxt", new Vector2(0.02f, 0.1f), new Vector2(0.98f, 0.9f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 12, true, $"<b><color=#1E6FB8>{text}</color></b>");
+            return banner;
         }
 
         private GameObject CreatePitchCard(StudioPitch pitch)
@@ -508,7 +539,7 @@ namespace MGT2Mod.PublishingDeals
             CreateText(card.transform, "Time", new Vector2(0.40f, 0.08f), new Vector2(0.68f, 0.50f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false, $"{PublishingDealsLabels.DevTime} {pitch.devWeeks} {PublishingDealsLabels.Weeks}  |  {PublishingDealsLabels.DeveloperCut} {Mathf.RoundToInt(pitch.proposedRoyaltySplit)}%");
 
             // Start Negotiation Button
-            var fundBtn = CreateNativeButton(card.transform, "FundBtn", new Vector2(-16f, 0f), new Vector2(175f, 38f), () =>
+            var fundBtn = CreateNativeButton(card.transform, "FundBtn", new Vector2(-24f, 0f), new Vector2(165f, 36f), () =>
             {
                 if (!pitch.negotiationFailed)
                     ShowDealNegotiationModal(pitch);
@@ -517,7 +548,7 @@ namespace MGT2Mod.PublishingDeals
             var fBtn = fundBtn.GetComponent<Button>();
             var fImg = fundBtn.GetComponent<Image>();
             var fTxt = fundBtn.GetComponentInChildren<Text>();
-            fTxt.fontSize = 12;
+            fTxt.fontSize = 11;
             fTxt.fontStyle = FontStyle.Bold;
 
             if (pitch.negotiationFailed)
@@ -599,6 +630,14 @@ namespace MGT2Mod.PublishingDeals
 
         private void RefreshBiddingWars()
         {
+            int fans = _ms != null && _ms.genres_ != null ? _ms.genres_.GetAmountFans() : 0;
+            if (!Ali.Mgt2.Simulation.ProgressionMilestones.IsBiddingWarsUnlocked(_ms.year, _ms.money, fans))
+            {
+                var lockCard = CreateLockedBiddingNotice(_biddingWarsContent);
+                _spawnedItems.Add(lockCard);
+                return;
+            }
+
             var wars = PublishingManager.Data.activeBiddingWars;
             if (wars.Count == 0)
             {
@@ -612,6 +651,26 @@ namespace MGT2Mod.PublishingDeals
                 var card = CreateBiddingWarCard(war);
                 _spawnedItems.Add(card);
             }
+        }
+
+        private GameObject CreateLockedBiddingNotice(Transform parent)
+        {
+            var card = new GameObject("LockedBiddingNotice", typeof(RectTransform), typeof(Image), typeof(LayoutElement));
+            card.transform.SetParent(parent, false);
+
+            var le = card.GetComponent<LayoutElement>();
+            le.preferredHeight = 150f;
+            le.minHeight = 150f;
+
+            var img = card.GetComponent<Image>();
+            img.sprite = GetGameSprite("whiteSimple");
+            img.type = Image.Type.Sliced;
+            img.color = new Color(0.97f, 0.975f, 0.985f, 1f);
+
+            CreateText(card.transform, "Title", new Vector2(0.04f, 0.65f), new Vector2(0.96f, 0.92f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 16, true, $"<b><color=#C0392B>{PublishingDealsLabels.BiddingWarsLockedTitle}</color></b>");
+            CreateText(card.transform, "Desc", new Vector2(0.06f, 0.15f), new Vector2(0.94f, 0.65f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, false, PublishingDealsLabels.BiddingWarsLockedDesc);
+
+            return card;
         }
 
         private GameObject CreateBiddingWarCard(BiddingWarItem war)
@@ -866,7 +925,7 @@ namespace MGT2Mod.PublishingDeals
                 }
                 else if (pitch.hasCounterOffer)
                 {
-                    dialogText = $"{pitch.lastCounterReason}\n<b>{PublishingDealsLabels.DeveloperCut} {pitch.currentDevCutOffer:F0}%  |  <color=#D9822B>{PublishingDealsLabels.PublisherCut} {pitch.currentPubCutOffer:F0}%</color></b>";
+                    dialogText = $"{pitch.lastCounterReason}\n<b><color=#D9822B>{PublishingDealsLabels.CounterOfferBox}</color> {PublishingDealsLabels.PublisherCut} {pitch.currentPubCutOffer:F0}%  |  {PublishingDealsLabels.DeveloperCut} {pitch.currentDevCutOffer:F0}%</b>";
                 }
                 else
                 {
@@ -898,7 +957,7 @@ namespace MGT2Mod.PublishingDeals
 
                 // Term 1: Publisher Royalty Share
                 CreateText(contentContainer.transform, "CutTitle", new Vector2(0f, 1f), new Vector2(1f, 1f), new Vector2(4f, startY), new Vector2(-4f, startY + 22f), TextAnchor.MiddleLeft, 13, true,
-                    $"{PublishingDealsLabels.RoyaltySplit}  {PublishingDealsLabels.PublisherCut} {selectedPlayerCut:F0}%  |  {PublishingDealsLabels.DeveloperCut} {100f - selectedPlayerCut:F0}%");
+                    $"<b><color=#1E6FB8>{PublishingDealsLabels.PlayerOfferBox}</color>  {PublishingDealsLabels.PublisherCut} {selectedPlayerCut:F0}%  |  {PublishingDealsLabels.DeveloperCut} {100f - selectedPlayerCut:F0}%</b>");
 
                 float[] cuts = { 15f, 25f, 35f, 50f, 65f };
                 float cutBtnW = 118f;
@@ -1033,6 +1092,7 @@ namespace MGT2Mod.PublishingDeals
                         {
                             pitch.agreementReached = true;
                             pitch.hasCounterOffer = false;
+                            selectedPlayerCut = pitch.currentPubCutOffer;
                             rebuildContent();
                         }, new Vector2(0.5f, 1f), new Vector2(0.5f, 1f));
                         acceptCounterBtn.GetComponent<Image>().color = new Color(0.161f, 0.502f, 0.725f, 1f);

@@ -575,6 +575,19 @@ namespace MGT2Mod.CommunityDynamics
         public void RefreshActiveTab()
         {
             UpdateMetricsHeader();
+
+            if (_tab0Label != null)
+            {
+                int y = _ms != null ? _ms.year : 1980;
+                var era = Ali.Mgt2.Simulation.EraEngine.GetEraForYear(y);
+                if (era == Ali.Mgt2.Simulation.IndustryEra.PioneeringAndCrash || era == Ali.Mgt2.Simulation.IndustryEra.ConsoleWars16Bit)
+                    _tab0Label.text = CommunityDynamicsLabels.EraMagazines;
+                else if (era == Ali.Mgt2.Simulation.IndustryEra.Revolution3D)
+                    _tab0Label.text = CommunityDynamicsLabels.EraForums;
+                else
+                    _tab0Label.text = CommunityDynamicsLabels.EraSocial;
+            }
+
             switch (_currentTab)
             {
                 case ActiveTab.Feed:
@@ -797,6 +810,14 @@ namespace MGT2Mod.CommunityDynamics
             ClearSpawnedItems();
             if (_streamersContent == null) return;
 
+            int year = _ms != null ? _ms.year : 1980;
+            if (!Ali.Mgt2.Simulation.ProgressionMilestones.IsStreamersUnlocked(year))
+            {
+                var lockCard = CreateTextCard(_streamersContent, $"{CommunityDynamicsLabels.StreamersLockedTitle}\n\n<size=12><color=#AAAAAA>{CommunityDynamicsLabels.StreamersLockedDesc}</color></size>", 110f);
+                _spawnedItems.Add(lockCard);
+                return;
+            }
+
             var games = FindObjectsOfType<gameScript>()
                 .Where(g => g != null && g.IsMyGame() && (g.inDevelopment || (g.isOnMarket && g.weeksOnMarket <= 4)))
                 .ToList();
@@ -886,6 +907,14 @@ namespace MGT2Mod.CommunityDynamics
         {
             ClearSpawnedItems();
             if (_crisisContent == null) return;
+
+            int myGamesCount = _ms != null ? FindObjectsOfType<gameScript>().Count(g => g != null && g.IsMyGame()) : 0;
+            if (!Ali.Mgt2.Simulation.ProgressionMilestones.IsCrisisManagementUnlocked(myGamesCount))
+            {
+                var lockCard = CreateTextCard(_crisisContent, $"{CommunityDynamicsLabels.CrisisLockedTitle}\n\n<size=12><color=#AAAAAA>{CommunityDynamicsLabels.CrisisLockedDesc}</color></size>", 100f);
+                _spawnedItems.Add(lockCard);
+                return;
+            }
 
             var bombs = CommunityManager.Data.activeReviewBombs;
 
