@@ -3,34 +3,49 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <AssemblyName>StockMarket</AssemblyName>
+    <RootNamespace>MGT2Mod.StockMarket</RootNamespace>
     <LangVersion>latest</LangVersion>
     <Nullable>disable</Nullable>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <!-- other machines: set the GameDir environment variable or pass -p:GameDir=... -->
+
+    <!-- Game & BepInEx Installation Paths -->
     <GameDir Condition="'$(GameDir)' == ''">E:\Steam\steamapps\common\Mad Games Tycoon 2</GameDir>
     <Managed>$(GameDir)\Mad Games Tycoon 2_Data\Managed</Managed>
+    <BepInExCore>$(GameDir)\BepInEx\core</BepInExCore>
+    <PluginsDir>$(GameDir)\BepInEx\plugins</PluginsDir>
   </PropertyGroup>
 
-  <!-- Game, Unity and BepInEx assemblies are referenced from the install, never copied. -->
+  <!-- Assemblies & Engine Dependencies -->
   <ItemGroup>
+    <!-- Game Assembly -->
     <Reference Include="Assembly-CSharp" HintPath="$(Managed)\Assembly-CSharp.dll" Private="false" />
+
+    <!-- Unity Engine Modules -->
     <Reference Include="UnityEngine" HintPath="$(Managed)\UnityEngine.dll" Private="false" />
     <Reference Include="UnityEngine.CoreModule" HintPath="$(Managed)\UnityEngine.CoreModule.dll" Private="false" />
-    <Reference Include="UnityEngine.IMGUIModule" HintPath="$(Managed)\UnityEngine.IMGUIModule.dll" Private="false" />
-    <Reference Include="UnityEngine.InputLegacyModule" HintPath="$(Managed)\UnityEngine.InputLegacyModule.dll" Private="false" />
-    <Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(Managed)\UnityEngine.JSONSerializeModule.dll" Private="false" />
-    <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(Managed)\UnityEngine.TextRenderingModule.dll" Private="false" />
     <Reference Include="UnityEngine.UI" HintPath="$(Managed)\UnityEngine.UI.dll" Private="false" />
     <Reference Include="UnityEngine.UIModule" HintPath="$(Managed)\UnityEngine.UIModule.dll" Private="false" />
+    <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(Managed)\UnityEngine.TextRenderingModule.dll" Private="false" />
+    <Reference Include="UnityEngine.InputLegacyModule" HintPath="$(Managed)\UnityEngine.InputLegacyModule.dll" Private="false" />
+    <Reference Include="UnityEngine.IMGUIModule" HintPath="$(Managed)\UnityEngine.IMGUIModule.dll" Private="false" />
+    <Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(Managed)\UnityEngine.JSONSerializeModule.dll" Private="false" />
     <Reference Include="UnityEngine.ScreenCaptureModule" HintPath="$(Managed)\UnityEngine.ScreenCaptureModule.dll" Private="false" />
-    <Reference Include="BepInEx" HintPath="$(GameDir)\BepInEx\core\BepInEx.dll" Private="false" />
-    <Reference Include="0Harmony" HintPath="$(GameDir)\BepInEx\core\0Harmony.dll" Private="false" />
+
+    <!-- BepInEx & Harmony -->
+    <Reference Include="BepInEx" HintPath="$(BepInExCore)\BepInEx.dll" Private="false" />
+    <Reference Include="0Harmony" HintPath="$(BepInExCore)\0Harmony.dll" Private="false" />
   </ItemGroup>
 
+  <!-- Shared Library Links -->
   <ItemGroup>
     <Compile Include="..\Shared\SimulationMath.cs" Link="SimulationMath.cs" />
     <Compile Include="..\Shared\ArabicFixer.cs" Link="ArabicFixer.cs" />
     <Compile Include="..\Shared\RealismLicenseEnforcer.cs" Link="RealismLicenseEnforcer.cs" />
   </ItemGroup>
+
+  <!-- Auto-Deploy to BepInEx Plugins on Release Build -->
+  <Target Name="PostBuildDeploy" AfterTargets="PostBuildEvent" Condition="'$(Configuration)' == 'Release' And Exists('$(PluginsDir)')">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginsDir)" SkipUnchangedFiles="true" />
+  </Target>
 
 </Project>
