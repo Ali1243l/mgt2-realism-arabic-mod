@@ -26,8 +26,8 @@ The GDD repeats points 19-22 (lines 350-480) and 29 (two versions), and has no p
 | 1 | Live service & seasons | Done (v2), waiting for user test | Ali |
 | 2 | Stock market, shares, hostile takeover | Done, waiting for user test | Ali / feature/stock-market |
 | 3 | Publishing & exclusivity deals | Done, waiting for user test | Ali / feature/stock-market |
-| 4 | Social media, hype, review bombing | In Progress | Ali / feature/stock-market |
-| 5 | Smart automation & analytics | Pending | |
+| 4 | Social media, hype, review bombing | Done, waiting for user test | Ali / feature/stock-market |
+| 5 | Smart automation & analytics | Done, waiting for user test | Ali / feature/stock-market |
 | 6 | Custom silicon & hardware R&D | Pending | |
 | 7 | Programming languages & tech debt | Pending | |
 | 8 | Timeline to 2100 | Mostly done: platforms, engine/gameplay features, hardware 2030-2100 (`mod/future.py`) | Ali |
