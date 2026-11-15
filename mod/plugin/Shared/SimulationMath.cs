@@ -873,4 +873,105 @@ namespace Ali.Mgt2.Simulation
             }
         }
     }
+
+    /// <summary>
+    /// Thread-safe, AppDomain-shared bridge connecting PublishingDeals, StockMarket, and CommunityDynamics.
+    /// Uses AppDomain property storage to share primitives and BCL collections safely across assembly boundaries.
+    /// </summary>
+    public static class CrossSystemBridge
+    {
+        private const string Prefix = "MGT2_BRIDGE_";
+        private static readonly object LockObj = new object();
+
+        public static void SetDouble(string key, double value)
+        {
+            AppDomain.CurrentDomain.SetData(Prefix + key, value);
+        }
+
+        public static double GetDouble(string key, double fallback = 0.0)
+        {
+            object o = AppDomain.CurrentDomain.GetData(Prefix + key);
+            if (o is double d) return d;
+            if (o is float f) return (double)f;
+            if (o is long l) return (double)l;
+            if (o is int i) return (double)i;
+            return fallback;
+        }
+
+        public static void SetLong(string key, long value)
+        {
+            AppDomain.CurrentDomain.SetData(Prefix + key, value);
+        }
+
+        public static long GetLong(string key, long fallback = 0L)
+        {
+            object o = AppDomain.CurrentDomain.GetData(Prefix + key);
+            if (o is long l) return l;
+            if (o is int i) return (long)i;
+            return fallback;
+        }
+
+        public static void SetBool(string key, bool value)
+        {
+            AppDomain.CurrentDomain.SetData(Prefix + key, value);
+        }
+
+        public static bool GetBool(string key, bool fallback = false)
+        {
+            object o = AppDomain.CurrentDomain.GetData(Prefix + key);
+            if (o is bool b) return b;
+            return fallback;
+        }
+
+        public static void SetString(string key, string value)
+        {
+            AppDomain.CurrentDomain.SetData(Prefix + key, value ?? string.Empty);
+        }
+
+        public static string GetString(string key, string fallback = "")
+        {
+            object o = AppDomain.CurrentDomain.GetData(Prefix + key);
+            if (o is string s) return s;
+            return fallback;
+        }
+
+        public static void SetOwnership(int publisherId, float playerShare)
+        {
+            SetDouble("OWN_" + publisherId, (double)playerShare);
+        }
+
+        public static float GetOwnership(int publisherId)
+        {
+            return (float)GetDouble("OWN_" + publisherId, 0.0);
+        }
+
+        public static void EnqueueEvent(string channel, string payload)
+        {
+            if (string.IsNullOrEmpty(payload)) return;
+            lock (LockObj)
+            {
+                string key = Prefix + "QUEUE_" + channel;
+                List<string> list = AppDomain.CurrentDomain.GetData(key) as List<string>;
+                if (list == null)
+                {
+                    list = new List<string>();
+                    AppDomain.CurrentDomain.SetData(key, list);
+                }
+                list.Add(payload);
+            }
+        }
+
+        public static List<string> DequeueAllEvents(string channel)
+        {
+            lock (LockObj)
+            {
+                string key = Prefix + "QUEUE_" + channel;
+                List<string> list = AppDomain.CurrentDomain.GetData(key) as List<string>;
+                if (list == null || list.Count == 0) return new List<string>();
+                List<string> copy = new List<string>(list);
+                list.Clear();
+                return copy;
+            }
+        }
+    }
 }

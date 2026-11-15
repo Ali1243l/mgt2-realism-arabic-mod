@@ -60,6 +60,7 @@ namespace MGT2Mod.CommunityDynamics
         public List<StreamerCampaign> activeStreamers = new List<StreamerCampaign>();
         public List<ReviewBombState> activeReviewBombs = new List<ReviewBombState>();
         public float overallSentiment = 0.85f;
+        public int hypePoints = 65;
         public int lastPostWeek = -1;
     }
 }

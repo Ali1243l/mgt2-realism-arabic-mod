@@ -42,6 +42,75 @@ namespace MGT2Mod.StockMarket
 
             // Check poison pill expiry
             CheckPoisonPills(ms, totalMonths);
+
+            // Simulate competitor stock drift
+            SimulateCompetitorStocksDrift(ms);
+
+            // Sync with cross-system bridge
+            SyncBridgeData(ms);
+        }
+
+        private static void SimulateCompetitorStocksDrift(mainScript ms)
+        {
+            if (ms == null) return;
+            int totalWeeks = ms.year * 48 + ms.month * 4 + ms.week;
+            var macro = Ali.Mgt2.Simulation.StockDriftEngine.GetMacroPhaseForWeek(totalWeeks);
+            var rng = new System.Random(totalWeeks * 19);
+
+            var pubs = GameObject.FindGameObjectsWithTag("Publisher")
+                .Select(go => go.GetComponent<publisherScript>())
+                .Where(p => p != null && p.isUnlocked && !p.isPlayer)
+                .ToList();
+
+            foreach (var pub in pubs)
+            {
+                var stock = StockData.GetOrCreate(pub.myID);
+                double fairValue = StockData.CalculateSharePrice(pub, ms);
+                if (stock.currentSharePrice <= 0.01)
+                {
+                    stock.currentSharePrice = fairValue;
+                    stock.previousSharePrice = fairValue;
+                }
+
+                var stockState = new Ali.Mgt2.Simulation.CompanyStockState
+                {
+                    CompanyId = pub.myID.ToString(),
+                    SharePrice = stock.currentSharePrice,
+                    TotalShares = 1000000L,
+                    FundamentalFairValue = fairValue,
+                    StockBeta = 1.0 + (pub.stars * 0.1),
+                    BaseWeeklyVolatility = 0.025,
+                    MomentumEwma = stock.priceTrendPercent / 100.0,
+                    BoardHostility = stock.poisonPillActive ? 85.0 : 20.0
+                };
+
+                var synergy = new Ali.Mgt2.Simulation.CrossSystemSynergyContext
+                {
+                    MacroPhase = macro,
+                    ActiveReviewBombSeverity = 0.0
+                };
+
+                var res = Ali.Mgt2.Simulation.StockDriftEngine.SimulateWeeklyTick(stockState, totalWeeks, 0.0, 0.0, synergy, rng);
+
+                stock.previousSharePrice = stock.currentSharePrice;
+                stock.currentSharePrice = res.NewSharePrice;
+                stock.priceTrendPercent = res.PercentChange;
+            }
+        }
+
+        private static void SyncBridgeData(mainScript ms)
+        {
+            if (ms == null || StockData.Data == null) return;
+
+            Ali.Mgt2.Simulation.CrossSystemBridge.SetBool("PLAYER_IS_PUBLIC", StockData.Data.playerIsPublic);
+            Ali.Mgt2.Simulation.CrossSystemBridge.SetLong("PLAYER_VALUATION", PlayerIpoManager.State.marketValuation);
+            Ali.Mgt2.Simulation.CrossSystemBridge.SetDouble("PLAYER_SHARE_PRICE", PlayerIpoManager.State.currentSharePrice);
+            Ali.Mgt2.Simulation.CrossSystemBridge.SetDouble("BOARD_DISCONTENT", (double)PlayerIpoManager.State.boardDiscontent);
+
+            foreach (var stock in StockData.Data.ownerships)
+            {
+                Ali.Mgt2.Simulation.CrossSystemBridge.SetOwnership(stock.companyId, stock.playerShare);
+            }
         }
 
         private static void PayDividends(mainScript ms)

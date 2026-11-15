@@ -85,6 +85,8 @@ namespace MGT2Mod.StockMarket
         private Text _dividendRecommendedText;
         private Button _payDividendBtn;
         private Button _emergencyDividendBtn;
+        private Button _buybackBtn;
+        private Button _poisonPillBtn;
 
         private float _nextAutoRefreshTime;
         private static readonly Dictionary<string, Sprite> _spriteCache = new Dictionary<string, Sprite>();
@@ -690,22 +692,41 @@ namespace MGT2Mod.StockMarket
 
             // Card 4: Dividends & Shareholder Relations (Bottom Right)
             var cardDividends = CreateNativeCard(_postIpoContainer.transform, "CardDividends", new Vector2(0.51f, 0f), new Vector2(1f, 0.50f), new Vector2(1f, 0f), Vector2.zero, Vector2.zero);
-            CreateText(cardDividends.transform, "Header", new Vector2(0.04f, 0.82f), new Vector2(0.96f, 0.96f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 16, true, StockMarketLabels.DividendsTitle);
-            _dividendRecommendedText = CreateText(cardDividends.transform, "RecDiv", new Vector2(0.04f, 0.50f), new Vector2(0.96f, 0.78f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 14, false);
+            CreateText(cardDividends.transform, "Header", new Vector2(0.04f, 0.84f), new Vector2(0.96f, 0.96f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 15, true, StockMarketLabels.DividendsTitle);
+            _dividendRecommendedText = CreateText(cardDividends.transform, "RecDiv", new Vector2(0.04f, 0.62f), new Vector2(0.96f, 0.82f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 13, false);
 
-            _payDividendBtn = CreateNativeButton(cardDividends.transform, "PayDivBtn", new Vector2(20f, 16f), new Vector2(180f, 40f), OnPayDividendClicked, new Vector2(0f, 0f), new Vector2(0f, 0f)).GetComponent<Button>();
+            float btnW = 180f;
+            float btnH = 36f;
+
+            // Row 1: Dividends
+            _payDividendBtn = CreateNativeButton(cardDividends.transform, "PayDivBtn", new Vector2(16f, 0f), new Vector2(btnW, btnH), OnPayDividendClicked, new Vector2(0f, 0.44f), new Vector2(0f, 0.44f), new Vector2(0f, 0.5f)).GetComponent<Button>();
             _payDividendBtn.GetComponent<Image>().color = new Color(0.18f, 0.65f, 0.35f, 1f);
             var payTxt = _payDividendBtn.GetComponentInChildren<Text>();
             payTxt.text = StockMarketLabels.PayDividend;
-            payTxt.fontSize = 13;
+            payTxt.fontSize = 12;
             payTxt.fontStyle = FontStyle.Bold;
 
-            _emergencyDividendBtn = CreateNativeButton(cardDividends.transform, "EmergDivBtn", new Vector2(-20f, 16f), new Vector2(180f, 40f), OnPayEmergencyDividendClicked, new Vector2(1f, 0f), new Vector2(1f, 0f)).GetComponent<Button>();
+            _emergencyDividendBtn = CreateNativeButton(cardDividends.transform, "EmergDivBtn", new Vector2(-16f, 0f), new Vector2(btnW, btnH), OnPayEmergencyDividendClicked, new Vector2(1f, 0.44f), new Vector2(1f, 0.44f), new Vector2(1f, 0.5f)).GetComponent<Button>();
             _emergencyDividendBtn.GetComponent<Image>().color = new Color(0.85f, 0.45f, 0.15f, 1f);
             var emergTxt = _emergencyDividendBtn.GetComponentInChildren<Text>();
             emergTxt.text = StockMarketLabels.EmergencyDividend;
-            emergTxt.fontSize = 12;
+            emergTxt.fontSize = 11;
             emergTxt.fontStyle = FontStyle.Bold;
+
+            // Row 2: Defense (Buyback + Poison Pill)
+            _buybackBtn = CreateNativeButton(cardDividends.transform, "BuybackBtn", new Vector2(16f, 0f), new Vector2(btnW, btnH), OnShareBuybackClicked, new Vector2(0f, 0.16f), new Vector2(0f, 0.16f), new Vector2(0f, 0.5f)).GetComponent<Button>();
+            _buybackBtn.GetComponent<Image>().color = new Color(0.18f, 0.55f, 0.80f, 1f);
+            var buybTxt = _buybackBtn.GetComponentInChildren<Text>();
+            buybTxt.text = StockMarketLabels.ShareBuyback;
+            buybTxt.fontSize = 11;
+            buybTxt.fontStyle = FontStyle.Bold;
+
+            _poisonPillBtn = CreateNativeButton(cardDividends.transform, "PoisonPillBtn", new Vector2(-16f, 0f), new Vector2(btnW, btnH), OnPoisonPillClicked, new Vector2(1f, 0.16f), new Vector2(1f, 0.16f), new Vector2(1f, 0.5f)).GetComponent<Button>();
+            _poisonPillBtn.GetComponent<Image>().color = new Color(0.75f, 0.20f, 0.20f, 1f);
+            var poisTxt = _poisonPillBtn.GetComponentInChildren<Text>();
+            poisTxt.text = StockMarketLabels.PoisonPillBtn;
+            poisTxt.fontSize = 11;
+            poisTxt.fontStyle = FontStyle.Bold;
         }
 
         #endregion
@@ -911,14 +932,19 @@ namespace MGT2Mod.StockMarket
                 var stock = StockData.GetOrCreate(pub.myID);
                 if (stock.playerShare > 0f)
                 {
-                    long val = StockData.CalculateCompanyValue(pub, _ms);
+                    double pPrice = stock.currentSharePrice > 0.01 ? stock.currentSharePrice : StockData.CalculateSharePrice(pub, _ms);
+                    long val = (long)Math.Round(pPrice * 1000000.0);
                     totalPortfolioVal += (long)(val * (stock.playerShare / 100f));
                 }
             }
 
+            int totalWeeks = _ms.year * 48 + _ms.month * 4 + _ms.week;
+            var macro = Ali.Mgt2.Simulation.StockDriftEngine.GetMacroPhaseForWeek(totalWeeks);
+            string macroStr = GetMacroLabel(macro);
+
             // Summary Texts
             if (_marketIndexText != null)
-                _marketIndexText.text = $"{StockMarketLabels.IndexVal} <b><color=#1E6FB8>10,482</color></b>";
+                _marketIndexText.text = $"{StockMarketLabels.IndexVal} <b><color=#1E6FB8>10,482</color></b>  |  <color=#8E44AD><b>{macroStr}</b></color>";
             if (_portfolioValText != null)
                 _portfolioValText.text = $"{StockMarketLabels.PortfolioVal} <b><color=#1E8C3A>{_ms.GetMoney(totalPortfolioVal, true)}</color></b>";
             if (_cashText != null)
@@ -938,6 +964,17 @@ namespace MGT2Mod.StockMarket
             }
         }
 
+        private string GetMacroLabel(Ali.Mgt2.Simulation.MacroCyclePhase phase)
+        {
+            switch (phase)
+            {
+                case Ali.Mgt2.Simulation.MacroCyclePhase.Expansion: return StockMarketLabels.MacroExpansion;
+                case Ali.Mgt2.Simulation.MacroCyclePhase.Bubble: return StockMarketLabels.MacroBubble;
+                case Ali.Mgt2.Simulation.MacroCyclePhase.Saturation: return StockMarketLabels.MacroSaturation;
+                default: return StockMarketLabels.MacroBear;
+            }
+        }
+
         private GameObject CreateCompetitorRow(publisherScript pub)
         {
             var row = new GameObject("Row_" + pub.myID, typeof(RectTransform), typeof(Image), typeof(LayoutElement));
@@ -953,8 +990,11 @@ namespace MGT2Mod.StockMarket
             img.color = new Color(0.97f, 0.975f, 0.985f, 1f);
 
             var stock = StockData.GetOrCreate(pub.myID);
-            long marketCap = StockData.CalculateCompanyValue(pub, _ms);
-            double sharePrice = StockData.CalculateSharePrice(pub, _ms);
+            double effectivePrice = stock.currentSharePrice > 0.01 ? stock.currentSharePrice : StockData.CalculateSharePrice(pub, _ms);
+            long marketCap = (long)Math.Round(effectivePrice * 1000000.0);
+            double pctChange = stock.priceTrendPercent;
+            string trendStr = pctChange > 0.05 ? $"+{pctChange:F1}% ▲" : (pctChange < -0.05 ? $"{pctChange:F1}% ▼" : "0.0%");
+            string trendCol = pctChange > 0.05 ? "#1E8C3A" : (pctChange < -0.05 ? "#C0392B" : "#7F8C8D");
 
             // Logo
             var logoGo = new GameObject("Logo", typeof(RectTransform), typeof(Image));
@@ -972,17 +1012,11 @@ namespace MGT2Mod.StockMarket
             var typeGo = CreateText(row.transform, "Type", new Vector2(0.07f, 0.08f), new Vector2(0.30f, 0.48f), Vector2.zero, Vector2.zero, TextAnchor.MiddleLeft, 12, false, pub.GetDeveloperPublisherString());
             typeGo.color = new Color(0.45f, 0.48f, 0.52f, 1f);
 
-            // Valuation & Share Price
-            if (stock.previousSharePrice <= 0.001) stock.previousSharePrice = sharePrice;
-            double pctChange = stock.previousSharePrice > 0 ? ((sharePrice - stock.previousSharePrice) / stock.previousSharePrice) * 100.0 : 0.0;
-            string trendStr = pctChange > 0.05 ? $"+{pctChange:F1}%" : (pctChange < -0.05 ? $"{pctChange:F1}%" : "0.0%");
-            string trendCol = pctChange > 0.05 ? "#1E8C3A" : (pctChange < -0.05 ? "#C0392B" : "#7F8C8D");
-
             // Col 2: Valuation (Market Cap)
             CreateText(row.transform, "Valuation", new Vector2(0.30f, 0.10f), new Vector2(0.48f, 0.90f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 14, true, $"<b><color=#1E8C3A>{_ms.GetMoney(marketCap, true)}</color></b>");
 
             // Col 3: Share Price & Trend
-            CreateText(row.transform, "SharePrice", new Vector2(0.48f, 0.10f), new Vector2(0.66f, 0.90f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, false, $"<b>${sharePrice:F2}</b>   <color={trendCol}><b>{trendStr}</b></color>");
+            CreateText(row.transform, "SharePrice", new Vector2(0.48f, 0.10f), new Vector2(0.66f, 0.90f), Vector2.zero, Vector2.zero, TextAnchor.MiddleCenter, 13, false, $"<b>${effectivePrice:F2}</b>   <color={trendCol}><b>{trendStr}</b></color>");
 
             // Col 4: Player Stake
             string stakeColor = stock.playerShare >= 51f ? "#1E8C3A" : stock.playerShare > 0f ? "#1E6FB8" : "#666666";
@@ -1328,16 +1362,26 @@ namespace MGT2Mod.StockMarket
         {
             var state = PlayerIpoManager.State;
 
-            // Card 1: Stock Summary
+            // Card 1: Stock Summary & Ownership
+            double pctChange = state.priceTrendPercent;
+            string trendStr = pctChange > 0.05 ? $"+{pctChange:F1}% ▲" : (pctChange < -0.05 ? $"{pctChange:F1}% ▼" : "0.0%");
+            string trendCol = pctChange > 0.05 ? "#1E8C3A" : (pctChange < -0.05 ? "#C0392B" : "#7F8C8D");
+
             if (_sharePriceText != null)
-                _sharePriceText.text = $"{StockMarketLabels.SharePrice} <b><color=#1E8C3A>${state.currentSharePrice:F2}</color></b>";
+                _sharePriceText.text = $"{StockMarketLabels.SharePrice} <b>${state.currentSharePrice:F2}</b>   <color={trendCol}><b>{trendStr}</b></color>";
             if (_marketCapText != null)
                 _marketCapText.text = $"{StockMarketLabels.StudioVal} <b><color=#1E8C3A>{_ms.GetMoney(state.marketValuation, true)}</color></b>";
             if (_sharesDistributionText != null)
             {
-                float publicStake = (float)(state.totalShares - (long)(state.totalShares * (1f - _selectedOfferingPct))) / state.totalShares * 100f;
-                float playerStake = 100f - publicStake;
-                _sharesDistributionText.text = $"{StockMarketLabels.Ownership} <b><color=#1E6FB8>{playerStake:F0}%</color></b>  |  {StockMarketLabels.Float} <b>{publicStake:F0}%</b>";
+                float playerStake = state.founderSharePercent > 0f ? state.founderSharePercent : 80f;
+                float publicFloat = Mathf.Clamp(100f - playerStake - state.hostileRivalSharePercent, 0f, 100f);
+                string rivalInfo = "";
+                if (state.hostileRivalSharePercent > 0.5f)
+                {
+                    string rCol = state.hostileRivalSharePercent >= 20f ? "#C0392B" : "#D35400";
+                    rivalInfo = $"  |  <color={rCol}><b>{state.hostileRivalName}: {state.hostileRivalSharePercent:F1}%</b></color>";
+                }
+                _sharesDistributionText.text = $"{StockMarketLabels.FounderStake} <b><color=#1E8C3A>{playerStake:F1}%</color></b>  |  {StockMarketLabels.Float} <b>{publicFloat:F1}%</b>{rivalInfo}";
             }
 
             // Card 2: Board Sentiment
@@ -1400,7 +1444,7 @@ namespace MGT2Mod.StockMarket
             if (_streakText != null)
                 _streakText.text = $"{StockMarketLabels.TargetProgress} Streak Met: <color=green>{state.consecutiveTargetsMet}</color> | Missed: <color=red>{state.consecutiveTargetsMissed}</color>";
 
-            // Card 4: Dividends
+            // Card 4: Dividends & Defense
             long recommendedDiv = Math.Max(10000L, (long)(state.marketValuation * 0.015));
             if (_dividendRecommendedText != null)
                 _dividendRecommendedText.text = $"{StockMarketLabels.RecommendedDiv}\n<b><color=#1E8C3A>{_ms.GetMoney(recommendedDiv, true)}</color></b>";
@@ -1410,6 +1454,38 @@ namespace MGT2Mod.StockMarket
 
             if (_emergencyDividendBtn != null)
                 _emergencyDividendBtn.interactable = state.boardDiscontent >= PlayerIpoManager.HighDiscontentThreshold && _ms.money >= recommendedDiv * 2;
+
+            double buybackCost = (state.totalShares * 0.05) * state.currentSharePrice * 1.03;
+            long costLong = (long)Math.Round(buybackCost);
+
+            if (_buybackBtn != null)
+            {
+                _buybackBtn.interactable = _ms.money >= costLong && state.founderSharePercent < 95f;
+                var bTxt = _buybackBtn.GetComponentInChildren<Text>();
+                if (bTxt != null) bTxt.text = $"{StockMarketLabels.ShareBuyback}\n({_ms.GetMoney(costLong, true)})";
+            }
+
+            if (_poisonPillBtn != null)
+            {
+                _poisonPillBtn.interactable = state.hostileRivalSharePercent >= 20f && !state.poisonPillActive;
+                _poisonPillBtn.gameObject.SetActive(state.hostileRivalSharePercent >= 15f || state.poisonPillActive);
+            }
+        }
+
+        private void OnShareBuybackClicked()
+        {
+            if (_ms == null) return;
+            PlaySound(2);
+            PlayerIpoManager.ExecuteShareBuyback(_ms, _guiMain, out _);
+            RefreshActiveTab();
+        }
+
+        private void OnPoisonPillClicked()
+        {
+            if (_ms == null) return;
+            PlaySound(1);
+            PlayerIpoManager.ExecutePoisonPillDefense(_ms, _guiMain, out _);
+            RefreshActiveTab();
         }
 
         private void OnPayDividendClicked()

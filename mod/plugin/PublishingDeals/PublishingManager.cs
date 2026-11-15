@@ -180,11 +180,26 @@ namespace MGT2Mod.PublishingDeals
             };
 
             int totalWeeks = ms.year * 48 + ms.month * 4 + ms.week;
+
+            // Cross-System Synergies: Query actual stock ownership, review bombs, and community reputation
+            float stockOwnership = CrossSystemBridge.GetOwnership(pitch.developerId);
+            if (pub != null && pub.IsMyTochterfirma()) stockOwnership = 100f;
+
+            double activeBomb = CrossSystemBridge.GetDouble("ACTIVE_REVIEW_BOMB_SEVERITY", 0.0);
+            double communitySentiment = CrossSystemBridge.GetDouble("COMMUNITY_SENTIMENT", 0.75);
+            bool isPublic = CrossSystemBridge.GetBool("PLAYER_IS_PUBLIC", false);
+            double boardDiscontent = CrossSystemBridge.GetDouble("BOARD_DISCONTENT", 10.0);
+
+            // Trust metric combines community sentiment and public stability
+            double trustMetric = communitySentiment * 100.0;
+            if (isPublic && boardDiscontent < 30.0) trustMetric += 10.0;
+            else if (isPublic && boardDiscontent > 70.0) trustMetric -= 15.0;
+
             var synergy = new CrossSystemSynergyContext
             {
-                OwnedEquityPercent = (pub != null) ? pub.share : 0.0,
-                ActiveReviewBombSeverity = 0.0,
-                StudioTrustMetric = 60.0,
+                OwnedEquityPercent = Math.Max((double)stockOwnership, (pub != null ? (double)pub.share : 0.0)),
+                ActiveReviewBombSeverity = activeBomb,
+                StudioTrustMetric = MathUtil.Clamp(trustMetric, 10.0, 100.0),
                 MacroPhase = StockDriftEngine.GetMacroPhaseForWeek(totalWeeks)
             };
 
@@ -389,6 +404,10 @@ namespace MGT2Mod.PublishingDeals
                         deal.isReleased = true;
                         deal.weeksLeft = 24; // Market shelf-life
                         ms.guiMain_?.CreateTopNewsInfo($"{deal.developerName}: {deal.gameTitle} released! (Published by {ms.GetCompanyName()})");
+
+                        // Broadcast release event to Community and StockMarket
+                        CrossSystemBridge.EnqueueEvent("GAME_RELEASED",
+                            $"{deal.gameTitle}|{deal.developerName}|{deal.developerId}|{deal.reviewScore}|{deal.fundedBudget}|0");
                     }
                 }
                 else

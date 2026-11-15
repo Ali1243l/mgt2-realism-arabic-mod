@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
+using Ali.Mgt2.Simulation;
 
 namespace MGT2Mod.StockMarket
 {
@@ -59,6 +61,15 @@ namespace MGT2Mod.StockMarket
         public long pendingEmergencyDividend = 0L;
         public bool spendingRestrictionActive = false;
         public bool dividendOfferedThisQuarter = false;
+
+        public float founderSharePercent = 100f;
+        public int hostileRivalCompanyId = -1;
+        public string hostileRivalName = "";
+        public float hostileRivalSharePercent = 0f;
+        public bool poisonPillActive = false;
+        public int poisonPillExpiryMonth = 0;
+        public double previousSharePrice = 1.0;
+        public double priceTrendPercent = 0.0;
 
         public List<long> weeklyNetRevenueHistory = new List<long>();
     }
@@ -298,6 +309,17 @@ namespace MGT2Mod.StockMarket
             State.spendingRestrictionActive = false;
             State.pendingEmergencyDividend = 0L;
             State.dividendOfferedThisQuarter = false;
+
+            State.founderSharePercent = (1.0f - normalizedShare) * 100f;
+            State.hostileRivalCompanyId = -1;
+            State.hostileRivalName = "";
+            State.hostileRivalSharePercent = 0f;
+            State.poisonPillActive = false;
+            State.previousSharePrice = State.currentSharePrice;
+            State.priceTrendPercent = 0.0;
+
+            CrossSystemBridge.EnqueueEvent("CORPORATE_EVENT",
+                $"@TechVentureDaily: عاجل: {ms.GetCompanyName()} تطلق رسمياً اكتتابها العام في البورصة وتجمع {ms.GetMoney(netProceeds, true)} لتمويل مشاريعها القادمة! #IPO");
 
             // Set baseline money after IPO cash injection.
             State.lastRecordedMoney = ms.money;
@@ -595,11 +617,64 @@ namespace MGT2Mod.StockMarket
             {
                 State.currentQuarterRevenue += organicWeeklyNet;
 
-                // Gently re-anchor share price toward intrinsic valuation each week.
+                // Deep Simulation: Stock Drift Engine with Macro Cycles, Alpha Shocks, and Review Bomb Drag
                 long intrinsicValuation = CalculatePlayerValuation(ms);
-                double intrinsicSharePrice = Math.Max(0.01, (double)intrinsicValuation / (double)State.totalShares);
-                State.currentSharePrice = (State.currentSharePrice * 0.90) + (intrinsicSharePrice * 0.10);
+                double fairValue = Math.Max(0.01, (double)intrinsicValuation / (double)State.totalShares);
+
+                var stockState = new Ali.Mgt2.Simulation.CompanyStockState
+                {
+                    CompanyId = "PLAYER",
+                    SharePrice = State.currentSharePrice,
+                    TotalShares = State.totalShares,
+                    FundamentalFairValue = fairValue,
+                    StockBeta = 1.15,
+                    BaseWeeklyVolatility = 0.028,
+                    MomentumEwma = State.priceTrendPercent / 100.0,
+                    BoardHostility = State.boardDiscontent
+                };
+
+                int totalWeeks = ms.year * 48 + ms.month * 4 + ms.week;
+                double activeBombSeverity = Ali.Mgt2.Simulation.CrossSystemBridge.GetDouble("ACTIVE_REVIEW_BOMB_SEVERITY", 0.0);
+                if (activeBombSeverity > 0.0)
+                {
+                    // Review bomb angers the board
+                    State.boardDiscontent = Mathf.Clamp(State.boardDiscontent + (float)(activeBombSeverity * 0.04), 0f, 100f);
+                }
+
+                // Check game releases shock
+                double shockAlpha = 0.0;
+                var releaseEvents = Ali.Mgt2.Simulation.CrossSystemBridge.DequeueAllEvents("GAME_RELEASED");
+                foreach (var ev in releaseEvents)
+                {
+                    var parts = ev.Split('|');
+                    if (parts.Length >= 4 && float.TryParse(parts[3], out float rScore))
+                    {
+                        shockAlpha += Ali.Mgt2.Simulation.StockDriftEngine.CalculateGameReleaseShock(rScore, 75.0, 1.1);
+                    }
+                }
+
+                var synergy = new Ali.Mgt2.Simulation.CrossSystemSynergyContext
+                {
+                    ActiveReviewBombSeverity = activeBombSeverity,
+                    OwnedEquityPercent = 0.0,
+                    MacroPhase = Ali.Mgt2.Simulation.StockDriftEngine.GetMacroPhaseForWeek(totalWeeks)
+                };
+
+                var driftResult = Ali.Mgt2.Simulation.StockDriftEngine.SimulateWeeklyTick(stockState, totalWeeks, shockAlpha, 0.0, synergy, new System.Random(totalWeeks * 31));
+
+                State.previousSharePrice = State.currentSharePrice;
+                State.currentSharePrice = driftResult.NewSharePrice;
+                State.priceTrendPercent = driftResult.PercentChange;
                 State.marketValuation = (long)Math.Round(State.currentSharePrice * State.totalShares);
+
+                // Poison pill duration check
+                if (State.poisonPillActive && (ms.year * 12 + ms.month) >= State.poisonPillExpiryMonth)
+                {
+                    State.poisonPillActive = false;
+                }
+
+                // AI Competitor creeping takeover simulation
+                SimulateHostileTakeoverTurn(ms);
 
                 if (monthChanged)
                 {
@@ -617,6 +692,176 @@ namespace MGT2Mod.StockMarket
                 State.currentSharePrice = Math.Max(0.01, (double)State.marketValuation / (double)State.totalShares);
             }
         }
+
+        #region Hostile Takeover & Shareholder Defense System
+
+        public static void SimulateHostileTakeoverTurn(mainScript ms)
+        {
+            if (ms == null || StockData.Data == null || !StockData.Data.playerIsPublic) return;
+
+            // Pick or verify hostile rival
+            if (State.hostileRivalCompanyId <= 0)
+            {
+                // 35% chance every few ticks if there is available public float
+                if (UnityEngine.Random.value < 0.25f && State.founderSharePercent < 90f)
+                {
+                    var pubs = GameObject.FindGameObjectsWithTag("Publisher")
+                        .Select(go => go.GetComponent<publisherScript>())
+                        .Where(p => p != null && p.isUnlocked && !p.isPlayer && !p.IsMyTochterfirma() && p.firmenwert >= 5000000L)
+                        .OrderByDescending(p => p.firmenwert)
+                        .ToList();
+
+                    if (pubs.Count > 0)
+                    {
+                        var rival = pubs[UnityEngine.Random.Range(0, Math.Min(3, pubs.Count))];
+                        State.hostileRivalCompanyId = rival.myID;
+                        State.hostileRivalName = rival.GetName();
+                        State.hostileRivalSharePercent = UnityEngine.Random.Range(2.0f, 5.0f);
+                    }
+                }
+            }
+            else
+            {
+                // Active rival attempts creeping accumulation if public float has room
+                float maxRivalCap = 100f - State.founderSharePercent;
+                if (State.hostileRivalSharePercent < maxRivalCap - 1f && !State.poisonPillActive)
+                {
+                    // Rival buys 1.0% to 2.5% every few weeks
+                    if (UnityEngine.Random.value < 0.35f)
+                    {
+                        float increment = UnityEngine.Random.Range(1.0f, 2.5f);
+                        float oldShare = State.hostileRivalSharePercent;
+                        State.hostileRivalSharePercent = Mathf.Clamp(State.hostileRivalSharePercent + increment, 0f, maxRivalCap);
+
+                        // If rival crossed 20% threshold, trigger emergency alert
+                        if (oldShare < 20f && State.hostileRivalSharePercent >= 20f)
+                        {
+                            State.boardDiscontent = Mathf.Clamp(State.boardDiscontent + 20f, 0f, 100f);
+                            string alert = $"<color=red><b>{StockMarketLabels.TakeoverThreatTitle}</b></color>\n\n" +
+                                $"{State.hostileRivalName} has acquired {State.hostileRivalSharePercent:F1}% of studio shares!\n" +
+                                "The Board of Directors strongly urges activating the Poison Pill Defense immediately.";
+
+                            var guiMain = GameObject.Find("CanvasInGameMenu")?.GetComponent<GUI_Main>();
+                            guiMain?.MessageBox(alert, false);
+
+                            Ali.Mgt2.Simulation.CrossSystemBridge.EnqueueEvent("CORPORATE_EVENT",
+                                $"@MarketInsider: عاجل: شركة {State.hostileRivalName} تستحوذ على أكثر من 20% من أسهم استوديوهاتنا في خطوة عدائية مقلقة! #TakeoverDefense");
+                        }
+                    }
+                }
+            }
+        }
+
+        public static bool ExecuteShareBuyback(mainScript ms, GUI_Main guiMain, out string message)
+        {
+            if (ms == null || StockData.Data == null || !StockData.Data.playerIsPublic)
+            {
+                message = "Not public.";
+                return false;
+            }
+
+            if (State.founderSharePercent >= 95f)
+            {
+                message = "Founder already owns max shares (95%).";
+                guiMain?.MessageBox(message, false);
+                return false;
+            }
+
+            double cost = (State.totalShares * 0.05) * State.currentSharePrice * 1.03;
+            long buybackCost = (long)Math.Round(cost);
+
+            if (ms.money < buybackCost)
+            {
+                message = $"Insufficient funds. Required: {ms.GetMoney(buybackCost, true)}";
+                guiMain?.MessageBox(message, false);
+                return false;
+            }
+
+            ms.Pay(buybackCost, FinanceCategory);
+            State.financialAdjustmentThisTick -= buybackCost;
+
+            State.founderSharePercent = Mathf.Clamp(State.founderSharePercent + 5f, 0f, 100f);
+            StockData.Data.playerPublicShare = Mathf.Clamp(StockData.Data.playerPublicShare - 0.05f, 0f, 1f);
+
+            if (State.hostileRivalSharePercent > 0f)
+            {
+                State.hostileRivalSharePercent = Mathf.Max(0f, State.hostileRivalSharePercent - 2.5f);
+            }
+
+            State.investorConfidence = Mathf.Clamp(State.investorConfidence + 6f, 0f, 100f);
+            State.boardDiscontent = Mathf.Clamp(State.boardDiscontent - 8f, 0f, 100f);
+            State.currentSharePrice = Math.Round(State.currentSharePrice * 1.04, 2);
+            State.marketValuation = (long)Math.Round(State.currentSharePrice * State.totalShares);
+
+            message = StockMarketLabels.BuybackSuccess;
+            guiMain?.MessageBox($"<color=#1E8C3A><b>{StockMarketLabels.BuybackSuccess}</b></color>\n\n" +
+                $"{StockMarketLabels.FounderStake} {State.founderSharePercent:F1}%\n" +
+                $"{StockMarketLabels.BuybackCost} {ms.GetMoney(buybackCost, true)}", false);
+
+            Ali.Mgt2.Simulation.CrossSystemBridge.EnqueueEvent("CORPORATE_EVENT",
+                $"@WallStreetHerald: الاستوديو ينفذ بنجاح برنامج إعادة شراء أسهم بقيمة {ms.GetMoney(buybackCost, true)} لتعزيز سيطرة المؤسس وطمأنة المستثمرين!");
+
+            return true;
+        }
+
+        public static bool ExecutePoisonPillDefense(mainScript ms, GUI_Main guiMain, out string message)
+        {
+            if (ms == null || StockData.Data == null || !StockData.Data.playerIsPublic)
+            {
+                message = "Not public.";
+                return false;
+            }
+
+            if (State.hostileRivalSharePercent < 20f)
+            {
+                message = "Poison Pill requires a hostile acquirer owning at least 20%.";
+                guiMain?.MessageBox(message, false);
+                return false;
+            }
+
+            if (State.poisonPillActive)
+            {
+                message = "Poison Pill is already active.";
+                guiMain?.MessageBox(message, false);
+                return false;
+            }
+
+            var targetStock = new Ali.Mgt2.Simulation.CompanyStockState
+            {
+                CompanyId = "PLAYER",
+                SharePrice = State.currentSharePrice,
+                TotalShares = State.totalShares,
+                BoardHostility = 80.0,
+                IndustryRelations = 60.0
+            };
+
+            var defense = Ali.Mgt2.Simulation.StockDriftEngine.EvaluateHostileTakeoverDefense(targetStock, (double)State.hostileRivalSharePercent, 0.0, 0.0);
+
+            State.poisonPillActive = true;
+            State.poisonPillExpiryMonth = (ms.year * 12 + ms.month) + 12;
+
+            float oldRivalShare = State.hostileRivalSharePercent;
+            State.hostileRivalSharePercent = (float)defense.PostDilutionPlayerOwnershipPercent;
+            State.totalShares = defense.NewTotalShares;
+            State.currentSharePrice = targetStock.SharePrice;
+            State.marketValuation = (long)Math.Round(State.currentSharePrice * State.totalShares);
+
+            State.founderSharePercent = Mathf.Clamp(State.founderSharePercent * 1.08f, 51f, 95f);
+            StockData.Data.playerPublicShare = Mathf.Clamp((100f - State.founderSharePercent) / 100f, 0.05f, 0.49f);
+            State.boardDiscontent = Mathf.Clamp(State.boardDiscontent - 20f, 0f, 100f);
+
+            message = StockMarketLabels.PoisonPillSuccess;
+            guiMain?.MessageBox($"<color=#1E8C3A><b>{StockMarketLabels.PoisonPillSuccess}</b></color>\n\n" +
+                $"{State.hostileRivalName} stake diluted from {oldRivalShare:F1}% down to {State.hostileRivalSharePercent:F1}%!\n" +
+                $"Hostile takeover averted for 12 months.", false);
+
+            Ali.Mgt2.Simulation.CrossSystemBridge.EnqueueEvent("CORPORATE_EVENT",
+                $"@FinancialTimes: مجلس إدارة الاستوديو يفعل بنجاح خطة حقوق المساهمين (حبة السم) لإحباط محاولة استحواذ عدائية من {State.hostileRivalName}!");
+
+            return true;
+        }
+
+        #endregion
 
         /// <summary>
         /// Returns a clean status string indicating whether the studio is Private or Public.

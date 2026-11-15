@@ -80,6 +80,92 @@ namespace MGT2Mod.CommunityDynamics
                 Data.overallSentiment = Mathf.Min(0.95f, Data.overallSentiment + 0.02f);
             }
 
+            // Cross-System Bridge: Sync community status to other systems
+            double totalSeverity = Data.activeReviewBombs.Count * 25.0;
+            CrossSystemBridge.SetDouble("ACTIVE_REVIEW_BOMB_SEVERITY", totalSeverity);
+            CrossSystemBridge.SetDouble("COMMUNITY_SENTIMENT", (double)Data.overallSentiment);
+            CrossSystemBridge.SetLong("STUDIO_HYPE", (long)Data.hypePoints);
+
+            // Cross-System Bridge: Poll and process Game Release events from Publishing Deals
+            var gameReleases = CrossSystemBridge.DequeueAllEvents("GAME_RELEASED");
+            foreach (var rel in gameReleases)
+            {
+                var parts = rel.Split('|');
+                if (parts.Length >= 5)
+                {
+                    string title = parts[0];
+                    string dev = parts[1];
+                    if (float.TryParse(parts[3], out float score))
+                    {
+                        if (score >= 85f)
+                        {
+                            AddPost(new SocialPost
+                            {
+                                authorHandle = "@GamingPulse",
+                                content = $"إطلاق أسطوري للعبة {title} من تطوير {dev} وبدعم كامل من شركتنا! اللعبة تكتسح المراجعات بنسبة {score:F0}%!",
+                                gameName = title,
+                                category = 1,
+                                sentiment = 2,
+                                likes = UnityEngine.Random.Range(8000, 25000),
+                                retweets = UnityEngine.Random.Range(2000, 9000),
+                                year = ms.year,
+                                week = ms.week
+                            });
+                            Data.hypePoints = Mathf.Min(100, Data.hypePoints + 15);
+                        }
+                        else if (score <= 45f)
+                        {
+                            AddPost(new SocialPost
+                            {
+                                authorHandle = "@AngryGamer",
+                                content = $"لعبة {title} للمطور {dev} مخيبة للآمال بشكل لا يصدق ({score:F0}%)... مراجعات سلبية عاصفة تجتاح شبكات التواصل!",
+                                gameName = title,
+                                category = 1,
+                                sentiment = 4,
+                                likes = UnityEngine.Random.Range(5000, 15000),
+                                retweets = UnityEngine.Random.Range(1800, 5000),
+                                year = ms.year,
+                                week = ms.week
+                            });
+                            Data.hypePoints = Mathf.Max(0, Data.hypePoints - 10);
+                        }
+                        else
+                        {
+                            AddPost(new SocialPost
+                            {
+                                authorHandle = "@GameReviewDaily",
+                                content = $"صدرت رسمياً لعبة {title} من المطور {dev}! تقييمات متوسطة ({score:F0}%) واستقبال هادئ من مجتمع اللاعبين.",
+                                gameName = title,
+                                category = 1,
+                                sentiment = 0,
+                                likes = UnityEngine.Random.Range(1000, 4000),
+                                retweets = UnityEngine.Random.Range(200, 800),
+                                year = ms.year,
+                                week = ms.week
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Cross-System Bridge: Poll and process Corporate events from Stock Market
+            var corpEvents = CrossSystemBridge.DequeueAllEvents("CORPORATE_EVENT");
+            foreach (var postContent in corpEvents)
+            {
+                AddPost(new SocialPost
+                {
+                    authorHandle = "@BusinessInsider",
+                    content = postContent,
+                    gameName = "",
+                    category = 2,
+                    sentiment = 1,
+                    likes = UnityEngine.Random.Range(3000, 10000),
+                    retweets = UnityEngine.Random.Range(900, 3500),
+                    year = ms.year,
+                    week = ms.week
+                });
+            }
+
             // Generate organic community buzz occasionally
             if (UnityEngine.Random.Range(0, 100) < 40)
             {
